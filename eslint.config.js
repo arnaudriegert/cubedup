@@ -49,16 +49,40 @@ export default tseslint.config(
       '@stylistic/object-curly-newline': ['error', {
         ObjectExpression: {
           multiline: true,
-          minProperties: 3,
+          minProperties: 2,
+          consistent: true,
         },
-        ObjectPattern: { multiline: true },
+        ObjectPattern: {
+          multiline: true,
+          minProperties: 2,
+          consistent: true,
+        },
         ImportDeclaration: 'never',
         ExportDeclaration: {
           multiline: true,
-          minProperties: 3,
+          minProperties: 2,
+          consistent: true,
+        },
+        TSTypeLiteral: {
+          multiline: true,
+          minProperties: 2,
+          consistent: true,
         },
       }],
-      '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: false }],
+      '@stylistic/object-property-newline': ['error', {
+        allowAllPropertiesOnSameLine: false,
+      }],
+      '@stylistic/member-delimiter-style': ['error', {
+        multiline: {
+          delimiter: 'none',
+          requireLast: false,
+        },
+        singleline: {
+          delimiter: 'semi',
+          requireLast: false,
+        },
+      }],
+      '@stylistic/type-annotation-spacing': 'error',
       '@stylistic/array-bracket-spacing': ['error', 'never'],
       '@stylistic/arrow-spacing': ['error', {
         before: true,
@@ -75,6 +99,8 @@ export default tseslint.config(
         named: 'never',
         asyncArrow: 'always',
       }],
+      '@stylistic/function-paren-newline': ['error', 'multiline-arguments'],
+      '@stylistic/function-call-argument-newline': ['error', 'consistent'],
       '@stylistic/space-infix-ops': 'error',
       '@stylistic/eol-last': ['error', 'always'],
       '@stylistic/no-trailing-spaces': 'error',

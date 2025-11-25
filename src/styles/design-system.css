@@ -38,7 +38,7 @@ html {
 }
 
 .section-card {
-  @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-8 mb-12 scroll-mt-60;
+  @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-8 mb-12 scroll-mt-72;
 }
 
 /* Feature Cards */
@@ -76,4 +76,17 @@ html {
 
 .section-nav-link {
   @apply inline-block px-4 py-2 rounded-lg text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 transition-colors font-medium cursor-pointer;
+}
+
+/* Tab Navigation */
+.tab-nav {
+  @apply flex gap-1 bg-slate-200/80 p-1 rounded-lg;
+}
+
+.tab {
+  @apply px-4 py-2 rounded-md text-slate-600 font-medium transition-colors hover:text-slate-800;
+}
+
+.tab-active {
+  @apply px-4 py-2 rounded-md bg-white text-indigo-700 font-semibold shadow-sm;
 }

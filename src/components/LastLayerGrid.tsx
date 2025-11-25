@@ -2,9 +2,20 @@ import { useMemo } from 'react'
 import { Color, LastLayerColors, TopFaceColors, SideRowColors } from '../types/cube'
 
 // Tailwind classes must be complete strings for JIT compilation
-const STICKER_SIZE = 'size-12'
-const SIDE_STICKER_HORIZONTAL_SIZE = 'w-12 h-8'
-const SIDE_STICKER_VERTICAL_SIZE = 'w-8 h-12'
+type GridSize = 'normal' | 'compact'
+
+const STICKER_SIZES: Record<GridSize, string> = {
+  normal: 'size-12',
+  compact: 'size-4',
+}
+const SIDE_STICKER_HORIZONTAL_SIZES: Record<GridSize, string> = {
+  normal: 'w-12 h-8',
+  compact: 'w-4 h-2',
+}
+const SIDE_STICKER_VERTICAL_SIZES: Record<GridSize, string> = {
+  normal: 'w-8 h-12',
+  compact: 'w-2 h-4',
+}
 const STICKER_SPACING = 'gap-[2px] p-[2px]'
 
 const colorToTailwind: Record<Color, string> = {
@@ -36,25 +47,28 @@ const middleBorderRadius: Record<Exclude<StickerLocation, 'top'>, string> = {
 type StickerLocation = 'top' | 'back' | 'front' | 'left' | 'right'
 
 interface StickerProps {
-  color: Color;
-  location: StickerLocation;
-  position?: number; // Position within the face (0-8 for top, 0-2 for sides)
-  className?: string;
+  color: Color
+  location: StickerLocation
+  position?: number // Position within the face (0-8 for top, 0-2 for sides)
+  size?: GridSize
+  className?: string
 }
 
-function Sticker({ color, location, position = 0, className = '' }: StickerProps) {
+function Sticker({
+  color, location, position = 0, size = 'normal', className = '',
+}: StickerProps) {
   const bgColor = colorToTailwind[color] || colorToTailwind[Color.GRAY]
 
   // Determine size classes based on location
   const sizeClasses = useMemo(() => {
     if (location === 'top') {
-      return STICKER_SIZE
+      return STICKER_SIZES[size]
     } else if (location === 'back' || location === 'front') {
-      return SIDE_STICKER_HORIZONTAL_SIZE
+      return SIDE_STICKER_HORIZONTAL_SIZES[size]
     } else {
-      return SIDE_STICKER_VERTICAL_SIZE
+      return SIDE_STICKER_VERTICAL_SIZES[size]
     }
-  }, [location])
+  }, [location, size])
 
   // Determine border radius based on location and position
   const borderRadius = useMemo(() => {
@@ -75,11 +89,14 @@ function Sticker({ color, location, position = 0, className = '' }: StickerProps
 }
 
 export interface TopFaceProps {
-  colors: TopFaceColors;
-  className?: string;
+  colors: TopFaceColors
+  size?: GridSize
+  className?: string
 }
 
-export function TopFace({ colors, className = '' }: TopFaceProps) {
+export function TopFace({
+  colors, size = 'normal', className = '',
+}: TopFaceProps) {
   return (
     <div className={`grid grid-cols-3 ${STICKER_SPACING} bg-gray-800 ${className}`}>
       {colors.map((color, i) => (
@@ -88,6 +105,7 @@ export function TopFace({ colors, className = '' }: TopFaceProps) {
           color={color}
           location="top"
           position={i}
+          size={size}
         />
       ))}
     </div>
@@ -95,12 +113,15 @@ export function TopFace({ colors, className = '' }: TopFaceProps) {
 }
 
 interface SideRowProps {
-  colors: SideRowColors;
-  side: 'back' | 'front' | 'left' | 'right';
-  className?: string;
+  colors: SideRowColors
+  side: 'back' | 'front' | 'left' | 'right'
+  size?: GridSize
+  className?: string
 }
 
-function SideRow({ colors, side, className = '' }: SideRowProps) {
+function SideRow({
+  colors, side, size = 'normal', className = '',
+}: SideRowProps) {
   const isVertical = side === 'left' || side === 'right'
   const layout = isVertical ? 'flex-col' : 'flex-row'
   const borderRadius = useMemo(() => {
@@ -124,6 +145,7 @@ function SideRow({ colors, side, className = '' }: SideRowProps) {
           color={color}
           location={side}
           position={i}
+          size={size}
         />
       ))}
     </div>
@@ -131,28 +153,34 @@ function SideRow({ colors, side, className = '' }: SideRowProps) {
 }
 
 interface LastLayerGridProps {
-  colors: LastLayerColors;
+  colors: LastLayerColors
+  size?: GridSize
 }
 
 /**
  * LastLayerGrid - Displays the last layer of a Rubik's cube
  * @param colors - Structured colors for top, back, left, right, front faces
+ * @param size - 'normal' (default) or 'compact' for smaller display
  */
-export default function LastLayerGrid({ colors }: LastLayerGridProps) {
+export default function LastLayerGrid({
+  colors, size = 'normal',
+}: LastLayerGridProps) {
   return (
     <div className="inline-flex flex-col items-center gap-1">
       {/* Back side */}
-      <SideRow colors={colors.back} side="back" />
+      <SideRow colors={colors.back} side="back" size={size} />
 
       {/* Middle row: Left + Top face + Right */}
       <div className="flex flex-row gap-1 items-center">
-        <SideRow colors={colors.left} side="left" />
-        <TopFace colors={colors.top} />
-        <SideRow colors={colors.right} side="right" />
+        <SideRow colors={colors.left} side="left" size={size} />
+        <TopFace colors={colors.top} size={size} />
+        <SideRow colors={colors.right} side="right" size={size} />
       </div>
 
       {/* Front side */}
-      <SideRow colors={colors.front} side="front" />
+      <SideRow colors={colors.front} side="front" size={size} />
     </div>
   )
 }
+
+export type { GridSize }

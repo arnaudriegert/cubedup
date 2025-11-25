@@ -26,10 +26,10 @@ export enum Orientation {
 //
 // Side faces: Back[0,1,2], Left[0,1,2], Right[0,1,2], Front[0,1,2]
 type SideMapping = {
-  back?: number;
-  left?: number;
-  right?: number;
-  front?: number;
+  back?: number
+  left?: number
+  right?: number
+  front?: number
 }
 
 export const TOP_TO_SIDES: Record<number, SideMapping> = {
@@ -105,9 +105,9 @@ export type SideRowColors = [
 ]
 
 export interface LastLayerColors {
-  top: TopFaceColors;
-  back: SideRowColors;
-  left: SideRowColors;
-  right: SideRowColors;
-  front: SideRowColors;
+  top: TopFaceColors
+  back: SideRowColors
+  left: SideRowColors
+  right: SideRowColors
+  front: SideRowColors
 }

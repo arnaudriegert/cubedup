@@ -1,24 +1,24 @@
 import { Orientation, OLLOrientations } from '../types/cube'
 
 export interface Algorithm {
-  full: string;
-  shorthand?: string;
+  full: string
+  shorthand?: string
 }
 
 export interface OLLCase {
-  number: number;
-  name: string;
-  orientations: OLLOrientations;
-  algorithms: Algorithm[];
+  number: number
+  name: string
+  orientations: OLLOrientations
+  algorithms: Algorithm[]
 }
 
 // Can be either a related pair of cases or a single case
 export type OLLEntry = [OLLCase, OLLCase] | [OLLCase]
 
 export interface OLLCategory {
-  name: string;
-  description: string;
-  cases: OLLEntry[];
+  name: string
+  description: string
+  cases: OLLEntry[]
 }
 
 // OLL Cases organized by shape categories

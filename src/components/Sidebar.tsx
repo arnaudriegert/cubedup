@@ -3,7 +3,12 @@ import { Link, useLocation } from 'react-router-dom'
 export default function Sidebar() {
   const location = useLocation()
 
-  const isActive = (path: string) => location.pathname === path
+  const isActive = (path: string) => {
+    if (path === '/oll') {
+      return location.pathname.startsWith('/oll')
+    }
+    return location.pathname === path
+  }
 
   return (
     <nav className="sidebar">

@@ -1,6 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import OLL from './pages/OLL'
+import OLLOverview from './pages/OLLOverview'
+import OLLDetailed from './pages/OLLDetailed'
 import Sidebar from './components/Sidebar'
 
 function App() {
@@ -11,7 +13,11 @@ function App() {
         <div className="flex-1 ml-48">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/oll" element={<OLL />} />
+            <Route path="/oll" element={<OLL />}>
+              <Route index element={<Navigate to="overview" replace />} />
+              <Route path="overview" element={<OLLOverview />} />
+              <Route path="detailed" element={<OLLDetailed />} />
+            </Route>
           </Routes>
         </div>
       </div>
