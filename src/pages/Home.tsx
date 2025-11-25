@@ -46,10 +46,12 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="feature-card">
+            <div className="feature-card-active">
               <h3 className="text-xl font-bold text-gray-800 mb-2">4. PLL</h3>
-              <p className="text-gray-600 mb-4">Permute Last Layer - 21 algorithms</p>
-              <span className="text-sm text-gray-500 italic">Coming Soon</span>
+              <p className="text-gray-700 mb-4">Permute Last Layer - 21 algorithms organized by symmetry</p>
+              <Link to="/pll" className="btn-primary">
+                Start Learning →
+              </Link>
             </div>
           </div>
         </section>

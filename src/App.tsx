@@ -3,6 +3,9 @@ import Home from './pages/Home'
 import OLL from './pages/OLL'
 import OLLOverview from './pages/OLLOverview'
 import OLLDetailed from './pages/OLLDetailed'
+import PLL from './pages/PLL'
+import PLLOverview from './pages/PLLOverview'
+import PLLDetailed from './pages/PLLDetailed'
 import Sidebar from './components/Sidebar'
 
 function App() {
@@ -17,6 +20,11 @@ function App() {
               <Route index element={<Navigate to="overview" replace />} />
               <Route path="overview" element={<OLLOverview />} />
               <Route path="detailed" element={<OLLDetailed />} />
+            </Route>
+            <Route path="/pll" element={<PLL />}>
+              <Route index element={<Navigate to="overview" replace />} />
+              <Route path="overview" element={<PLLOverview />} />
+              <Route path="detailed" element={<PLLDetailed />} />
             </Route>
           </Routes>
         </div>

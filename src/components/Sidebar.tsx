@@ -7,6 +7,9 @@ export default function Sidebar() {
     if (path === '/oll') {
       return location.pathname.startsWith('/oll')
     }
+    if (path === '/pll') {
+      return location.pathname.startsWith('/pll')
+    }
     return location.pathname === path
   }
 
@@ -41,9 +44,12 @@ export default function Sidebar() {
         >
           3. OLL
         </Link>
-        <div className="sidebar-link opacity-50 cursor-not-allowed">
+        <Link
+          to="/pll"
+          className={isActive('/pll') ? 'sidebar-link-active' : 'sidebar-link'}
+        >
           4. PLL
-        </div>
+        </Link>
       </div>
     </nav>
   )
