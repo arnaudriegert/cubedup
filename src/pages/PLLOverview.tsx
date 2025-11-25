@@ -1,9 +1,19 @@
-import { memo, useRef, useEffect, useCallback } from 'react'
+import { memo, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
 import AlgorithmText from '../components/AlgorithmText'
+
+// Build a map from case name to category name
+const categoryByCase = new Map<string, string>()
+for (const category of pllCategories) {
+  for (const entry of category.cases) {
+    for (const c of entry) {
+      categoryByCase.set(c.name.toLowerCase(), category.name)
+    }
+  }
+}
 
 // Flatten all PLL cases for the overview grid (static, computed once)
 const allCases: PLLCase[] = (() => {
@@ -112,8 +122,17 @@ export default function PLLOverview() {
     debouncedSearch,
     setSearch,
     clearSearch,
+    selectedCategory,
   } = useOutletContext<PLLContextType>()
   const gridRef = useRef<HTMLDivElement>(null)
+
+  // Filter cases based on selected category
+  const filteredCases = useMemo(() => {
+    if (selectedCategory === null) {
+      return allCases
+    }
+    return allCases.filter(c => categoryByCase.get(c.name.toLowerCase()) === selectedCategory)
+  }, [selectedCategory])
 
   // Derive expanded case from search
   const searchLower = debouncedSearch.toLowerCase().trim()
@@ -160,7 +179,7 @@ export default function PLLOverview() {
         className="grid gap-4"
         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(7rem, 1fr))' }}
       >
-        {allCases.map((pllCase) => (
+        {filteredCases.map((pllCase) => (
           <CompactCard
             key={pllCase.name}
             pllCase={pllCase}

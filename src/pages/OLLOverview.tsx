@@ -1,9 +1,19 @@
-import { memo, useRef, useEffect, useCallback } from 'react'
+import { memo, useRef, useEffect, useCallback, useMemo } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
 import AlgorithmText from '../components/AlgorithmText'
+
+// Build a map from case number to category name
+const categoryByCase = new Map<number, string>()
+for (const category of ollCategories) {
+  for (const entry of category.cases) {
+    for (const c of entry) {
+      categoryByCase.set(c.number, category.name)
+    }
+  }
+}
 
 // Flatten all OLL cases for the overview grid (static, computed once)
 const allCases: OLLCase[] = (() => {
@@ -112,8 +122,17 @@ export default function OLLOverview() {
     debouncedSearch,
     setSearch,
     clearSearch,
+    selectedCategory,
   } = useOutletContext<OLLContextType>()
   const gridRef = useRef<HTMLDivElement>(null)
+
+  // Filter cases based on selected category
+  const filteredCases = useMemo(() => {
+    if (selectedCategory === null) {
+      return allCases
+    }
+    return allCases.filter(c => categoryByCase.get(c.number) === selectedCategory)
+  }, [selectedCategory])
 
   // Derive expanded case from search
   const searchNum = parseInt(debouncedSearch, 10)
@@ -160,7 +179,7 @@ export default function OLLOverview() {
         className="grid gap-4"
         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(7rem, 1fr))' }}
       >
-        {allCases.map((ollCase) => (
+        {filteredCases.map((ollCase) => (
           <CompactCard
             key={ollCase.number}
             ollCase={ollCase}

@@ -83,6 +83,10 @@ html {
   @apply inline-block px-4 py-2 rounded-lg text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 transition-colors font-medium cursor-pointer;
 }
 
+.section-nav-link-active {
+  @apply inline-block px-4 py-2 rounded-lg bg-indigo-100 text-indigo-700 font-semibold cursor-pointer;
+}
+
 /* Tab Navigation */
 .tab-nav {
   @apply flex gap-1 bg-slate-200/80 p-1 rounded-lg;

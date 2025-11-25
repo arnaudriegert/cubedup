@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { pllCategories } from '../data/pllCases'
+import CategoryNav from '../components/CategoryNav'
 
 // Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -30,12 +31,14 @@ export interface PLLContextType {
   highlightedPll: string | null
   setSearch: (value: string) => void
   clearSearch: () => void
+  selectedCategory: string | null
 }
 
 export default function PLL() {
   const location = useLocation()
   const [searchValue, setSearchValue] = useState('')
   const [instantValue, setInstantValue] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const debouncedFromInput = useDebounce(searchValue, 500)
@@ -106,6 +109,7 @@ export default function PLL() {
     highlightedPll,
     setSearch: setSearchImmediate,
     clearSearch,
+    selectedCategory,
   }
 
   return (
@@ -159,21 +163,13 @@ export default function PLL() {
               />
             </div>
 
-            {/* Category links - only in detailed view */}
-            {!isOverview && (
-              <div className="flex flex-wrap gap-2 justify-center items-center">
-                <span className="text-slate-500 text-sm mr-2">Jump to:</span>
-                {pllCategories.map((category) => (
-                  <a
-                    key={category.name}
-                    href={`#${category.name.replace(/\s+/g, '-').toLowerCase()}`}
-                    className="section-nav-link"
-                  >
-                    {category.name}
-                  </a>
-                ))}
-              </div>
-            )}
+            {/* Category navigation */}
+            <CategoryNav
+              categories={pllCategories}
+              mode={isOverview ? 'filter' : 'jump'}
+              selectedCategory={selectedCategory}
+              onCategorySelect={setSelectedCategory}
+            />
           </div>
         </nav>
       </div>
