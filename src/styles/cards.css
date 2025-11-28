@@ -19,7 +19,7 @@
 }
 
 .compact-card-expanded {
-  @apply col-span-2 row-span-2 sm:col-span-3 md:col-span-4 p-4 bg-white rounded-xl shadow-lg border-2 border-blue-300;
+  @apply col-span-2 row-span-2 sm:col-span-3 p-4 bg-white rounded-xl shadow-lg border-2 border-blue-300;
 }
 
 /* Pair Container */

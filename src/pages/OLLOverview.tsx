@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom'
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
-import AlgorithmText from '../components/AlgorithmText'
+import AlgorithmBox from '../components/AlgorithmBox'
 
 // Build a map from case number to category name
 const categoryByCase = new Map<number, string>()
@@ -81,22 +81,12 @@ const CompactCard = memo(function CompactCard({
             OLL {ollCase.number} - {ollCase.name}
           </h3>
           <div className="mb-6">
-            <OLLGrid orientations={ollCase.orientations} />
+            <OLLGrid orientations={ollCase.orientations} size="medium" />
           </div>
           <div className="w-full space-y-2">
-            {ollCase.algorithms.map((algorithm, i) => {
-              const displayText = algorithm.shorthand || algorithm.full
-              return (
-                <div key={i} className="algorithm-box text-center group-hover:algorithm-box-hover">
-                  <div className="group-hover:hidden">
-                    <AlgorithmText text={displayText} />
-                  </div>
-                  <div className="hidden group-hover:block">
-                    <AlgorithmText text={algorithm.full} />
-                  </div>
-                </div>
-              )
-            })}
+            {ollCase.algorithms.map((algorithm, i) => (
+              <AlgorithmBox key={i} algorithm={algorithm} />
+            ))}
           </div>
         </div>
       ) : (

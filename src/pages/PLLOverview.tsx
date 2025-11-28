@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
-import AlgorithmText from '../components/AlgorithmText'
+import AlgorithmBox from '../components/AlgorithmBox'
 import { Color } from '../types/cube'
 
 // Build a map from case name to category name
@@ -84,22 +84,12 @@ const CompactCard = memo(function CompactCard({
             {pllCase.name}
           </h3>
           <div className="mb-6">
-            <PLLGrid pllCase={pllCase} selectedColor={selectedColor} />
+            <PLLGrid pllCase={pllCase} selectedColor={selectedColor} size="medium" />
           </div>
           <div className="w-full space-y-2">
-            {pllCase.algorithms.map((algorithm, i) => {
-              const displayText = algorithm.shorthand || algorithm.full
-              return (
-                <div key={i} className="algorithm-box text-center group-hover:algorithm-box-hover">
-                  <div className="group-hover:hidden">
-                    <AlgorithmText text={displayText} />
-                  </div>
-                  <div className="hidden group-hover:block">
-                    <AlgorithmText text={algorithm.full} />
-                  </div>
-                </div>
-              )
-            })}
+            {pllCase.algorithms.map((algorithm, i) => (
+              <AlgorithmBox key={i} algorithm={algorithm} />
+            ))}
           </div>
         </div>
       ) : (
