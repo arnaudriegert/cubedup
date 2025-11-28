@@ -73,17 +73,11 @@ const CompactCard = memo(function CompactCard({
           handleClick()
         }
       }}
-      className={`
-        cursor-pointer transition-all duration-300 ease-in-out
-        ${isExpanded
-      ? 'col-span-2 row-span-2 sm:col-span-3 md:col-span-4 p-4 bg-white rounded-xl shadow-lg border-2 border-blue-300'
-      : 'p-3 bg-white rounded-lg shadow hover:shadow-md hover:scale-105 border border-gray-200'
-    }
-      `}
+      className={isExpanded ? 'compact-card-expanded' : 'compact-card'}
     >
       {isExpanded ? (
         <div className="group flex flex-col items-center">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">
+          <h3 className="case-card-title">
             OLL {ollCase.number} - {ollCase.name}
           </h3>
           <div className="mb-6">
@@ -173,7 +167,7 @@ export default function OLLOverview() {
   }, [setSearch])
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8">
+    <main className="main-content-overview">
       <div
         ref={gridRef}
         className="grid gap-4"

@@ -1,0 +1,29 @@
+/* Color Remote */
+.color-remote {
+  @apply fixed right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2 bg-gray-900/80 backdrop-blur-sm rounded-full px-2 py-3 shadow-lg;
+}
+
+.color-remote-btn {
+  @apply size-8 rounded-full transition-all;
+}
+
+.color-remote-btn-active {
+  @apply ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110;
+}
+
+.color-remote-btn-inactive {
+  @apply hover:scale-105 opacity-70 hover:opacity-100;
+}
+
+/* Algorithm Text Styling */
+.algo-strikethrough {
+  @apply line-through opacity-50;
+}
+
+.algo-bold {
+  @apply font-bold text-blue-600;
+}
+
+.algo-brackets {
+  @apply text-purple-600;
+}

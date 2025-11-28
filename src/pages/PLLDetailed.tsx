@@ -14,9 +14,9 @@ function PLLCaseCard({
   selectedColor: Color
 }) {
   return (
-    <div className={`group pll-case-card transition-all duration-300 ${isHighlighted ? 'ring-4 ring-blue-500 ring-offset-2 scale-[1.02]' : ''}`}>
+    <div className={`group case-card transition-all duration-300 ${isHighlighted ? 'case-card-highlight' : ''}`}>
       <div className="flex flex-col items-center">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">
+        <h3 className="case-card-title">
           {pllCase.name}
         </h3>
 
@@ -62,7 +62,7 @@ export default function PLLDetailed() {
         return
       }
       // Don't clear if clicking on a card
-      if (target.closest('.pll-case-card')) {
+      if (target.closest('.case-card')) {
         return
       }
       clearSearch()
@@ -74,11 +74,11 @@ export default function PLLDetailed() {
   return (
     <>
       {/* Main content */}
-      <main className="max-w-5xl mx-auto px-8 py-8 my-8">
+      <main className="main-content-detailed">
         {pllCategories.map((category, categoryIndex) => (
-          <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="section-card">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">{category.name}</h2>
-            <p className="text-gray-700 italic mb-8">{category.description}</p>
+          <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
+            <h2 className="section-title">{category.name}</h2>
+            <p className="section-description">{category.description}</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {(() => {
@@ -96,7 +96,7 @@ export default function PLLDetailed() {
                   if (isRelatedPair) {
                     rendered.push(
                       <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`} className="md:col-span-2">
-                        <div id={`pll-${entry[1].name.toLowerCase()}`} className="border-2 border-blue-200 rounded-lg bg-blue-50/30 p-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div id={`pll-${entry[1].name.toLowerCase()}`} className="pair-container">
                           <PLLCaseCard pllCase={entry[0]} isHighlighted={highlightedPll === entry[0].name.toLowerCase()} selectedColor={selectedColor} />
                           <PLLCaseCard pllCase={entry[1]} isHighlighted={highlightedPll === entry[1].name.toLowerCase()} selectedColor={selectedColor} />
                         </div>
@@ -120,7 +120,7 @@ export default function PLLDetailed() {
         ))}
       </main>
 
-      <footer className="text-center py-6 text-gray-600">
+      <footer className="page-footer">
         <p>&copy; 2025 CFOP Learning Guide</p>
       </footer>
     </>

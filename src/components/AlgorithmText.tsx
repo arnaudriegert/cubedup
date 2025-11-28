@@ -8,19 +8,19 @@ export default function AlgorithmText({ text }: { text: string }) {
       {parts.map((part, i) => {
         if (part.match(/^~.+~$/)) {
           return (
-            <span key={i} className="line-through opacity-50">
+            <span key={i} className="algo-strikethrough">
               {part.slice(1, -1)}
             </span>
           )
         } else if (part.match(/^\*\*.+\*\*$/)) {
           return (
-            <span key={i} className="font-bold text-blue-600">
+            <span key={i} className="algo-bold">
               {part.slice(2, -2)}
             </span>
           )
         } else if (part.match(/^\[.+\]$/)) {
           return (
-            <span key={i} className="text-purple-600">
+            <span key={i} className="algo-brackets">
               {part}
             </span>
           )

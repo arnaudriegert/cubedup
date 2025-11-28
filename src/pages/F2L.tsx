@@ -43,15 +43,13 @@ function F2LCaseCard({
   slot, algorithm, generateFaces,
 }: F2LCaseCardProps) {
   const isLeft = slot === 'left'
-  const bgColor = isLeft ? 'bg-blue-50' : 'bg-green-50'
-  const textColor = isLeft ? 'text-blue-800' : 'text-green-800'
   const label = isLeft ? 'Left Slot (FL)' : 'Right Slot (FR)'
   const view = isLeft ? 'top-front-left' : 'top-front-right'
   const colorRotations = isLeft ? colorRotationsLeft : colorRotationsRight
 
   return (
-    <div className={`${bgColor} rounded-xl p-6`}>
-      <h4 className={`font-semibold ${textColor} mb-4 text-center text-lg`}>{label}</h4>
+    <div className="case-card">
+      <h4 className="case-card-title text-center">{label}</h4>
       <div className="grid grid-cols-2 gap-x-4 gap-y-4 justify-items-center mb-6">
         {colorRotations.map((colors, i) => (
           <IsometricCube
@@ -62,7 +60,7 @@ function F2LCaseCard({
           />
         ))}
       </div>
-      <div className="algorithm-box text-center bg-white">
+      <div className="algorithm-box text-center">
         <AlgorithmText text={algorithm} />
       </div>
     </div>
@@ -81,10 +79,10 @@ export default function F2L() {
         </header>
       </div>
 
-      <main className="max-w-6xl mx-auto px-8 py-8">
+      <main className="main-content-wide">
         {/* Introduction */}
         <div className="section-card text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">The Goal</h2>
+          <h2 className="section-subtitle">The Goal</h2>
           <div className="flex flex-wrap justify-center items-center gap-8">
             <IsometricCube
               faces={{
@@ -96,10 +94,10 @@ export default function F2L() {
               size="normal"
             />
             <div className="text-left max-w-md">
-              <p className="text-gray-700 mb-2">
+              <p className="body-text mb-2">
                 <strong>Insert corner-edge pairs</strong> into the 4 slots around the bottom layer.
               </p>
-              <p className="text-gray-600 text-sm">
+              <p className="help-text">
                 Each pattern shows all 4 color variations.
                 Focus on recognizing the <em>relationship</em> between corner and edge, not specific colors.
               </p>
@@ -108,7 +106,7 @@ export default function F2L() {
         </div>
 
         {/* Basic Patterns */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="section-subtitle-centered">
           Basic Patterns
         </h2>
         <p className="text-gray-600 text-center mb-6 max-w-2xl mx-auto">
@@ -117,9 +115,9 @@ export default function F2L() {
         </p>
 
         {/* Case 1: Joined Pair - Easy Insert */}
-        <div className="section-card mb-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">1. Joined Pair - Easy Insert</h3>
-          <p className="text-gray-600 mb-4 text-center">
+        <div className="case-group">
+          <h3 className="card-title-centered mb-2">1. Joined Pair - Easy Insert</h3>
+          <p className="help-text mb-6 text-center">
             Corner and edge already paired (touching, colors aligned). Pair is in front, slot is behind.
             U move hides pair, then insert.
           </p>
@@ -176,9 +174,9 @@ export default function F2L() {
         </div>
 
         {/* Case 2: Split Pair - Three Move Insert */}
-        <div className="section-card mb-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-2 text-center">2. Split Pair - Three Move Insert</h3>
-          <p className="text-gray-600 mb-4 text-center">
+        <div className="case-group">
+          <h3 className="card-title-centered mb-2">2. Split Pair - Three Move Insert</h3>
+          <p className="help-text mb-6 text-center">
             Corner and edge separated. Corner in front with white facing sideways.
             Edge in back with front-color facing up.
           </p>
@@ -230,7 +228,7 @@ export default function F2L() {
         </div>
       </main>
 
-      <footer className="text-center py-6 text-gray-600">
+      <footer className="page-footer">
         <p>&copy; 2025 CFOP Learning Guide</p>
       </footer>
     </div>

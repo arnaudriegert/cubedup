@@ -30,10 +30,10 @@ export default function Cross() {
         </header>
       </div>
 
-      <main className="max-w-6xl mx-auto px-8 py-8">
+      <main className="main-content-wide">
         {/* Introduction */}
         <div className="section-card text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">The Goal</h2>
+          <h2 className="section-subtitle">The Goal</h2>
           <div className="flex flex-wrap justify-center items-center gap-8">
             <IsometricCube
               faces={{
@@ -45,10 +45,10 @@ export default function Cross() {
               size="normal"
             />
             <div className="text-left max-w-md">
-              <p className="text-gray-700 mb-2">
+              <p className="body-text mb-2">
                 <strong>White cross on bottom</strong>, with edges matching center colors.
               </p>
-              <p className="text-gray-600 text-sm">
+              <p className="help-text">
                 Each pattern below shows all 4 color variations to build pattern recognition.
               </p>
             </div>
@@ -61,7 +61,7 @@ export default function Cross() {
         </div>
       </main>
 
-      <footer className="text-center py-6 text-gray-600">
+      <footer className="page-footer">
         <p>&copy; 2025 CFOP Learning Guide</p>
       </footer>
     </div>

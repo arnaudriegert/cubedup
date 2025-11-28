@@ -159,11 +159,7 @@ export default function PLL() {
                 onChange={(e) => setSearchValue(e.target.value)}
                 placeholder="PLL name (press /)"
                 aria-label="Search PLL case by name"
-                className={`w-40 px-3 py-2 text-sm rounded-lg bg-white text-gray-800 placeholder-gray-400 border-2 focus:outline-none transition-colors ${
-                  isInvalidSearch
-                    ? 'border-red-400 focus:border-red-500'
-                    : 'border-gray-200 focus:border-blue-500'
-                }`}
+                className={`w-40 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}
               />
             </div>
 

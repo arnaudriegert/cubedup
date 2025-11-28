@@ -11,15 +11,15 @@ export default function ColorRemote({
   onColorSelect,
 }: ColorRemoteProps) {
   return (
-    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2 bg-gray-900/80 backdrop-blur-sm rounded-full px-2 py-3 shadow-lg">
+    <div className="color-remote">
       {SIDE_COLORS.map((color) => (
         <button
           key={color}
           onClick={() => onColorSelect(color)}
-          className={`size-8 rounded-full ${colorToTailwind[color]} transition-all ${
+          className={`color-remote-btn ${colorToTailwind[color]} ${
             selectedColor === color
-              ? 'ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110'
-              : 'hover:scale-105 opacity-70 hover:opacity-100'
+              ? 'color-remote-btn-active'
+              : 'color-remote-btn-inactive'
           }`}
           aria-label={`Show ${color} color variant`}
           aria-pressed={selectedColor === color}
