@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import NavLinks from './NavLinks'
 import Logo from './Logo'
 
@@ -29,10 +30,14 @@ export default function Sidebar() {
 
       {/* Mobile: Slide-out menu */}
       <nav className={`mobile-nav-menu md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4 border-b border-slate-200 flex items-center gap-3">
+        <Link
+          to="/"
+          onClick={() => setIsOpen(false)}
+          className="p-4 border-b border-slate-200 flex items-center gap-3"
+        >
           <Logo className="size-10" />
-          <h2 className="text-lg font-bold text-indigo-700">CFOP Guide</h2>
-        </div>
+          <span className="text-lg font-bold text-indigo-700">CFOP Guide</span>
+        </Link>
         <div className="p-4 space-y-1">
           <NavLinks onLinkClick={() => setIsOpen(false)} />
         </div>
@@ -40,10 +45,10 @@ export default function Sidebar() {
 
       {/* Desktop: Sidebar */}
       <nav className="sidebar hidden md:block">
-        <div className="mb-8 flex items-center gap-3">
+        <Link to="/" className="mb-8 flex items-center gap-3">
           <Logo className="size-12" />
-          <h2 className="text-xl font-bold text-indigo-700">CFOP Guide</h2>
-        </div>
+          <span className="text-xl font-bold text-indigo-700">CFOP Guide</span>
+        </Link>
         <div className="space-y-1">
           <NavLinks showDivider />
         </div>
