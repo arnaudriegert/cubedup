@@ -2,18 +2,21 @@ import { useMemo } from 'react'
 import { Color, LastLayerColors, TopFaceColors, SideRowColors } from '../types/cube'
 
 // Tailwind classes must be complete strings for JIT compilation
-type GridSize = 'normal' | 'compact'
+type GridSize = 'normal' | 'medium' | 'compact'
 
 const STICKER_SIZES: Record<GridSize, string> = {
   normal: 'size-12',
+  medium: 'size-8',
   compact: 'size-4',
 }
 const SIDE_STICKER_HORIZONTAL_SIZES: Record<GridSize, string> = {
   normal: 'w-12 h-8',
+  medium: 'w-8 h-5',
   compact: 'w-4 h-2',
 }
 const SIDE_STICKER_VERTICAL_SIZES: Record<GridSize, string> = {
   normal: 'w-8 h-12',
+  medium: 'w-5 h-8',
   compact: 'w-2 h-4',
 }
 const STICKER_SPACING = 'gap-[2px] p-[2px]'

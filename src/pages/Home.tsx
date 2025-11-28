@@ -32,10 +32,12 @@ export default function Home() {
               <span className="text-sm text-gray-500 italic">Coming Soon</span>
             </div>
 
-            <div className="feature-card">
+            <div className="feature-card-active">
               <h3 className="text-xl font-bold text-gray-800 mb-2">2. F2L</h3>
-              <p className="text-gray-600 mb-4">First Two Layers - pair and insert corners with edges</p>
-              <span className="text-sm text-gray-500 italic">Coming Soon</span>
+              <p className="text-gray-700 mb-4">First Two Layers - pair and insert corners with edges</p>
+              <Link to="/f2l" className="btn-primary">
+                Start Learning →
+              </Link>
             </div>
 
             <div className="feature-card-active">

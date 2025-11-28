@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
+import F2L from './pages/F2L'
 import OLL from './pages/OLL'
 import OLLOverview from './pages/OLLOverview'
 import OLLDetailed from './pages/OLLDetailed'
@@ -16,6 +17,7 @@ function App() {
         <div className="flex-1 ml-48">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/f2l" element={<F2L />} />
             <Route path="/oll" element={<OLL />}>
               <Route index element={<Navigate to="overview" replace />} />
               <Route path="overview" element={<OLLOverview />} />

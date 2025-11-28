@@ -10,6 +10,9 @@ export default function Sidebar() {
     if (path === '/pll') {
       return location.pathname.startsWith('/pll')
     }
+    if (path === '/f2l') {
+      return location.pathname.startsWith('/f2l')
+    }
     return location.pathname === path
   }
 
@@ -35,9 +38,12 @@ export default function Sidebar() {
         <div className="sidebar-link opacity-50 cursor-not-allowed">
           1. Cross
         </div>
-        <div className="sidebar-link opacity-50 cursor-not-allowed">
+        <Link
+          to="/f2l"
+          className={isActive('/f2l') ? 'sidebar-link-active' : 'sidebar-link'}
+        >
           2. F2L
-        </div>
+        </Link>
         <Link
           to="/oll"
           className={isActive('/oll') ? 'sidebar-link-active' : 'sidebar-link'}
