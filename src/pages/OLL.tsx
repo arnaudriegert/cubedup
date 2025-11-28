@@ -113,19 +113,18 @@ export default function OLL() {
 
   return (
     <div className="page-bg">
-      <div className="sticky top-0 z-20">
-        {/* Header */}
-        <header className="header-gradient text-center py-10">
-          <h1 className="text-4xl font-bold mb-2">
-            OLL - Orientation of Last Layer
-          </h1>
-          <p className="text-slate-300 text-sm">
-            Orient all pieces on the last layer
-          </p>
-        </header>
+      {/* Header */}
+      <header className="header-gradient text-center py-10">
+        <h1 className="page-header-title">
+          OLL - Orientation of Last Layer
+        </h1>
+        <p className="page-header-subtitle text-slate-300">
+          Orient all pieces on the last layer
+        </p>
+      </header>
 
-        {/* Tab nav + Search + Category links */}
-        <nav className="section-nav">
+      {/* Tab nav + Search + Category links */}
+      <nav className="section-nav sticky top-0 z-20">
           <div className="max-w-5xl mx-auto flex flex-col gap-3">
             {/* Top row: Tabs + Search */}
             <div className="flex justify-between items-center">
@@ -168,7 +167,6 @@ export default function OLL() {
             />
           </div>
         </nav>
-      </div>
 
       {/* Child route content */}
       <Outlet context={outletContext} />

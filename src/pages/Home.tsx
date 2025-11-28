@@ -3,16 +3,14 @@ import { Link } from 'react-router-dom'
 export default function Home() {
   return (
     <div className="page-bg">
-      <div className="sticky top-0 z-20">
-        <header className="header-gradient text-center py-12">
-          <h1 className="text-5xl font-bold mb-3">
-            CFOP Method Learning Guide
-          </h1>
-          <p className="text-lg opacity-90">
-            Master speedcubing through systematic learning with symmetry-based algorithms
-          </p>
-        </header>
-      </div>
+      <header className="header-gradient text-center py-12">
+        <h1 className="page-header-title-lg">
+          CFOP Method Learning Guide
+        </h1>
+        <p className="page-header-subtitle">
+          Master speedcubing through systematic learning with symmetry-based algorithms
+        </p>
+      </header>
 
       <main className="main-content-narrow">
         <section className="card mb-16 text-center p-8">

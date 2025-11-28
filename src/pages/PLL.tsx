@@ -118,19 +118,18 @@ export default function PLL() {
 
   return (
     <div className="page-bg">
-      <div className="sticky top-0 z-20">
-        {/* Header */}
-        <header className="header-gradient text-center py-10">
-          <h1 className="text-4xl font-bold mb-2">
-            PLL - Permutation of Last Layer
-          </h1>
-          <p className="text-slate-300 text-sm">
-            Permute all pieces to their correct positions
-          </p>
-        </header>
+      {/* Header */}
+      <header className="header-gradient text-center py-10">
+        <h1 className="page-header-title">
+          PLL - Permutation of Last Layer
+        </h1>
+        <p className="page-header-subtitle text-slate-300">
+          Permute all pieces to their correct positions
+        </p>
+      </header>
 
-        {/* Tab nav + Search + Category links */}
-        <nav className="section-nav">
+      {/* Tab nav + Search + Category links */}
+      <nav className="section-nav sticky top-0 z-20">
           <div className="max-w-5xl mx-auto flex flex-col gap-3">
             {/* Top row: Tabs + Search */}
             <div className="flex justify-between items-center">
@@ -172,7 +171,6 @@ export default function PLL() {
             />
           </div>
         </nav>
-      </div>
 
       {/* Child route content */}
       <Outlet context={outletContext} />

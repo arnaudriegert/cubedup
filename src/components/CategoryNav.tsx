@@ -19,13 +19,13 @@ export default function CategoryNav({
 
   if (mode === 'jump') {
     return (
-      <div className="flex flex-wrap gap-2 justify-center items-center">
-        <span className="text-slate-500 text-sm mr-2">Jump to:</span>
+      <div className="flex gap-2 items-center overflow-x-auto md:overflow-visible md:flex-wrap md:justify-center pb-2 md:pb-0">
+        <span className="text-slate-500 text-sm mr-2 shrink-0">Jump to:</span>
         {categories.map((category) => (
           <a
             key={category.name}
             href={`#${getCategoryId(category.name)}`}
-            className="section-nav-link"
+            className="section-nav-link shrink-0"
           >
             {category.name}
           </a>
@@ -36,11 +36,11 @@ export default function CategoryNav({
 
   // Filter mode
   return (
-    <div className="flex flex-wrap gap-2 justify-center items-center">
-      <span className="text-slate-500 text-sm mr-2">Filter:</span>
+    <div className="flex gap-2 items-center overflow-x-auto md:overflow-visible md:flex-wrap md:justify-center pb-2 md:pb-0">
+      <span className="text-slate-500 text-sm mr-2 shrink-0">Filter:</span>
       <button
         onClick={() => onCategorySelect(null)}
-        className={`section-nav-link ${selectedCategory === null ? 'section-nav-link-active' : ''}`}
+        className={`section-nav-link shrink-0 ${selectedCategory === null ? 'section-nav-link-active' : ''}`}
       >
         All
       </button>
@@ -48,7 +48,7 @@ export default function CategoryNav({
         <button
           key={category.name}
           onClick={() => onCategorySelect(category.name)}
-          className={`section-nav-link ${selectedCategory === category.name ? 'section-nav-link-active' : ''}`}
+          className={`section-nav-link shrink-0 ${selectedCategory === category.name ? 'section-nav-link-active' : ''}`}
         >
           {category.name}
         </button>

@@ -50,7 +50,7 @@ function F2LCaseCard({
   return (
     <div className="case-card">
       <h4 className="case-card-title text-center">{label}</h4>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-4 justify-items-center mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-4 justify-items-center mb-4 md:mb-6">
         {colorRotations.map((colors, i) => (
           <IsometricCube
             key={i}
@@ -70,14 +70,12 @@ function F2LCaseCard({
 export default function F2L() {
   return (
     <div className="page-bg">
-      <div className="sticky top-0 z-20">
-        <header className="header-gradient text-center py-8">
-          <h1 className="text-4xl font-bold mb-2">F2L Patterns</h1>
-          <p className="text-lg opacity-90">
-            Pattern recognition for First Two Layers
-          </p>
-        </header>
-      </div>
+      <header className="header-gradient text-center py-8">
+        <h1 className="page-header-title">F2L Patterns</h1>
+        <p className="page-header-subtitle">
+          Pattern recognition for First Two Layers
+        </p>
+      </header>
 
       <main className="main-content-wide">
         {/* Introduction */}

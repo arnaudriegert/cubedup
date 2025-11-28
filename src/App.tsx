@@ -15,7 +15,7 @@ function App() {
     <BrowserRouter basename="/rubik">
       <div className="flex">
         <Sidebar />
-        <div className="flex-1 ml-48">
+        <div className="flex-1 min-w-0">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/cross" element={<Cross />} />

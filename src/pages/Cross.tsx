@@ -21,14 +21,12 @@ function makeFace(
 export default function Cross() {
   return (
     <div className="page-bg">
-      <div className="sticky top-0 z-20">
-        <header className="header-gradient text-center py-8">
-          <h1 className="text-4xl font-bold mb-2">Cross Patterns</h1>
-          <p className="text-lg opacity-90">
-            Learn to recognize patterns in all color orientations
-          </p>
-        </header>
-      </div>
+      <header className="header-gradient text-center py-8">
+        <h1 className="page-header-title">Cross Patterns</h1>
+        <p className="page-header-subtitle">
+          Learn to recognize patterns in all color orientations
+        </p>
+      </header>
 
       <main className="main-content-wide">
         {/* Introduction */}

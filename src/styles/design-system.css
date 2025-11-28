@@ -25,7 +25,7 @@ html {
 
 /* Sidebar Navigation */
 .sidebar {
-  @apply fixed left-0 top-0 h-screen w-48 bg-white border-r border-slate-200 p-6 shadow-sm z-30;
+  @apply sticky top-0 h-screen w-48 shrink-0 bg-white border-r border-slate-200 p-6 shadow-sm z-30;
 }
 
 .sidebar-link {
@@ -42,16 +42,16 @@ html {
 }
 
 .section-card {
-  @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-8 mb-12 scroll-mt-72;
+  @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-4 md:p-8 mb-8 md:mb-12 scroll-mt-72;
 }
 
 /* Feature Cards */
 .feature-card {
-  @apply bg-white/90 backdrop-blur-sm p-6 rounded-xl border-2 border-slate-200 shadow-md hover:shadow-lg hover:border-indigo-300 transition-all;
+  @apply bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-xl border-2 border-slate-200 shadow-md hover:shadow-lg hover:border-indigo-300 transition-all;
 }
 
 .feature-card-active {
-  @apply bg-linear-to-br from-orange-50 via-white to-blue-50 p-6 rounded-xl border-2 border-orange-300 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all;
+  @apply bg-linear-to-br from-orange-50 via-white to-blue-50 p-4 md:p-6 rounded-xl border-2 border-orange-300 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all;
 }
 
 /* Buttons */
@@ -70,7 +70,7 @@ html {
 
 /* Section Navigation */
 .section-nav {
-  @apply bg-white/90 backdrop-blur-sm border-b border-slate-200 py-4 px-8 shadow-sm;
+  @apply bg-white/90 backdrop-blur-sm border-b border-slate-200 py-3 md:py-4 px-4 md:px-8 shadow-sm;
 }
 
 .section-nav-link {
@@ -96,19 +96,19 @@ html {
 
 /* Layout Containers */
 .main-content-narrow {
-  @apply max-w-5xl mx-auto px-8 py-12;
+  @apply max-w-5xl mx-auto px-4 md:px-8 pt-16 pb-8 md:py-12;
 }
 
 .main-content-wide {
-  @apply max-w-6xl mx-auto px-8 py-8;
+  @apply max-w-6xl mx-auto px-4 md:px-8 pt-16 pb-6 md:py-8;
 }
 
 .main-content-overview {
-  @apply max-w-6xl mx-auto px-4 py-8;
+  @apply max-w-6xl mx-auto px-3 md:px-4 pt-16 pb-6 md:py-8;
 }
 
 .main-content-detailed {
-  @apply max-w-5xl mx-auto px-8 py-8 my-8;
+  @apply max-w-5xl mx-auto px-4 md:px-8 pt-16 pb-6 md:py-8 my-4 md:my-8;
 }
 
 /* Footer */
