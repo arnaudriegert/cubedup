@@ -26,10 +26,12 @@ export default function Home() {
         <section>
           <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">Learning Path</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="feature-card">
+            <div className="feature-card-active">
               <h3 className="text-xl font-bold text-gray-800 mb-2">1. Cross</h3>
-              <p className="text-gray-600 mb-4">Solve the white cross on the bottom layer</p>
-              <span className="text-sm text-gray-500 italic">Coming Soon</span>
+              <p className="text-gray-700 mb-4">Efficient cross planning techniques</p>
+              <Link to="/cross" className="btn-primary">
+                Start Learning →
+              </Link>
             </div>
 
             <div className="feature-card-active">
