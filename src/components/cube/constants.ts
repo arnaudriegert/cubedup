@@ -1,49 +1,36 @@
 // Grid size variants
-const GRID_SIZES = ['normal', 'medium', 'compact'] as const
-export type GridSize = (typeof GRID_SIZES)[number]
+export type GridSize = 'normal' | 'medium' | 'compact'
+const GRID_SIZES: GridSize[] = ['normal', 'medium', 'compact']
 
-// Base measurements in Tailwind spacing units (1 unit = 0.25rem)
-export const STICKER_TW: Record<GridSize, number> = {
-  normal: 12, // 3rem
-  medium: 8, // 2rem
-  compact: 4, // 1rem
+// Tailwind classes - explicit strings so Tailwind can detect them at build time
+export const STICKER_CLASSES: Record<GridSize, string> = {
+  normal: 'size-12',  // 3rem
+  medium: 'size-8',   // 2rem
+  compact: 'size-4',  // 1rem
 }
 
-// Shorter dimension for side stickers (~2/3 ratio, constrained by Tailwind values)
-export const SIDE_SHORT_TW: Record<GridSize, number> = {
-  normal: 8,
-  medium: 5,
-  compact: 2,
+export const SIDE_HORIZONTAL_CLASSES: Record<GridSize, string> = {
+  normal: 'w-12 h-8',
+  medium: 'w-8 h-5',
+  compact: 'w-4 h-2',
 }
 
-// Grid gap/padding in Tailwind units
-export const GRID_GAP_TW = 0.5
+export const SIDE_VERTICAL_CLASSES: Record<GridSize, string> = {
+  normal: 'w-8 h-12',
+  medium: 'w-5 h-8',
+  compact: 'w-2 h-4',
+}
 
-// Derived: Convert Tailwind units to rem
-const twToRem = (tw: number) => tw * 0.25
+export const GRID_SPACING_CLASS = 'gap-0.5 p-0.5'
 
-// Derived: Face size in rem (3 stickers + gap/padding)
+// Derive face size from sticker and spacing classes
+const parseTwSize = (cls: string) => parseInt(cls.match(/size-(\d+)/)?.[1] ?? '0') * 0.25
+const parseTwSpacing = (cls: string) => parseFloat(cls.match(/gap-([\d.]+)/)?.[1] ?? '0') * 0.25
+
+// Face = 3 stickers + 2 gaps + 2 paddings
 export const FACE_SIZE_REM = Object.fromEntries(
-  GRID_SIZES.map((size) => [size, 3 * twToRem(STICKER_TW[size]) + 0.5]),
+  GRID_SIZES.map(size => [
+    size,
+    3 * parseTwSize(STICKER_CLASSES[size]) + 4 * parseTwSpacing(GRID_SPACING_CLASS),
+  ]),
 ) as Record<GridSize, number>
-
-// Derived: Tailwind class strings
-export const STICKER_CLASSES = Object.fromEntries(
-  GRID_SIZES.map((size) => [size, `size-${STICKER_TW[size]}`]),
-) as Record<GridSize, string>
-
-export const SIDE_HORIZONTAL_CLASSES = Object.fromEntries(
-  GRID_SIZES.map((size) => [
-    size,
-    `w-${STICKER_TW[size]} h-${SIDE_SHORT_TW[size]}`,
-  ]),
-) as Record<GridSize, string>
-
-export const SIDE_VERTICAL_CLASSES = Object.fromEntries(
-  GRID_SIZES.map((size) => [
-    size,
-    `w-${SIDE_SHORT_TW[size]} h-${STICKER_TW[size]}`,
-  ]),
-) as Record<GridSize, string>
-
-export const GRID_SPACING_CLASS = `gap-${GRID_GAP_TW} p-${GRID_GAP_TW}`
