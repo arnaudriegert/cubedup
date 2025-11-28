@@ -13,19 +13,17 @@
 
 /* Color Remote */
 .color-remote {
-  @apply fixed right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-1.5 md:gap-2 bg-gray-900/80 backdrop-blur-sm rounded-full px-1.5 md:px-2 py-2 md:py-3 shadow-lg;
+  @apply fixed z-30 flex bg-gray-900/80 backdrop-blur-sm rounded-full shadow-lg
+    bottom-4 left-1/2 -translate-x-1/2 flex-row gap-1.5 px-2 py-1.5
+    md:bottom-auto md:left-auto md:translate-x-0 md:right-4 md:top-1/2 md:-translate-y-1/2 md:flex-col md:gap-2 md:px-2 md:py-3;
 }
 
 .color-remote-btn {
-  @apply size-6 md:size-8 rounded-full transition-all;
+  @apply size-6 md:size-8 rounded-full transition-all cursor-pointer opacity-70 hover:scale-105 hover:opacity-100;
 }
 
-.color-remote-btn-active {
-  @apply ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110;
-}
-
-.color-remote-btn-inactive {
-  @apply hover:scale-105 opacity-70 hover:opacity-100;
+.color-remote-btn:has(:checked) {
+  @apply ring-2 ring-white ring-offset-2 ring-offset-gray-900 scale-110 opacity-100;
 }
 
 /* Algorithm Text Styling */

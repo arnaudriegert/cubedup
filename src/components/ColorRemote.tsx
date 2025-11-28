@@ -11,20 +11,21 @@ export default function ColorRemote({
   onColorSelect,
 }: ColorRemoteProps) {
   return (
-    <div className="color-remote">
+    <fieldset className="color-remote">
       {SIDE_COLORS.map((color) => (
-        <button
-          key={color}
-          onClick={() => onColorSelect(color)}
-          className={`color-remote-btn ${colorToTailwind[color]} ${
-            selectedColor === color
-              ? 'color-remote-btn-active'
-              : 'color-remote-btn-inactive'
-          }`}
-          aria-label={`Show ${color} color variant`}
-          aria-pressed={selectedColor === color}
-        />
+        <label key={color} className={`color-remote-btn ${colorToTailwind[color]}`}>
+
+          <input
+            type="radio"
+            name="color-select"
+            value={color}
+            checked={selectedColor === color}
+            onChange={() => onColorSelect(color)}
+            className="sr-only"
+          />
+          <span className="sr-only">Show {color} color variant</span>
+        </label>
       ))}
-    </div>
+    </fieldset>
   )
 }
