@@ -211,7 +211,7 @@ export const pllCategories: PLLCategory[] = [
           },
           algorithms: [{
             full: "R' U' F' (R U R' U') R' F R² U' R' U' (R U R' U) R",
-            shorthand: "R' U' F' {sexy} R' F R² U' R' U' (R U R' U) R",
+            shorthand: "R' U' F' {sexy} R' F R² U' R' U' {half-sune} R",
           }, {
             full: "R' U R U' R² F' U' F U R (F R' F' R) R U'",
             shorthand: "R' U R U' R² F' U' F U R {sledge}' R U'",
@@ -344,7 +344,7 @@ export const pllCategories: PLLCategory[] = [
           },
           algorithms: [{
             full: "(R U R' U) R U R' F' (R U R' U') R' F R² U' R' U² R U' R'",
-            shorthand: "(R U R' U) R U R' F' {sexy} R' F R² U' R' U² R U' R'",
+            shorthand: "{half-sune} R U R' F' {sexy} R' F R² U' R' U² R U' R'",
           }, {
             full: "L U' R U² L' U R' L U' R U² L' U R'",
           }],
@@ -420,6 +420,7 @@ export const pllCategories: PLLCategory[] = [
           },
           algorithms: [{
             full: "R² U' R U' (R U R' U) R² U D' R U' R' D",
+            shorthand: "R² U' R U' {half-sune} R² U D' R U' R' D",
           }, {
             full: "R² F² R U² R U² R' F (R U R' U') R' F R²",
             shorthand: "R² F² R U² R U² R' F {sexy} R' F R²",

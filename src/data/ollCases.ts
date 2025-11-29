@@ -443,7 +443,7 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [{
             full: "(R U R' U) (R' F R F') U² (R' F R F')",
-            shorthand: "(R U R' U) {sledge} U² {sledge}",
+            shorthand: '{half-sune} {sledge} U² {sledge}',
           }],
         },
       ],
@@ -495,7 +495,10 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
             Orientation.FRONT, Orientation.TOP, Orientation.RIGHT,
           ],
-          algorithms: [{ full: "(R U R' U) R d' R U' R' F'" }],
+          algorithms: [{
+            full: "(R U R' U) R d' R U' R' F'",
+            shorthand: "{half-sune} R d' R U' R' F'",
+          }],
         },
       ],
       [
@@ -641,7 +644,7 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [{
             full: "(R U R' U) (R' F R F') R U² R'",
-            shorthand: "(R U R' U) {sledge} R U² R'",
+            shorthand: "{half-sune} {sledge} R U² R'",
           }],
         },
       ],

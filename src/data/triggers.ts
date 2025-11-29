@@ -120,6 +120,23 @@ export const triggerCategories: TriggerCategory[] = [
           description: 'Also known as Anti-Sune. Inverse is Sune.',
         },
       ],
+      // Left Half Sune / Half Sune pair
+      [
+        {
+          name: 'Left Half Sune',
+          notation: '{left-half-sune}',
+          moves: 'L\' U\' L U\'',
+          inverse: 'U L U L\'',
+          description: 'First half of Left Sune. Mirror of Half Sune.',
+        },
+        {
+          name: 'Half Sune',
+          notation: '{half-sune}',
+          moves: 'R U R\' U',
+          inverse: 'U\' R U\' R\'',
+          description: 'First half of Sune. Appears in many OLL/PLL algorithms.',
+        },
+      ],
     ],
   },
 ]
