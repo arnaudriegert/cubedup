@@ -94,87 +94,80 @@ export default function PLLDetailed() {
   }, [highlightedPll, clearSearch])
 
   return (
-    <>
-      {/* Main content */}
-      <main className="main-content-detailed">
-        {/* Collapsible intro */}
-        <details className="collapsible">
-          <summary className="collapsible-trigger">About PLL cases</summary>
-          <div className="collapsible-content">
-            <p>
-              The 21 PLL cases rearrange last-layer pieces without disturbing their orientation.
-              Recognition is key: identify cases quickly from side-face patterns. Look for
-              <strong> headlights</strong> (two matching colors on one side)—their presence and position
-              narrows down possibilities dramatically.
-            </p>
-            <p>
-              <strong>Learning strategy:</strong> Start with Edges Only (Ua, Ub, H, Z)—common cases with short algorithms.
-              Then learn T and Jb from Adjacent Corners; they appear frequently. G-perms can wait until last;
-              they're complex but occur less often. Use the color selector to practice recognition from any angle.
-            </p>
-          </div>
-        </details>
+    <main className="main-content-detailed">
+      {/* Collapsible intro */}
+      <details className="collapsible">
+        <summary className="collapsible-trigger">About PLL cases</summary>
+        <div className="collapsible-content">
+          <p>
+            The 21 PLL cases rearrange last-layer pieces without disturbing their orientation.
+            Recognition is key: identify cases quickly from side-face patterns. Look for
+            <strong> headlights</strong> (two matching colors on one side)—their presence and position
+            narrows down possibilities dramatically.
+          </p>
+          <p>
+            <strong>Learning strategy:</strong> Start with Edges Only (Ua, Ub, H, Z)—common cases with short algorithms.
+            Then learn T and Jb from Adjacent Corners; they appear frequently. G-perms can wait until last;
+            they're complex but occur less often. Use the color selector to practice recognition from any angle.
+          </p>
+        </div>
+      </details>
 
-        {pllCategories.map((category, categoryIndex) => (
-          <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
-            <h2 className="section-title">{category.name}</h2>
-            <p className="section-description">{category.description}</p>
+      {pllCategories.map((category, categoryIndex) => (
+        <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
+          <h2 className="section-title">{category.name}</h2>
+          <p className="section-description">{category.description}</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {(() => {
-                const rendered = []
-                let position = 0
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {(() => {
+              const rendered = []
+              let position = 0
 
-                for (const entry of category.cases) {
-                  const isRelatedPair = entry.length === 2
+              for (const entry of category.cases) {
+                const isRelatedPair = entry.length === 2
 
-                  if (isRelatedPair && position === 1) {
-                    rendered.push(<div key={`spacer-${entry[0].name}`} className="hidden md:block" />)
-                    position = (position + 1) % 2
-                  }
+                if (isRelatedPair && position === 1) {
+                  rendered.push(<div key={`spacer-${entry[0].name}`} className="hidden md:block" />)
+                  position = (position + 1) % 2
+                }
 
-                  if (isRelatedPair) {
-                    rendered.push(
-                      <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`} className="md:col-span-2">
-                        <div id={`pll-${entry[1].name.toLowerCase()}`} className="pair-container">
-                          <PLLCaseCard
-                            pllCase={entry[0]}
-                            isHighlighted={highlightedPll === entry[0].name.toLowerCase()}
-                            selectedColor={selectedColor}
-                          />
-                          <PLLCaseCard
-                            pllCase={entry[1]}
-                            isHighlighted={highlightedPll === entry[1].name.toLowerCase()}
-                            selectedColor={selectedColor}
-                          />
-                        </div>
-                      </div>,
-                    )
-                    position = 0
-                  } else {
-                    rendered.push(
-                      <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`}>
+                if (isRelatedPair) {
+                  rendered.push(
+                    <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`} className="md:col-span-2">
+                      <div id={`pll-${entry[1].name.toLowerCase()}`} className="pair-container">
                         <PLLCaseCard
                           pllCase={entry[0]}
                           isHighlighted={highlightedPll === entry[0].name.toLowerCase()}
                           selectedColor={selectedColor}
                         />
-                      </div>,
-                    )
-                    position = (position + 1) % 2
-                  }
+                        <PLLCaseCard
+                          pllCase={entry[1]}
+                          isHighlighted={highlightedPll === entry[1].name.toLowerCase()}
+                          selectedColor={selectedColor}
+                        />
+                      </div>
+                    </div>,
+                  )
+                  position = 0
+                } else {
+                  rendered.push(
+                    <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`}>
+                      <PLLCaseCard
+                        pllCase={entry[0]}
+                        isHighlighted={highlightedPll === entry[0].name.toLowerCase()}
+                        selectedColor={selectedColor}
+                      />
+                    </div>,
+                  )
+                  position = (position + 1) % 2
                 }
+              }
 
-                return rendered
-              })()}
-            </div>
-          </section>
-        ))}
-      </main>
-
-      <footer className="page-footer">
-        <p>&copy; 2025 CFOP Learning Guide</p>
-      </footer>
-    </>
+              return rendered
+            })()}
+          </div>
+        </section>
+      ))}
+    </main>
   )
 }
