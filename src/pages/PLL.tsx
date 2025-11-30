@@ -1,5 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import {
+  useState, useEffect, useRef, useCallback,
+} from 'react'
+import {
+  Outlet, Link, useLocation,
+} from 'react-router-dom'
 import { pllCategories } from '../data/pllCases'
 import CategoryNav from '../components/CategoryNav'
 import ColorRemote from '../components/ColorRemote'
@@ -130,47 +134,47 @@ export default function PLL() {
 
       {/* Tab nav + Search + Category links */}
       <nav className="section-nav sticky top-0 z-20">
-          <div className="max-w-5xl mx-auto flex flex-col gap-3">
-            {/* Top row: Tabs + Search */}
-            <div className="flex justify-between items-center">
-              {/* Tabs */}
-              <div className="tab-nav">
-                <Link
-                  to="/pll/overview"
-                  className={isOverview ? 'tab-active' : 'tab'}
-                >
-                  Overview
-                </Link>
-                <Link
-                  to="/pll/detailed"
-                  className={!isOverview ? 'tab-active' : 'tab'}
-                >
-                  Detailed
-                </Link>
-              </div>
-
-              {/* Search */}
-              <input
-                ref={searchInputRef}
-                type="search"
-                maxLength={3}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="PLL name (press /)"
-                aria-label="Search PLL case by name"
-                className={`w-40 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}
-              />
+        <div className="max-w-5xl mx-auto flex flex-col gap-3">
+          {/* Top row: Tabs + Search */}
+          <div className="flex justify-between items-center">
+            {/* Tabs */}
+            <div className="tab-nav">
+              <Link
+                to="/pll/overview"
+                className={isOverview ? 'tab-active' : 'tab'}
+              >
+                Overview
+              </Link>
+              <Link
+                to="/pll/detailed"
+                className={!isOverview ? 'tab-active' : 'tab'}
+              >
+                Detailed
+              </Link>
             </div>
 
-            {/* Category navigation */}
-            <CategoryNav
-              categories={pllCategories}
-              mode={isOverview ? 'filter' : 'jump'}
-              selectedCategory={selectedCategory}
-              onCategorySelect={setSelectedCategory}
+            {/* Search */}
+            <input
+              ref={searchInputRef}
+              type="search"
+              maxLength={3}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="PLL name (press /)"
+              aria-label="Search PLL case by name"
+              className={`w-40 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}
             />
           </div>
-        </nav>
+
+          {/* Category navigation */}
+          <CategoryNav
+            categories={pllCategories}
+            mode={isOverview ? 'filter' : 'jump'}
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
+          />
+        </div>
+      </nav>
 
       {/* Child route content */}
       <Outlet context={outletContext} />

@@ -1,8 +1,15 @@
 import AlgorithmText from '../components/AlgorithmText'
 import { IsometricCube } from '../components/cube'
-import { Color, TopFaceColors } from '../types/cube'
+import { Color, FaceColors } from '../types/cube'
 import { solidFace, f2lFace } from '../utils/cubeHelpers'
 import { getColorRotations } from '../utils/colors'
+import {
+  makeFace,
+  makeLeftFront,
+  makeLeftSide,
+  makeRightFront,
+  makeRightSide,
+} from '../utils/f2lHelpers'
 
 // Color rotations for showing all 4 orientations of a pattern
 // For RIGHT slot view (front+right visible): start with blue-front
@@ -10,32 +17,16 @@ const colorRotationsRight = getColorRotations(Color.BLUE)
 // For LEFT slot view (front+left visible): start with red-front (so blue+red are visible)
 const colorRotationsLeft = getColorRotations(Color.RED)
 
-// Helper to create a face with specific stickers highlighted
-function makeFace(
-  center: Color,
-  positions: { [key: number]: Color },
-): TopFaceColors {
-  const face: TopFaceColors = [
-    Color.GRAY, Color.GRAY, Color.GRAY,
-    Color.GRAY, center, Color.GRAY,
-    Color.GRAY, Color.GRAY, Color.GRAY,
-  ]
-  for (const [pos, color] of Object.entries(positions)) {
-    face[parseInt(pos)] = color
-  }
-  return face
-}
-
 // Component for showing a single F2L case with left OR right orientation
 // Uses 2x2 grid for larger cube display
 interface F2LCaseCardProps {
   slot: 'left' | 'right'
   algorithm: string
   generateFaces: (colors: typeof colorRotationsRight[0]) => {
-    top?: TopFaceColors
-    front?: TopFaceColors
-    right?: TopFaceColors
-    left?: TopFaceColors
+    top?: FaceColors
+    front?: FaceColors
+    right?: FaceColors
+    left?: FaceColors
   }
 }
 
@@ -129,16 +120,13 @@ export default function F2L() {
               slot="left"
               algorithm="**U' L' U L**"
               generateFaces={(c) => ({
-                // LEFT slot joined pair: corner at UFL, edge at UL
-                // Corner: WHITE faces FRONT (front[0]), F-color on left[2], L-color on top[6]
-                // Edge at UL: top[3]=L-color (orange), left[1]=F-color (blue)
-                // Joined = corner's left[2] (F-color) adjacent to edge's left[1] (F-color) - same color!
+                // Joined pair: corner at UFL (white front), edge at UL
                 top: makeFace(Color.YELLOW, {
                   6: c.left,
                   3: c.left,
                 }),
-                front: makeFace(c.front, { 0: Color.WHITE }),
-                left: makeFace(c.left, {
+                front: makeLeftFront(c, { 0: Color.WHITE }),
+                left: makeLeftSide(c, {
                   2: c.front,
                   1: c.front,
                 }),
@@ -153,16 +141,13 @@ export default function F2L() {
               slot="right"
               algorithm="**U R U' R'**"
               generateFaces={(c) => ({
-                // RIGHT slot joined pair: corner at UFR, edge at UR
-                // Corner: WHITE faces FRONT (front[2]), R-color on top[8], F-color on right[0]
-                // Edge at UR: top[5]=R-color, right[1]=F-color
-                // Joined = corner's right[0] (F-color) adjacent to edge's right[1] (F-color)
+                // Joined pair: corner at UFR (white front), edge at UR
                 top: makeFace(Color.YELLOW, {
                   8: c.right,
                   5: c.right,
                 }),
-                front: makeFace(c.front, { 2: Color.WHITE }),
-                right: makeFace(c.right, {
+                front: makeRightFront(c, { 2: Color.WHITE }),
+                right: makeRightSide(c, {
                   0: c.front,
                   1: c.front,
                 }),
@@ -187,15 +172,13 @@ export default function F2L() {
               slot="left"
               algorithm="**L' U' L**"
               generateFaces={(c) => ({
-                // LEFT slot split pair: corner at UFL, edge at UB (back)
-                // Corner: WHITE faces LEFT (left[2]), top[6]=L-color, front[0]=F-color
-                // Edge at UB: top[1]=F-color (facing up), back face has L-color (not visible)
+                // Split pair: corner at UFL (white left), edge at UB
                 top: makeFace(Color.YELLOW, {
                   6: c.left,
                   1: c.front,
                 }),
-                front: makeFace(c.front, { 0: c.front }),
-                left: makeFace(c.left, { 2: Color.WHITE }),
+                front: makeLeftFront(c, { 0: c.front }),
+                left: makeLeftSide(c, { 2: Color.WHITE }),
               })}
             />
 
@@ -206,15 +189,13 @@ export default function F2L() {
               slot="right"
               algorithm="**R U R'**"
               generateFaces={(c) => ({
-                // RIGHT slot split pair: corner at UFR, edge at UB (back)
-                // Corner: WHITE faces RIGHT (right[0]), top[8]=R-color, front[2]=F-color
-                // Edge at UB: top[1]=F-color (facing up), back face has R-color (not visible)
+                // Split pair: corner at UFR (white right), edge at UB
                 top: makeFace(Color.YELLOW, {
                   8: c.right,
                   1: c.front,
                 }),
-                front: makeFace(c.front, { 2: c.front }),
-                right: makeFace(c.right, { 0: Color.WHITE }),
+                front: makeRightFront(c, { 2: c.front }),
+                right: makeRightSide(c, { 0: Color.WHITE }),
               })}
             />
           </div>

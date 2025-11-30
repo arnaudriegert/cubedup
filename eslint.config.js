@@ -47,30 +47,18 @@ export default tseslint.config(
       }],
       '@stylistic/object-curly-spacing': ['error', 'always'],
       '@stylistic/object-curly-newline': ['error', {
-        ObjectExpression: {
+        ObjectExpression: { consistent: true },
+        ObjectPattern: { consistent: true },
+        ImportDeclaration: {
           multiline: true,
-          minProperties: 2,
+          minProperties: 3,
           consistent: true,
         },
-        ObjectPattern: {
-          multiline: true,
-          minProperties: 2,
-          consistent: true,
-        },
-        ImportDeclaration: 'never',
-        ExportDeclaration: {
-          multiline: true,
-          minProperties: 2,
-          consistent: true,
-        },
-        TSTypeLiteral: {
-          multiline: true,
-          minProperties: 2,
-          consistent: true,
-        },
+        ExportDeclaration: { consistent: true },
+        TSTypeLiteral: { consistent: true },
       }],
       '@stylistic/object-property-newline': ['error', {
-        allowAllPropertiesOnSameLine: false,
+        allowAllPropertiesOnSameLine: true,
       }],
       '@stylistic/member-delimiter-style': ['error', {
         multiline: {

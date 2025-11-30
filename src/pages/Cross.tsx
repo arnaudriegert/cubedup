@@ -1,13 +1,13 @@
 import { IsometricCube } from '../components/cube'
-import { Color, TopFaceColors } from '../types/cube'
+import { Color, FaceColors } from '../types/cube'
 import { crossFace } from '../utils/cubeHelpers'
 
 // Helper to create a face with specific stickers highlighted
 function makeFace(
   center: Color,
   positions: { [key: number]: Color },
-): TopFaceColors {
-  const face: TopFaceColors = [
+): FaceColors {
+  const face: FaceColors = [
     Color.GRAY, Color.GRAY, Color.GRAY,
     Color.GRAY, center, Color.GRAY,
     Color.GRAY, Color.GRAY, Color.GRAY,

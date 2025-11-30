@@ -1,6 +1,8 @@
 import { Color } from '../types/cube'
 import { PLLCase, PLLSideColors } from '../data/pllCases'
-import { SIDE_COLORS, isSideColor, getRotationSteps } from './colors'
+import {
+  SIDE_COLORS, isSideColor, getRotationSteps,
+} from './colors'
 
 // All PLL cases are defined with blue as the reference (front) color
 const REFERENCE_COLOR = Color.BLUE

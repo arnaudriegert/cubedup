@@ -1,4 +1,6 @@
-import { memo, useRef, useEffect, useCallback, useMemo } from 'react'
+import {
+  memo, useRef, useEffect, useCallback, useMemo,
+} from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'

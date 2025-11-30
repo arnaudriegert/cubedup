@@ -1,9 +1,9 @@
-import { TopFaceColors } from '../../types/cube'
+import { FaceColors } from '../../types/cube'
 import { GridSize, GRID_SPACING_CLASS } from './constants'
 import Sticker from './Sticker'
 
 export interface FaceProps {
-  colors: TopFaceColors
+  colors: FaceColors
   size?: GridSize
   className?: string
 }

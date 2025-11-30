@@ -1,5 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import {
+  useState, useEffect, useRef, useCallback,
+} from 'react'
+import {
+  Outlet, Link, useLocation,
+} from 'react-router-dom'
 import { ollCategories } from '../data/ollCases'
 import CategoryNav from '../components/CategoryNav'
 
@@ -125,48 +129,48 @@ export default function OLL() {
 
       {/* Tab nav + Search + Category links */}
       <nav className="section-nav sticky top-0 z-20">
-          <div className="max-w-5xl mx-auto flex flex-col gap-3">
-            {/* Top row: Tabs + Search */}
-            <div className="flex justify-between items-center">
-              {/* Tabs */}
-              <div className="tab-nav">
-                <Link
-                  to="/oll/overview"
-                  className={isOverview ? 'tab-active' : 'tab'}
-                >
-                  Overview
-                </Link>
-                <Link
-                  to="/oll/detailed"
-                  className={!isOverview ? 'tab-active' : 'tab'}
-                >
-                  Detailed
-                </Link>
-              </div>
-
-              {/* Search */}
-              <input
-                ref={searchInputRef}
-                type="search"
-                inputMode="numeric"
-                maxLength={2}
-                value={searchValue}
-                onChange={(e) => setSearchValue(e.target.value)}
-                placeholder="OLL # (press /)"
-                aria-label="Search OLL case by number"
-                className={`w-36 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}
-              />
+        <div className="max-w-5xl mx-auto flex flex-col gap-3">
+          {/* Top row: Tabs + Search */}
+          <div className="flex justify-between items-center">
+            {/* Tabs */}
+            <div className="tab-nav">
+              <Link
+                to="/oll/overview"
+                className={isOverview ? 'tab-active' : 'tab'}
+              >
+                Overview
+              </Link>
+              <Link
+                to="/oll/detailed"
+                className={!isOverview ? 'tab-active' : 'tab'}
+              >
+                Detailed
+              </Link>
             </div>
 
-            {/* Category navigation */}
-            <CategoryNav
-              categories={ollCategories}
-              mode={isOverview ? 'filter' : 'jump'}
-              selectedCategory={selectedCategory}
-              onCategorySelect={setSelectedCategory}
+            {/* Search */}
+            <input
+              ref={searchInputRef}
+              type="search"
+              inputMode="numeric"
+              maxLength={2}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              placeholder="OLL # (press /)"
+              aria-label="Search OLL case by number"
+              className={`w-36 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}
             />
           </div>
-        </nav>
+
+          {/* Category navigation */}
+          <CategoryNav
+            categories={ollCategories}
+            mode={isOverview ? 'filter' : 'jump'}
+            selectedCategory={selectedCategory}
+            onCategorySelect={setSelectedCategory}
+          />
+        </div>
+      </nav>
 
       {/* Child route content */}
       <Outlet context={outletContext} />

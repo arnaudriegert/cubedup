@@ -1,18 +1,18 @@
-import { Color, TopFaceColors } from '../../types/cube'
+import { Color, FaceColors } from '../../types/cube'
 import { GridSize, FACE_SIZE_REM } from './constants'
 import Face from './Face'
 
 export interface CubeFaces {
-  top?: TopFaceColors
-  bottom?: TopFaceColors
-  front?: TopFaceColors
-  back?: TopFaceColors
-  left?: TopFaceColors
-  right?: TopFaceColors
+  top?: FaceColors
+  bottom?: FaceColors
+  front?: FaceColors
+  back?: FaceColors
+  left?: FaceColors
+  right?: FaceColors
 }
 
 // Default gray face (unspecified)
-const grayFace: TopFaceColors = [
+const grayFace: FaceColors = [
   Color.GRAY, Color.GRAY, Color.GRAY,
   Color.GRAY, Color.GRAY, Color.GRAY,
   Color.GRAY, Color.GRAY, Color.GRAY,

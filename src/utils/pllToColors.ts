@@ -1,4 +1,6 @@
-import { Color, LastLayerColors, TopFaceColors } from '../types/cube'
+import {
+  Color, LastLayerColors, FaceColors,
+} from '../types/cube'
 import { PLLCase } from '../data/pllCases'
 
 /**
@@ -8,7 +10,7 @@ import { PLLCase } from '../data/pllCases'
  * For PLL, the top face is always solved (all yellow).
  */
 export function pllToColors(pllCase: PLLCase): LastLayerColors {
-  const solvedTop: TopFaceColors = [
+  const solvedTop: FaceColors = [
     Color.YELLOW, Color.YELLOW, Color.YELLOW,
     Color.YELLOW, Color.YELLOW, Color.YELLOW,
     Color.YELLOW, Color.YELLOW, Color.YELLOW,

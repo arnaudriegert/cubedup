@@ -1,10 +1,12 @@
-import { Color,
+import {
+  Color,
   Orientation,
   OLLOrientations,
   LastLayerColors,
-  TopFaceColors,
+  FaceColors,
   SideRowColors,
-  TOP_TO_SIDES } from '../types/cube'
+  TOP_TO_SIDES,
+} from '../types/cube'
 
 /**
  * Converts OLL orientation data (9 orientations for top face)
@@ -43,7 +45,7 @@ export function ollToColors(orientations: OLLOrientations): LastLayerColors {
 
   // Return structured colors
   return {
-    top: topColors as TopFaceColors,
+    top: topColors as FaceColors,
     back: backColors as SideRowColors,
     left: leftColors as SideRowColors,
     right: rightColors as SideRowColors,

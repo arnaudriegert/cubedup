@@ -1,4 +1,6 @@
-import { SwapInfo, CornerPosition, EdgePosition } from '../data/pllCases'
+import {
+  SwapInfo, CornerPosition, EdgePosition,
+} from '../data/pllCases'
 import { GridSize } from './cube'
 
 interface PLLArrowOverlayProps {

@@ -90,9 +90,8 @@ export type OLLOrientations = [
   CornerFR, // 8: bottom-right corner (front-right)
 ]
 
-// Type-safe structure for Last Layer colors
-// Each face has exactly 3 stickers (corner-edge-corner for sides, edge-edge-edge for horizontal)
-export type TopFaceColors = [
+// 9 stickers for any face of the cube (3x3 grid)
+export type FaceColors = [
   Color, Color, Color, // row 1: top-left, top-middle, top-right
   Color, Color, Color, // row 2: middle-left, center, middle-right
   Color, Color, Color, // row 3: bottom-left, bottom-middle, bottom-right
@@ -105,7 +104,7 @@ export type SideRowColors = [
 ]
 
 export interface LastLayerColors {
-  top: TopFaceColors
+  top: FaceColors
   back: SideRowColors
   left: SideRowColors
   right: SideRowColors
