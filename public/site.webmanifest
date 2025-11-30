@@ -1,6 +1,6 @@
 {
-  "name": "Rubik's Cube CFOP Guide",
-  "short_name": "CFOP Guide",
+  "name": "cubedup",
+  "short_name": "cubedup",
   "icons": [
     {
       "src": "/icon-192.png",

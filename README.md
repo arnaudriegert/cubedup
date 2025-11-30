@@ -1,16 +1,37 @@
-# React + Vite
+# cubedup
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Algorithms that unlock each other**
 
-Currently, two official plugins are available:
+A CFOP speedcubing reference that organizes algorithms by symmetry relationships. Learn one case, unlock its mirror or inverse for free.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Symmetry-based organization** — Related cases (mirrors, inverses) grouped together
+- **4 rotational variants** — Every case shown from all angles for pattern recognition
+- **Shorthand notation** — Algorithms displayed with trigger shortcuts (sexy, sledge, etc.)
+- **Compact & detailed views** — Quick reference grid or full breakdown by category
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+React 19, Vite, Tailwind CSS, TypeScript
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Development
+
+```bash
+yarn install
+yarn dev
+```
+
+Opens at `http://localhost:5173/cubedup/`
+
+## Build
+
+```bash
+yarn build
+```
+
+Output in `dist/`, deployed to GitHub Pages.
+
+## License
+
+MIT

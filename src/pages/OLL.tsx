@@ -6,6 +6,7 @@ import {
 } from 'react-router-dom'
 import { ollCategories } from '../data/ollCases'
 import CategoryNav from '../components/CategoryNav'
+import SEOHead from '../components/SEOHead'
 
 // Debounce hook
 function useDebounce<T>(value: T, delay: number): T {
@@ -116,7 +117,13 @@ export default function OLL() {
   }
 
   return (
-    <div className="page-bg">
+    <>
+      <SEOHead
+        title="OLL - Orientation of Last Layer"
+        description="Learn all 57 OLL algorithms organized by symmetry. Master last layer orientation with visual patterns and related case groupings for faster memorization."
+        path="/oll"
+      />
+
       {/* Header */}
       <header className="header-gradient text-center py-10">
         <h1 className="page-header-title">
@@ -126,6 +133,22 @@ export default function OLL() {
           Orient all pieces on the last layer
         </p>
       </header>
+
+      {/* Introduction */}
+      <section className="bg-slate-50 border-b border-slate-200 py-6">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <p className="body-text text-slate-600 mb-3">
+            The 57 OLL cases cover every possible last-layer orientation. Cases are grouped by the shape
+            formed by incorrectly-oriented pieces: edges form patterns (lines, dots, L-shapes) while
+            corners create the characteristic silhouette.
+          </p>
+          <p className="text-sm text-slate-500">
+            <strong>Learning strategy:</strong> Start with Solved Cross cases—you likely know some from 2-look OLL.
+            Then learn one category at a time. Mirror pairs share muscle memory; learn them together.
+            Small categories (T-shapes, C-shapes) are quick wins.
+          </p>
+        </div>
+      </section>
 
       {/* Tab nav + Search + Category links */}
       <nav className="section-nav sticky top-0 z-20">
@@ -174,6 +197,6 @@ export default function OLL() {
 
       {/* Child route content */}
       <Outlet context={outletContext} />
-    </div>
+    </>
   )
 }

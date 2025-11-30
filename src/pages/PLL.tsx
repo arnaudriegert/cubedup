@@ -7,6 +7,7 @@ import {
 import { pllCategories } from '../data/pllCases'
 import CategoryNav from '../components/CategoryNav'
 import ColorRemote from '../components/ColorRemote'
+import SEOHead from '../components/SEOHead'
 import { Color } from '../types/cube'
 
 // Debounce hook
@@ -121,7 +122,13 @@ export default function PLL() {
   }
 
   return (
-    <div className="page-bg">
+    <>
+      <SEOHead
+        title="PLL - Permutation of Last Layer"
+        description="Learn all 21 PLL algorithms organized by symmetry. Master last layer permutation with headlight recognition and swap patterns for faster solving."
+        path="/pll"
+      />
+
       {/* Header */}
       <header className="header-gradient text-center py-10">
         <h1 className="page-header-title">
@@ -131,6 +138,23 @@ export default function PLL() {
           Permute all pieces to their correct positions
         </p>
       </header>
+
+      {/* Introduction */}
+      <section className="bg-slate-50 border-b border-slate-200 py-6">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <p className="body-text text-slate-600 mb-3">
+            The 21 PLL cases rearrange last-layer pieces without disturbing their orientation.
+            Recognition is key: identify cases quickly from side-face patterns. Look for
+            <strong> headlights</strong> (two matching colors on one side)—their presence and position
+            narrows down possibilities dramatically.
+          </p>
+          <p className="text-sm text-slate-500">
+            <strong>Learning strategy:</strong> Start with Edges Only (Ua, Ub, H, Z)—common cases with short algorithms.
+            Then learn T and Jb from Adjacent Corners; they appear frequently. G-perms can wait until last;
+            they're complex but occur less often. Use the color selector to practice recognition from any angle.
+          </p>
+        </div>
+      </section>
 
       {/* Tab nav + Search + Category links */}
       <nav className="section-nav sticky top-0 z-20">
@@ -184,6 +208,6 @@ export default function PLL() {
         selectedColor={selectedColor}
         onColorSelect={setSelectedColor}
       />
-    </div>
+    </>
   )
 }

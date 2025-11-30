@@ -115,3 +115,40 @@ html {
 .page-footer {
   @apply text-center py-6 text-gray-600;
 }
+
+/* ===== Accessibility ===== */
+
+/* Focus Indicators */
+:focus-visible {
+  outline: 2px solid #4F46E5;
+  outline-offset: 2px;
+}
+
+/* Remove default outline but keep for keyboard users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Enhanced focus for interactive elements */
+.btn-primary:focus-visible,
+.sidebar-link:focus-visible,
+.tab:focus-visible,
+.tab-active:focus-visible,
+.compact-card:focus-visible,
+.case-card:focus-visible {
+  outline: 2px solid #4F46E5;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

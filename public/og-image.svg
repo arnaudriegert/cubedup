@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Cube icon (scaled from logo) -->
+  <g transform="translate(100, 165) scale(9.375)">
+    <!-- Row 0 -->
+    <path d="M1.5,9.5 Q1.5,1.5 9.5,1.5 L9.5,1.5 Q10.5,1.5 10.5,2.5 L10.5,9.5 Q10.5,10.5 9.5,10.5 L2.5,10.5 Q1.5,10.5 1.5,9.5 Z" fill="#f97316"/>
+    <path d="M12.5,1.5 h7 q1,0 1,1 v5 q0,3 -3,3 h-3 q-3,0 -3,-3 v-5 q0,-1 1,-1 z" fill="#ffffff"/>
+    <path d="M22.5,1.5 L22.5,1.5 Q30.5,1.5 30.5,9.5 L30.5,9.5 Q30.5,10.5 29.5,10.5 L22.5,10.5 Q21.5,10.5 21.5,9.5 L21.5,2.5 Q21.5,1.5 22.5,1.5 Z" fill="#2563eb"/>
+    <!-- Row 1 -->
+    <path d="M2.5,11.5 h5 q3,0 3,3 v3 q0,3 -3,3 h-5 q-1,0 -1,-1 v-7 q0,-1 1,-1 z" fill="#16a34a"/>
+    <rect x="11.5" y="11.5" width="9" height="9" rx="3" fill="#facc15"/>
+    <path d="M24.5,11.5 h5 q1,0 1,1 v7 q0,1 -1,1 h-5 q-3,0 -3,-3 v-3 q0,-3 3,-3 z" fill="#dc2626"/>
+    <!-- Row 2 -->
+    <path d="M2.5,21.5 L9.5,21.5 Q10.5,21.5 10.5,22.5 L10.5,29.5 Q10.5,30.5 9.5,30.5 L9.5,30.5 Q1.5,30.5 1.5,22.5 L1.5,22.5 Q1.5,21.5 2.5,21.5 Z" fill="#dc2626"/>
+    <path d="M14.5,21.5 h3 q3,0 3,3 v5 q0,1 -1,1 h-7 q-1,0 -1,-1 v-5 q0,-3 3,-3 z" fill="#2563eb"/>
+    <path d="M22.5,21.5 L29.5,21.5 Q30.5,21.5 30.5,22.5 L30.5,22.5 Q30.5,30.5 22.5,30.5 L22.5,30.5 Q21.5,30.5 21.5,29.5 L21.5,22.5 Q21.5,21.5 22.5,21.5 Z" fill="#16a34a"/>
+  </g>
+
+  <!-- Title -->
+  <text x="480" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="700" fill="white">
+    cubedup
+  </text>
+
+  <!-- Subtitle -->
+  <text x="480" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="36" fill="rgba(255,255,255,0.9)">
+    Algorithms that unlock each other
+  </text>
+
+  <!-- Steps -->
+  <text x="480" y="420" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="rgba(255,255,255,0.7)">
+    Cross • F2L • OLL • PLL
+  </text>
+
+  <!-- Domain -->
+  <text x="480" y="520" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="rgba(255,255,255,0.5)">
+    arnaudriegert.github.io/cubedup
+  </text>
+</svg>

@@ -36,7 +36,7 @@ export default function Sidebar() {
           className="p-4 border-b border-slate-200 flex items-center gap-3"
         >
           <Logo className="size-10" />
-          <span className="text-lg font-bold text-indigo-700">CFOP Guide</span>
+          <span className="text-lg font-bold text-indigo-700">cubedup</span>
         </Link>
         <div className="p-4 space-y-1">
           <NavLinks onLinkClick={() => setIsOpen(false)} />
@@ -47,7 +47,7 @@ export default function Sidebar() {
       <nav className="sidebar hidden md:block">
         <Link to="/" className="mb-8 flex items-center gap-3">
           <Logo className="size-12" />
-          <span className="text-xl font-bold text-indigo-700">CFOP Guide</span>
+          <span className="text-xl font-bold text-indigo-700">cubedup</span>
         </Link>
         <div className="space-y-1">
           <NavLinks showDivider />

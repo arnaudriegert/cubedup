@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arnaudriegert.github.io/cubedup/sitemap.xml

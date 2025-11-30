@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { triggerCategories, Trigger } from '../data/triggers'
 import AlgorithmBox from '../components/AlgorithmBox'
+import SEOHead from '../components/SEOHead'
 
 function TriggerCard({
   trigger, flashcardMode,
@@ -52,7 +53,13 @@ export default function Triggers() {
   const [flashcardMode, setFlashcardMode] = useState(false)
 
   return (
-    <div className="page-bg">
+    <>
+      <SEOHead
+        title="Algorithm Triggers"
+        description="Learn the building blocks of CFOP algorithms. Master triggers like the sexy move and sledgehammer to read and execute OLL/PLL algorithms faster."
+        path="/triggers"
+      />
+
       <header className="header-gradient text-center py-8">
         <h1 className="page-header-title">Algorithm Triggers</h1>
         <p className="page-header-subtitle">
@@ -79,9 +86,16 @@ export default function Triggers() {
         {/* Introduction */}
         <div className="section-card mb-8">
           <h2 className="section-subtitle-centered">What are Triggers?</h2>
-          <p className="body-text text-center max-w-2xl mx-auto">
+          <p className="body-text text-center max-w-2xl mx-auto mb-4">
             Triggers are short move sequences that appear repeatedly in OLL and PLL algorithms.
             Learning these building blocks makes it easier to memorize and execute full algorithms.
+          </p>
+          <p className="text-sm text-slate-500 text-center max-w-2xl mx-auto">
+            <strong>How to use this page:</strong> Learn each trigger until it becomes automatic—you should
+            execute {'{sexy}'} without consciously thinking "R U R' U'". Practice both the trigger and its
+            inverse; many algorithms use both. The <strong>Flashcard Mode</strong> toggle hides full notation,
+            letting you test your recall. Once triggers are internalized, OLL and PLL algorithms written in
+            shorthand become readable at a glance.
           </p>
         </div>
 
@@ -104,10 +118,6 @@ export default function Triggers() {
           </section>
         ))}
       </main>
-
-      <footer className="page-footer">
-        <p>&copy; 2025 CFOP Learning Guide</p>
-      </footer>
-    </div>
+    </>
   )
 }

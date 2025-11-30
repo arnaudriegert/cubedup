@@ -1,5 +1,6 @@
 import AlgorithmBox from '../components/AlgorithmBox'
 import { IsometricCube } from '../components/cube'
+import SEOHead from '../components/SEOHead'
 import { Color, FaceColors } from '../types/cube'
 import { Algorithm } from '../data/ollCases'
 import { solidFace, f2lFace } from '../utils/cubeHelpers'
@@ -59,7 +60,13 @@ function F2LCaseCard({
 
 export default function F2L() {
   return (
-    <div className="page-bg">
+    <>
+      <SEOHead
+        title="F2L - First Two Layers"
+        description="Learn F2L patterns for pairing corners with edges. Master intuitive F2L with pattern recognition across all color variations."
+        path="/f2l"
+      />
+
       <header className="header-gradient text-center py-8">
         <h1 className="page-header-title">F2L Patterns</h1>
         <p className="page-header-subtitle">
@@ -85,9 +92,15 @@ export default function F2L() {
               <p className="body-text mb-2">
                 <strong>Insert corner-edge pairs</strong> into the 4 slots around the bottom layer.
               </p>
-              <p className="help-text">
+              <p className="help-text mb-3">
                 Each pattern shows all 4 color variations.
                 Focus on recognizing the <em>relationship</em> between corner and edge, not specific colors.
+              </p>
+              <p className="text-sm text-slate-500">
+                <strong>Learning strategy:</strong> F2L can be learned intuitively by understanding how moves
+                affect pairs, or algorithmically by memorizing solutions.
+                Start intuitive—understand <em>why</em> moves work—then optimize specific cases.
+                Left-slot and right-slot algorithms are mirrors; learn one side, then adapt.
               </p>
             </div>
           </div>
@@ -205,10 +218,6 @@ export default function F2L() {
           <p className="text-gray-500 italic">More F2L cases coming soon...</p>
         </div>
       </main>
-
-      <footer className="page-footer">
-        <p>&copy; 2025 CFOP Learning Guide</p>
-      </footer>
-    </div>
+    </>
   )
 }
