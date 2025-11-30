@@ -104,7 +104,7 @@ html {
 }
 
 .main-content-overview {
-  @apply max-w-6xl mx-auto px-3 md:px-4 pt-16 pb-6 md:py-8;
+  @apply max-w-6xl mx-auto px-3 md:px-20 pt-16 pb-6 md:py-8;
 }
 
 .main-content-detailed {
