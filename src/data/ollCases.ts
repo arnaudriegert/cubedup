@@ -595,7 +595,7 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [{
             full: "M (L' U' L U' L' U² L) U' M'",
-            shorthand: "M {left-chair}' U M'",
+            shorthand: "M {left-sune} U M'",
           }],
         },
         {
@@ -620,31 +620,29 @@ export const ollCategories: OLLCategory[] = [
     cases: [
       [
         {
-          number: 9,
-          name: 'Fish 1',
-          orientations: [
-            Orientation.LEFT, Orientation.BACK, Orientation.TOP,
-            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
-            Orientation.FRONT, Orientation.TOP, Orientation.RIGHT,
-          ],
-          algorithms: [{
-            full: "(R U R' U') R' F R² U R' U' F'",
-            shorthand: "{sexy} R' F R² U R' U' F'",
-          }],
-        },
-      ],
-      [
-        {
           number: 10,
           name: 'Fish 2',
           orientations: [
-            Orientation.BACK, Orientation.BACK, Orientation.TOP,
-            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
-            Orientation.LEFT, Orientation.TOP, Orientation.FRONT,
+            Orientation.BACK, Orientation.TOP, Orientation.RIGHT,
+            Orientation.LEFT, Orientation.TOP, Orientation.TOP,
+            Orientation.TOP, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "(R U R' U) (R' F R F') R U² R'",
-            shorthand: "{half-sune} {sledge} R U² R'",
+            full: "(L' U' L U) (L F' L') (L' U' L U) F",
+            shorthand: "{left-sexy} L F' L' {left-sexy} F",
+          }],
+        },
+        {
+          number: 9,
+          name: 'Fish 1',
+          orientations: [
+            Orientation.LEFT, Orientation.TOP, Orientation.BACK,
+            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
+            Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
+          ],
+          algorithms: [{
+            full: "(R U R' U') (R' F R) (R U R' U') F'",
+            shorthand: "{sexy} R' F R {sexy} F'",
           }],
         },
       ],
@@ -686,11 +684,14 @@ export const ollCategories: OLLCategory[] = [
           number: 36,
           name: 'W Shape 1',
           orientations: [
-            Orientation.TOP, Orientation.BACK, Orientation.RIGHT,
-            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
-            Orientation.FRONT, Orientation.TOP, Orientation.TOP,
+            Orientation.TOP, Orientation.TOP, Orientation.BACK,
+            Orientation.LEFT, Orientation.TOP, Orientation.TOP,
+            Orientation.LEFT, Orientation.FRONT, Orientation.TOP,
           ],
-          algorithms: [{ full: "R' U' R U' R' U R U l U' R' U x" }],
+          algorithms: [{
+            full: "L' U' L (U' L' U L) U (L F' L' F)",
+            shorthand: "L' U' L {left-sexy}' U {left-sledge}",
+          }],
         },
         {
           number: 38,
@@ -748,16 +749,6 @@ export const ollCategories: OLLCategory[] = [
     cases: [
       [
         {
-          number: 13,
-          name: 'Knight 1',
-          orientations: [
-            Orientation.BACK, Orientation.BACK, Orientation.RIGHT,
-            Orientation.TOP, Orientation.TOP, Orientation.TOP,
-            Orientation.TOP, Orientation.FRONT, Orientation.FRONT,
-          ],
-          algorithms: [{ full: "r U' r' U' r U r' F' U F" }],
-        },
-        {
           number: 14,
           name: 'Knight 2',
           orientations: [
@@ -765,7 +756,17 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.TOP,
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
-          algorithms: [{ full: "R' F R U R' F' R F U' F'" }],
+          algorithms: [{ full: "(l' U l) U (l' U' l) (F U' F')" }],
+        },
+        {
+          number: 13,
+          name: 'Knight 1',
+          orientations: [
+            Orientation.BACK, Orientation.BACK, Orientation.RIGHT,
+            Orientation.TOP, Orientation.TOP, Orientation.TOP,
+            Orientation.TOP, Orientation.FRONT, Orientation.FRONT,
+          ],
+          algorithms: [{ full: "(r U' r') U' (r U r') (F' U F)" }],
         },
       ],
       [
@@ -773,11 +774,14 @@ export const ollCategories: OLLCategory[] = [
           number: 15,
           name: 'Knight 3',
           orientations: [
-            Orientation.BACK, Orientation.BACK, Orientation.RIGHT,
+            Orientation.TOP, Orientation.BACK, Orientation.RIGHT,
             Orientation.TOP, Orientation.TOP, Orientation.TOP,
-            Orientation.LEFT, Orientation.FRONT, Orientation.TOP,
+            Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
-          algorithms: [{ full: "r' U' r R' U' R U r' U r" }],
+          algorithms: [{
+            full: "(l' U' l) (L' U' L U) (l' U l)",
+            shorthand: "l' U' l {left-sexy} l' U l",
+          }],
         },
         {
           number: 16,
@@ -788,7 +792,7 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "r U r' (R U R' U') r U' r'",
+            full: "(r U r') (R U R' U') (r U' r')",
             shorthand: "r U r' {sexy} r U' r'",
           }],
         },
@@ -829,29 +833,29 @@ export const ollCategories: OLLCategory[] = [
       ],
       [
         {
+          number: 42,
+          name: 'Awkward 4',
+          orientations: [
+            Orientation.BACK, Orientation.TOP, Orientation.BACK,
+            Orientation.LEFT, Orientation.TOP, Orientation.TOP,
+            Orientation.TOP, Orientation.FRONT, Orientation.TOP,
+          ],
+          algorithms: [{
+            full: "(L' U' L U' L' U² L) F' (L' U' L U) F",
+            shorthand: "{left-sune} F' {left-sexy} F",
+          }],
+        },
+        {
           number: 41,
           name: 'Awkward 3',
           orientations: [
-            Orientation.TOP, Orientation.BACK, Orientation.TOP,
-            Orientation.LEFT, Orientation.TOP, Orientation.TOP,
-            Orientation.FRONT, Orientation.TOP, Orientation.FRONT,
+            Orientation.BACK, Orientation.TOP, Orientation.BACK,
+            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
+            Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
             full: "(R U R' U R U² R') F (R U R' U') F'",
             shorthand: "{sune} F {sexy} F'",
-          }],
-        },
-        {
-          number: 42,
-          name: 'Awkward 4',
-          orientations: [
-            Orientation.TOP, Orientation.BACK, Orientation.TOP,
-            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
-            Orientation.FRONT, Orientation.TOP, Orientation.FRONT,
-          ],
-          algorithms: [{
-            full: "R' U' R U' R' U² R F (R U R' U') F'",
-            shorthand: "R' U' R U' R' U² R F {sexy} F'",
           }],
         },
       ],
