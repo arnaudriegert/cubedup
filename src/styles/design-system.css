@@ -116,6 +116,19 @@ html {
   @apply text-center py-6 text-gray-600;
 }
 
+/* Collapsible Sections */
+.collapsible {
+  @apply mb-8 bg-slate-50 rounded-lg border border-slate-200;
+}
+
+.collapsible-trigger {
+  @apply cursor-pointer px-4 py-3 font-medium text-slate-700 hover:bg-slate-100 rounded-lg;
+}
+
+.collapsible-content {
+  @apply px-4 pb-4 text-sm text-slate-600 space-y-2;
+}
+
 /* ===== Accessibility ===== */
 
 /* Focus Indicators */

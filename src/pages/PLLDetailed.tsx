@@ -97,6 +97,24 @@ export default function PLLDetailed() {
     <>
       {/* Main content */}
       <main className="main-content-detailed">
+        {/* Collapsible intro */}
+        <details className="collapsible">
+          <summary className="collapsible-trigger">About PLL cases</summary>
+          <div className="collapsible-content">
+            <p>
+              The 21 PLL cases rearrange last-layer pieces without disturbing their orientation.
+              Recognition is key: identify cases quickly from side-face patterns. Look for
+              <strong> headlights</strong> (two matching colors on one side)—their presence and position
+              narrows down possibilities dramatically.
+            </p>
+            <p>
+              <strong>Learning strategy:</strong> Start with Edges Only (Ua, Ub, H, Z)—common cases with short algorithms.
+              Then learn T and Jb from Adjacent Corners; they appear frequently. G-perms can wait until last;
+              they're complex but occur less often. Use the color selector to practice recognition from any angle.
+            </p>
+          </div>
+        </details>
+
         {pllCategories.map((category, categoryIndex) => (
           <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
             <h2 className="section-title">{category.name}</h2>

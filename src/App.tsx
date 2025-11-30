@@ -46,14 +46,14 @@ function App() {
               <Route path="/cross" element={<Cross />} />
               <Route path="/f2l" element={<F2L />} />
               <Route path="/oll" element={<OLL />}>
-                <Route index element={<Navigate to="overview" replace />} />
-                <Route path="overview" element={<OLLOverview />} />
+                <Route index element={<Navigate to="detailed" replace />} />
                 <Route path="detailed" element={<OLLDetailed />} />
+                <Route path="overview" element={<OLLOverview />} />
               </Route>
               <Route path="/pll" element={<PLL />}>
-                <Route index element={<Navigate to="overview" replace />} />
-                <Route path="overview" element={<PLLOverview />} />
+                <Route index element={<Navigate to="detailed" replace />} />
                 <Route path="detailed" element={<PLLDetailed />} />
+                <Route path="overview" element={<PLLOverview />} />
               </Route>
               <Route path="/triggers" element={<Triggers />} />
               <Route path="/privacy" element={<Privacy />} />

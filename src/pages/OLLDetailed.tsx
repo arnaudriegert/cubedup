@@ -62,6 +62,23 @@ export default function OLLDetailed() {
     <>
       {/* Main content */}
       <main className="main-content-detailed">
+        {/* Collapsible intro */}
+        <details className="collapsible">
+          <summary className="collapsible-trigger">About OLL cases</summary>
+          <div className="collapsible-content">
+            <p>
+              The 57 OLL cases cover every possible last-layer orientation. Cases are grouped by the shape
+              formed by incorrectly-oriented pieces: edges form patterns (lines, dots, L-shapes) while
+              corners create the characteristic silhouette.
+            </p>
+            <p>
+              <strong>Learning strategy:</strong> Start with Solved Cross cases—you likely know some from 2-look OLL.
+              Then learn one category at a time. Mirror pairs share muscle memory; learn them together.
+              Small categories (T-shapes, C-shapes) are quick wins.
+            </p>
+          </div>
+        </details>
+
         {ollCategories.map((category, categoryIndex) => (
           <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
             <h2 className="section-title">{category.name}</h2>
