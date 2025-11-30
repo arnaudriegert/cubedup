@@ -41,7 +41,7 @@ export const ollCategories: OLLCategory[] = [
             shorthand: '{chair}²',
           }, {
             full: "F (R U R' U') (R U R' U') (R U R' U') F'",
-            shorthand: 'F {sexy}³ F',
+            shorthand: "F {sexy}³ F'",
 
           }],
         },
