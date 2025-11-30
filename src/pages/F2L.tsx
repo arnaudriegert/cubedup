@@ -1,6 +1,7 @@
-import AlgorithmText from '../components/AlgorithmText'
+import AlgorithmBox from '../components/AlgorithmBox'
 import { IsometricCube } from '../components/cube'
 import { Color, FaceColors } from '../types/cube'
+import { Algorithm } from '../data/ollCases'
 import { solidFace, f2lFace } from '../utils/cubeHelpers'
 import { getColorRotations } from '../utils/colors'
 import {
@@ -21,7 +22,7 @@ const colorRotationsLeft = getColorRotations(Color.RED)
 // Uses 2x2 grid for larger cube display
 interface F2LCaseCardProps {
   slot: 'left' | 'right'
-  algorithm: string
+  algorithm: Algorithm
   generateFaces: (colors: typeof colorRotationsRight[0]) => {
     top?: FaceColors
     front?: FaceColors
@@ -51,9 +52,7 @@ function F2LCaseCard({
           />
         ))}
       </div>
-      <div className="algorithm-box text-center">
-        <AlgorithmText text={algorithm} />
-      </div>
+      <AlgorithmBox algorithm={algorithm} />
     </div>
   )
 }
@@ -118,7 +117,7 @@ export default function F2L() {
                 For U' L' U L: U' hides pair, L' opens slot, U brings pair over, L closes */}
             <F2LCaseCard
               slot="left"
-              algorithm="**U' L' U L**"
+              algorithm={{ full: "U' L' U L", shorthand: "{left-sexy}'" }}
               generateFaces={(c) => ({
                 // Joined pair: corner at UFL (white front), edge at UL
                 top: makeFace(Color.YELLOW, {
@@ -139,7 +138,7 @@ export default function F2L() {
                 For U R U' R': U hides pair, R opens slot, U' brings pair over, R' closes */}
             <F2LCaseCard
               slot="right"
-              algorithm="**U R U' R'**"
+              algorithm={{ full: "U R U' R'", shorthand: "{sexy}'" }}
               generateFaces={(c) => ({
                 // Joined pair: corner at UFR (white front), edge at UR
                 top: makeFace(Color.YELLOW, {
@@ -170,7 +169,7 @@ export default function F2L() {
                 Edge at UB: F-color faces UP (top[1]) */}
             <F2LCaseCard
               slot="left"
-              algorithm="**L' U' L**"
+              algorithm={{ full: "L' U' L" }}
               generateFaces={(c) => ({
                 // Split pair: corner at UFL (white left), edge at UB
                 top: makeFace(Color.YELLOW, {
@@ -187,7 +186,7 @@ export default function F2L() {
                 Edge at UB: F-color faces UP (top[1]) */}
             <F2LCaseCard
               slot="right"
-              algorithm="**R U R'**"
+              algorithm={{ full: "R U R'" }}
               generateFaces={(c) => ({
                 // Split pair: corner at UFR (white right), edge at UB
                 top: makeFace(Color.YELLOW, {
