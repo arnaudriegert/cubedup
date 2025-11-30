@@ -55,11 +55,11 @@ export const pllCategories: PLLCategory[] = [
     cases: [
       [
         {
-          name: 'Ua',
+          name: 'Ub',
           sideColors: {
-            back: [G, O, G],
-            left: [O, R, O],
-            right: [R, G, R],
+            back: [G, R, G],
+            left: [O, G, O],
+            right: [R, O, R],
             front: [B, B, B],
           },
           algorithms: [{
@@ -69,18 +69,18 @@ export const pllCategories: PLLCategory[] = [
           }],
           swaps: {
             edges: [{
-              positions: ['L', 'R', 'B'],
-              direction: 'cw',
+              positions: ['B', 'R', 'L'],
+              direction: 'ccw',
             }],
-            description: '3-cycle edges: L→R→B',
+            description: '3-cycle edges: B→R→L',
           },
         },
         {
-          name: 'Ub',
+          name: 'Ua',
           sideColors: {
-            back: [G, R, G],
-            left: [O, G, O],
-            right: [R, O, R],
+            back: [G, O, G],
+            left: [O, R, O],
+            right: [R, G, R],
             front: [B, B, B],
           },
           algorithms: [{
@@ -90,10 +90,10 @@ export const pllCategories: PLLCategory[] = [
           }],
           swaps: {
             edges: [{
-              positions: ['B', 'R', 'L'],
-              direction: 'ccw',
+              positions: ['L', 'R', 'B'],
+              direction: 'cw',
             }],
-            description: '3-cycle edges: B→R→L',
+            description: '3-cycle edges: L→R→B',
           },
         },
       ],
