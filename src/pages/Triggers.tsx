@@ -26,10 +26,9 @@ function TriggerCard({
         <AlgorithmBox
           algorithm={flashcardMode
             ? {
-              shorthand: trigger.notation,
-              full: trigger.moves,
+              decomposition: [{ moves: trigger.moves, trigger: trigger.notation }],
             }
-            : { full: trigger.moves }
+            : { decomposition: [{ moves: trigger.moves }] }
           }
         />
         <div className="pt-2">
@@ -37,10 +36,9 @@ function TriggerCard({
           <AlgorithmBox
             algorithm={flashcardMode
               ? {
-                shorthand: inverseNotation,
-                full: trigger.inverse,
+                decomposition: [{ moves: trigger.inverse, trigger: inverseNotation }],
               }
-              : { full: trigger.inverse }
+              : { decomposition: [{ moves: trigger.inverse }] }
             }
           />
         </div>

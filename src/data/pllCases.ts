@@ -63,9 +63,17 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, B],
           },
           algorithms: [{
-            full: "L² (U L) (U L') (U' L') (U' L') (U L')",
+            decomposition: [
+              { moves: 'L²' },
+              { moves: "U L U L' U' L' U' L' U L'" },
+            ],
           }, {
-            full: "M² U' M' U² M U' M²",
+            decomposition: [
+              { moves: 'M²' },
+              { moves: "U' M'" },
+              { moves: 'U² M' },
+              { moves: "U' M²" },
+            ],
           }],
           swaps: {
             edges: [{
@@ -84,9 +92,17 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, B],
           },
           algorithms: [{
-            full: "R² (U' R') (U' R) (U R) (U R) (U' R)",
+            decomposition: [
+              { moves: 'R²' },
+              { moves: "U' R' U' R U R U R U' R" },
+            ],
           }, {
-            full: "M² U M' U² M U M²",
+            decomposition: [
+              { moves: 'M²' },
+              { moves: "U M'" },
+              { moves: 'U² M' },
+              { moves: 'U M²' },
+            ],
           }],
           swaps: {
             edges: [{
@@ -107,7 +123,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, G, B],
           },
           algorithms: [{
-            full: "M² U' M² U² M² U' M²",
+            decomposition: [
+              { moves: 'M²' },
+              { moves: "U' M²" },
+              { moves: 'U² M²' },
+              { moves: "U' M²" },
+            ],
           }],
           swaps: {
             edges: [
@@ -128,7 +149,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, R, B],
           },
           algorithms: [{
-            full: "M' U' M² U' M² U' M' U² M²",
+            decomposition: [
+              { moves: "M' U'" },
+              { moves: "M² U' M²" },
+              { moves: "U' M'" },
+              { moves: 'U² M²' },
+            ],
           }],
           swaps: {
             edges: [
@@ -155,7 +181,11 @@ export const pllCategories: PLLCategory[] = [
             front: [O, B, B],
           },
           algorithms: [{
-            full: "L² B² L' F' L B² L' F L'",
+            decomposition: [
+              { moves: 'L² B²' },
+              { moves: "L' F' L" },
+              { moves: "B² L' F L'" },
+            ],
           }],
           swaps: {
             corners: [{
@@ -174,7 +204,11 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, R],
           },
           algorithms: [{
-            full: "R² B² R F R' B² R F' R",
+            decomposition: [
+              { moves: 'R² B²' },
+              { moves: "R F R'" },
+              { moves: "B² R F' R" },
+            ],
           }],
           swaps: {
             corners: [{
@@ -195,7 +229,10 @@ export const pllCategories: PLLCategory[] = [
             front: [O, B, R],
           },
           algorithms: [{
-            full: "(r' U r F' r' U' r F) (r' U' r F' r' U r F)",
+            decomposition: [
+              { moves: "r' U r F' r' U' r F" },
+              { moves: "r' U' r F' r' U r F" },
+            ],
           }],
           swaps: {
             corners: [
@@ -222,8 +259,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, R],
           },
           algorithms: [{
-            full: "(R U R' U') R' F R² U' R' U' R U R' F'",
-            shorthand: "{sexy} R' F R² U' R' U' R U R' F'",
+            decomposition: [
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R²" },
+              { moves: "U' R' U' R U R'" },
+              { moves: "F'" },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BR', 'FR'] }],
@@ -242,8 +283,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, B],
           },
           algorithms: [{
-            full: "R' U R U' R² F' U' F U R (F R' F' R) R",
-            shorthand: "R' U R U' R² F' U' F U R {sledge}' R",
+            decomposition: [
+              { moves: "R' U R U'" },
+              { moves: "R² F' U' F U R" },
+              { moves: "F R' F' R", trigger: "{sledge}'" },
+              { moves: 'R' },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BL', 'BR'] }],
@@ -262,8 +307,12 @@ export const pllCategories: PLLCategory[] = [
             front: [G, G, O],
           },
           algorithms: [{
-            full: "(L' U' L F) (L' U' L U) (L F' L') (L' U L)",
-            shorthand: "(L' U' L F) {left-sexy} (L F' L') (L' U L)",
+            decomposition: [
+              { moves: "L' U' L F" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "L F' L'" },
+              { moves: "L' U L" },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['FL', 'BL'] }],
@@ -280,8 +329,12 @@ export const pllCategories: PLLCategory[] = [
             front: [R, G, G],
           },
           algorithms: [{
-            full: "(R U R' F') (R U R' U') (R' F R) (R U' R')",
-            shorthand: "(R U R' F') {sexy} (R' F R) (R U' R')",
+            decomposition: [
+              { moves: "R U R' F'" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R" },
+              { moves: "R U' R'" },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BR', 'FR'] }],
@@ -300,8 +353,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, O, B],
           },
           algorithms: [{
-            full: "L U² L' U² L F' (L' U' L U) L F L²",
-            shorthand: "L U² L' U² L F' {left-sexy} L F L²",
+            decomposition: [
+              { moves: "L U² L' U²" },
+              { moves: "L F'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'L F L²' },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BL', 'BR'] }],
@@ -318,8 +375,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, R, B],
           },
           algorithms: [{
-            full: "R' U² R U² R' F (R U R' U') R' F' R²",
-            shorthand: "R' U² R U² R' F {sexy} R' F' R²",
+            decomposition: [
+              { moves: "R' U² R U²" },
+              { moves: "R' F" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F' R²" },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BL', 'BR'] }],
@@ -344,8 +405,13 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, G],
           },
           algorithms: [{
-            full: "F R U' R' U' R U R' F' (R U R' U') (R' F R F')",
-            shorthand: "F R U' R' U' R U R' F' {sexy} {sledge}",
+            decomposition: [
+              { moves: "F R U'" },
+              { moves: "R' U' R" },
+              { moves: "U R' F'" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BL', 'FR'] }],
@@ -364,9 +430,19 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, G],
           },
           algorithms: [{
-            full: "R' U R' U' y R' F' R² U' R' U R' F R F",
+            decomposition: [
+              { moves: "R' U R'" },
+              { moves: "U' y R' F'" },
+              { moves: "R² U' R' U R'" },
+              { moves: 'F R F' },
+            ],
           }, {
-            full: "R' U R' d' R' F' R² U' R' U R' F R F",
+            decomposition: [
+              { moves: "R' U R'" },
+              { moves: "d' R' F'" },
+              { moves: "R² U' R' U R'" },
+              { moves: 'F R F' },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BL', 'FR'] }],
@@ -385,8 +461,14 @@ export const pllCategories: PLLCategory[] = [
             front: [G, B, B],
           },
           algorithms: [{
-            full: "L (U' L' U L) (F U F') (L' U' L) (F' L F L') U L'",
-            shorthand: "L {left-sexy}' (F U F') (L' U' L) {left-sledge}' U L'",
+            decomposition: [
+              { moves: 'L' },
+              { moves: "U' L' U L", trigger: "{left-sexy}'" },
+              { moves: "F U F'" },
+              { moves: "L' U' L" },
+              { moves: "F' L F L'", trigger: "{left-sledge}'" },
+              { moves: "U L'" },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['FL', 'BR'] }],
@@ -403,8 +485,14 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, G],
           },
           algorithms: [{
-            full: "R' (U R U' R') (F' U' F) (R U R') (F R' F' R) U' R",
-            shorthand: "R' {sexy}' (F' U' F) (R U R') {sledge}' U' R",
+            decomposition: [
+              { moves: "R'" },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "F' U' F" },
+              { moves: "R U R'" },
+              { moves: "F R' F' R", trigger: "{sledge}'" },
+              { moves: "U' R" },
+            ],
           }],
           swaps: {
             corners: [{ positions: ['BL', 'FR'] }],
@@ -429,8 +517,12 @@ export const pllCategories: PLLCategory[] = [
             front: [O, B, B],
           },
           algorithms: [{
-            full: "L² F² L' U² L' U² L F' (L' U' L U) L F' L²",
-            shorthand: "L² F² L' U² L' U² L F' {left-sexy} L F' L²",
+            decomposition: [
+              { moves: 'L² F²' },
+              { moves: "L' U² L' U² L F'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "L F' L²" },
+            ],
           }],
           swaps: {
             corners: [{
@@ -453,8 +545,12 @@ export const pllCategories: PLLCategory[] = [
             front: [R, R, G],
           },
           algorithms: [{
-            full: "R² F² R U² R U² R' F (R U R' U') R' F R²",
-            shorthand: "R² F² R U² R U² R' F {sexy} R' F R²",
+            decomposition: [
+              { moves: 'R² F²' },
+              { moves: "R U² R U² R' F" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R²" },
+            ],
           }],
           swaps: {
             corners: [{
@@ -479,8 +575,12 @@ export const pllCategories: PLLCategory[] = [
             front: [G, B, B],
           },
           algorithms: [{
-            full: "L² F L' (U' L' U L) F L' U² L U² L F² L²",
-            shorthand: "L² F L' {left-sexy}' F L' U² L U² L F² L²",
+            decomposition: [
+              { moves: "L² F L'" },
+              { moves: "U' L' U L", trigger: "{left-sexy}'" },
+              { moves: "F L' U² L U² L" },
+              { moves: 'F² L²' },
+            ],
           }],
           swaps: {
             corners: [{
@@ -503,8 +603,12 @@ export const pllCategories: PLLCategory[] = [
             front: [B, B, G],
           },
           algorithms: [{
-            full: "R² F' R (U R U' R') F' R U² R' U² R' F² R²",
-            shorthand: "R² F' R {sexy}' F' R U² R' U² R' F² R²",
+            decomposition: [
+              { moves: "R² F' R" },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "F' R U² R' U² R'" },
+              { moves: 'F² R²' },
+            ],
           }],
           swaps: {
             corners: [{

@@ -59,7 +59,7 @@ export const triggerCategories: TriggerCategory[] = [
   },
   {
     name: 'Wide Triggers',
-    description: 'Triggers using wide moves. Lowercase r/l = two layers together.',
+    description: 'Triggers using wide moves (lowercase r/l = two layers together). These affect the M slice, making them useful for edge-related cases.',
     triggers: [
       // Left Fat Sexy / Fat Sexy pair
       [
@@ -99,7 +99,7 @@ export const triggerCategories: TriggerCategory[] = [
   },
   {
     name: 'Sune Family',
-    description: 'Corner-oriented algorithms. Chair and Sune are inverses of each other.',
+    description: 'The Sune family algorithms orient corners. Chair (Anti-Sune) and Sune are inverses—learning one gives you both. These are standalone OLL solutions and building blocks for other algorithms.',
     triggers: [
       // Left Chair / Chair pair (with Sune as inverse)
       [

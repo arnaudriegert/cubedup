@@ -1,8 +1,13 @@
 import { Orientation, OLLOrientations } from '../types/cube'
 
+export interface AlgorithmStep {
+  moves: string           // The raw moves for this segment
+  trigger?: string        // Optional trigger notation e.g., '{sexy}'
+}
+
 export interface Algorithm {
-  full: string
-  shorthand?: string
+  decomposition: AlgorithmStep[]  // Source of truth - full is built from this
+  simplifiedResult?: string       // Optional simplified result with cancellations marked (contains ~)
 }
 
 export interface OLLCase {
@@ -37,12 +42,17 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.TOP, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "(R U² R' U' R ~U' R') (R U²~ **U** R' U' R U' R')",
-            shorthand: '{chair}²',
+            simplifiedResult: "(R U² R' U' R ~U' R') (R U²~ **U** R' U' R U' R')",
+            decomposition: [
+              { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+              { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+            ],
           }, {
-            full: "F (R U R' U') (R U R' U') (R U R' U') F'",
-            shorthand: "F {sexy}³ F'",
-
+            decomposition: [
+              { moves: 'F' },
+              { moves: "(R U R' U') (R U R' U') (R U R' U')", trigger: '{sexy}³' },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -57,10 +67,19 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [
             {
-              full: "(R U² R' U' R U' R') U' (R U² R' U' R U' R')",
-              shorthand: "{chair} U' {chair}",
+              decomposition: [
+                { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+                { moves: "U'" },
+                { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+              ],
             },
-            { full: "R U² R² U' R² U' R² U² R" },
+            {
+              decomposition: [
+                { moves: 'R U² R²' },
+                { moves: "U' R² U'" },
+                { moves: 'R² U² R' },
+              ],
+            },
           ],
         },
       ],
@@ -75,10 +94,20 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [
             {
-              full: "(R U² R' U' R U' R') (L' U² L U L' U L)",
-              shorthand: '{chair} {left-chair}',
+              decomposition: [
+                { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+                { moves: "L' U² L U L' U L", trigger: '{left-chair}' },
+              ],
             },
-            { full: "[u] R² D (R' U² R) D' (R' U² R')" },
+            {
+              decomposition: [
+                { moves: '[u]' },
+                { moves: 'R² D' },
+                { moves: "R' U² R" },
+                { moves: "D'" },
+                { moves: "R' U² R'" },
+              ],
+            },
           ],
         },
       ],
@@ -93,12 +122,18 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [
             {
-              full: "[u²] [f'] (R U² R' U' R U' R') (L' U² L U L' U L) [f]",
-              shorthand: "[u²] [f'] {chair} {left-chair} [f]",
+              decomposition: [
+                { moves: "[u²] [f']" },
+                { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+                { moves: "L' U² L U L' U L", trigger: '{left-chair}' },
+                { moves: '[f]' },
+              ],
             },
             {
-              full: "(r U R' U') (r' F R F')",
-              shorthand: '{fat-sexy} {fat-sledge}',
+              decomposition: [
+                { moves: "r U R' U'", trigger: '{fat-sexy}' },
+                { moves: "r' F R F'", trigger: '{fat-sledge}' },
+              ],
             },
           ],
         },
@@ -114,15 +149,18 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [
             {
-              full: "F (R U² R' U' R U' R') (L' U² L U L' U L) F'",
-              shorthand: "F {chair} {left-chair} F'",
+              decomposition: [
+                { moves: 'F' },
+                { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+                { moves: "L' U² L U L' U L", trigger: '{left-chair}' },
+                { moves: "F'" },
+              ],
             },
             {
-              full: "(F R' F' r) (U R U' r')",
-              shorthand: "{fat-sledge}' {fat-sexy}'",
-            },
-            {
-              full: "[u] (F' L F R') (F' L' F R)",
+              decomposition: [
+                { moves: "F R' F' r", trigger: "{fat-sledge}'" },
+                { moves: "U R U' r'", trigger: "{fat-sexy}'" },
+              ],
             },
           ],
         },
@@ -137,8 +175,9 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "L' U² L U L' U L",
-            shorthand: '{left-chair}',
+            decomposition: [
+              { moves: "L' U² L U L' U L", trigger: '{left-chair}' },
+            ],
           }],
         },
         {
@@ -150,8 +189,9 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.TOP, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "R U² R' U' R U' R'",
-            shorthand: '{chair}',
+            decomposition: [
+              { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+            ],
           }],
         },
       ],
@@ -171,8 +211,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "F' (L' U' L U) (L' U' L U) F",
-            shorthand: "F' {left-sexy}² F",
+            decomposition: [
+              { moves: "F'" },
+              { moves: "(L' U' L U) (L' U' L U)", trigger: '{left-sexy}²' },
+              { moves: 'F' },
+            ],
           }],
         },
         {
@@ -184,8 +227,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "F (R U R' U') (R U R' U') F'",
-            shorthand: "F {sexy}² F'",
+            decomposition: [
+              { moves: 'F' },
+              { moves: "(R U R' U') (R U R' U')", trigger: '{sexy}²' },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -198,7 +244,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
             Orientation.FRONT, Orientation.TOP, Orientation.RIGHT,
           ],
-          algorithms: [{ full: "l U' (l² U l² U l²) U' l" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "l U' l'" },
+              { moves: "l' U l" },
+              { moves: "l U l'" },
+              { moves: "l' U' l" },
+            ],
+          }],
         },
         {
           number: 50,
@@ -208,7 +261,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.TOP,
             Orientation.LEFT, Orientation.TOP, Orientation.FRONT,
           ],
-          algorithms: [{ full: "r' U (r² U' r² U' r²) U r'" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "r' U r" },
+              { moves: "r U' r'" },
+              { moves: "r' U' r" },
+              { moves: "r U r'" },
+            ],
+          }],
         },
       ],
       [
@@ -221,8 +281,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "l (U L' U L) (U' L' U L) U² l'",
-            shorthand: "l (U L' U L) {left-sexy} U² l'",
+            decomposition: [
+              { moves: 'l' },
+              { moves: "U L' U L" },
+              { moves: "U' L' U L", trigger: "{left-sexy}'" },
+              { moves: "U² l'" },
+            ],
           }],
         },
         {
@@ -235,8 +299,12 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [
             {
-              full: "r' (U' R U' R') (U R U' R') U² r",
-              shorthand: "r' (U' R U' R') {sexy}' U² r",
+              decomposition: [
+                { moves: "r'" },
+                { moves: "U' R U' R'" },
+                { moves: "U R U' R'", trigger: "{sexy}'" },
+                { moves: 'U² r' },
+              ],
             },
           ],
         },
@@ -257,8 +325,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "S' (L' U' L U) (L F' L' ~F) S~ **f**",
-            shorthand: "S' {left-sexy} {left-sledge} S",
+            simplifiedResult: "S' (L' U' L U) (L F' L' ~F) S~ **f**",
+            decomposition: [
+              { moves: "S'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "L F' L' F", trigger: '{left-sledge}' },
+              { moves: 'S' },
+            ],
           }],
         },
         {
@@ -270,8 +343,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.TOP, Orientation.TOP,
           ],
           algorithms: [{
-            full: "S (R U R' U') (R' F R ~F') S'~ **f'**",
-            shorthand: "S {sexy} {sledge} S'",
+            simplifiedResult: "S (R U R' U') (R' F R ~F') S'~ **f'**",
+            decomposition: [
+              { moves: 'S' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: "S'" },
+            ],
           }],
         },
       ],
@@ -285,8 +363,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "F' (U' L' U L) F",
-            shorthand: "F' {left-sexy}' F",
+            decomposition: [
+              { moves: "F'" },
+              { moves: "U' L' U L", trigger: "{left-sexy}'" },
+              { moves: 'F' },
+            ],
           }],
         },
         {
@@ -298,8 +379,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "F (U R U' R') F'",
-            shorthand: "F {sexy}' F'",
+            decomposition: [
+              { moves: 'F' },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -319,8 +403,10 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(R U R' U') (R' F R F')",
-            shorthand: '{sexy} {sledge}',
+            decomposition: [
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+            ],
           }],
         },
       ],
@@ -334,8 +420,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "F (R U R' U') F'",
-            shorthand: "F {sexy} F'",
+            decomposition: [
+              { moves: 'F' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -355,8 +444,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "R U² R² F R F' U² (R' F R F')",
-            shorthand: "R U² R² F R F' U² {sledge}",
+            decomposition: [
+              { moves: 'R U² R²' },
+              { moves: "F R F'" },
+              { moves: 'U²' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+            ],
           }],
         },
       ],
@@ -370,8 +463,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "F (R U R' U') F' f (R U R' U') f'",
-            shorthand: "F {sexy} F' f {sexy} f'",
+            decomposition: [
+              { moves: 'F' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F'" },
+              { moves: 'f' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "f'" },
+            ],
           }],
         },
       ],
@@ -385,8 +484,15 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "f' (L' U' L U) f U' F' (L' U' L U) F",
-            shorthand: "f' {left-sexy} f U' F' {left-sexy} F",
+            decomposition: [
+              { moves: "f'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'f' },
+              { moves: "U'" },
+              { moves: 'F' },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'F' },
+            ],
           }],
         },
         {
@@ -398,8 +504,15 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "f (R U R' U') f' U F (R U R' U') F'",
-            shorthand: "f {sexy} f' U F {sexy} F'",
+            decomposition: [
+              { moves: 'f' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "f'" },
+              { moves: 'U' },
+              { moves: 'F' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -413,7 +526,10 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "(r U R' U R U² r') (r' U' R U' R' U² r)",
+            decomposition: [
+              { moves: "r U R' U R U² r'", trigger: '{fat-sune}' },
+              { moves: "r' U' R U' R' U² r", trigger: '{left-fat-sune}' },
+            ],
           }],
         },
       ],
@@ -427,8 +543,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "M U (R U R' U') M' (R' F R F')",
-            shorthand: "M U {sexy} M' {sledge}",
+            decomposition: [
+              { moves: 'M U' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "M'" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+            ],
           }],
         },
       ],
@@ -442,8 +562,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(R U R' U) (R' F R F') U² (R' F R F')",
-            shorthand: '{half-sune} {sledge} U² {sledge}',
+            decomposition: [
+              { moves: "R U R' U", trigger: '{half-sune}' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: 'U²' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+            ],
           }],
         },
       ],
@@ -457,8 +581,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(r U R' U') M² (U R U' R') U' M'",
-            shorthand: "{fat-sexy} M² {sexy}' U' M'",
+            decomposition: [
+              { moves: "r U R' U'", trigger: '{fat-sexy}' },
+              { moves: 'M²' },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "U' M'" },
+            ],
           }],
         },
       ],
@@ -478,11 +606,18 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "f (R U R' U') (R U R' U') f'",
-            shorthand: "f {sexy}² f'",
+            decomposition: [
+              { moves: 'f' },
+              { moves: "(R U R' U') (R U R' U')", trigger: '{sexy}²' },
+              { moves: "f'" },
+            ],
           }, {
-            full: "[u2] F (U R U' R') (U R U' R') F'",
-            shorthand: "[u2] F {sexy}'² F'",
+            decomposition: [
+              { moves: '[u2]' },
+              { moves: 'F' },
+              { moves: "(U R U' R') (U R U' R')", trigger: "{sexy}'²" },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -496,8 +631,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.TOP, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "(R U R' U) R d' R U' R' F'",
-            shorthand: "{half-sune} R d' R U' R' F'",
+            decomposition: [
+              { moves: "R U R' U", trigger: '{half-sune}' },
+              { moves: "R d'" },
+              { moves: "R U' R' F'" },
+            ],
           }],
         },
       ],
@@ -510,7 +648,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
             Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
           ],
-          algorithms: [{ full: "R' F U R U' R² F' R² U' R' U R U R'" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "R' F" },
+              { moves: "U R U' R²" },
+              { moves: "F' R²" },
+              { moves: "U' R' U R U R'" },
+            ],
+          }],
         },
       ],
       [
@@ -523,8 +668,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "r' U' r U' R' (U R U' R') U R r' U r",
-            shorthand: "r' U' r U' R' {sexy}' U R r' U r",
+            decomposition: [
+              { moves: "r' U' r" },
+              { moves: "U' R'" },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "U R r' U r" },
+            ],
           }],
         },
       ],
@@ -543,7 +692,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
             Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
-          algorithms: [{ full: "l' U² (L U L' U) l" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "l' U²" },
+              { moves: "L U L' U", trigger: "{left-half-sune}'" },
+              { moves: 'l' },
+            ],
+          }],
         },
         {
           number: 6,
@@ -553,7 +708,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.TOP,
             Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
           ],
-          algorithms: [{ full: "r U² (R' U' R U') r'" }],
+          algorithms: [{
+            decomposition: [
+              { moves: 'r U²' },
+              { moves: "R' U' R U'", trigger: "{half-sune}'" },
+              { moves: "r'" },
+            ],
+          }],
         },
       ],
     ],
@@ -571,7 +732,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.TOP,
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
-          algorithms: [{ full: "l' (U' L U' L') U² l" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "l'" },
+              { moves: "U' L U' L'", trigger: '{left-half-sune}' },
+              { moves: 'U² l' },
+            ],
+          }],
         },
         {
           number: 7,
@@ -581,7 +748,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
             Orientation.TOP, Orientation.FRONT, Orientation.FRONT,
           ],
-          algorithms: [{ full: "r (U R' U R) U² r'" }],
+          algorithms: [{
+            decomposition: [
+              { moves: 'r' },
+              { moves: "U R' U R", trigger: '{half-sune}' },
+              { moves: "U² r'" },
+            ],
+          }],
         },
       ],
       [
@@ -594,8 +767,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.TOP, Orientation.TOP,
           ],
           algorithms: [{
-            full: "M (L' U' L U' L' U² L) U' M'",
-            shorthand: "M {left-sune} U M'",
+            decomposition: [
+              { moves: 'M' },
+              { moves: "L' U' L U' L' U² L", trigger: '{left-sune}' },
+              { moves: "U' M'" },
+            ],
           }],
         },
         {
@@ -607,8 +783,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "M (R U R' U R U² R') U M'",
-            shorthand: "M {sune} U M'",
+            decomposition: [
+              { moves: 'M' },
+              { moves: "R U R' U R U² R'", trigger: '{sune}' },
+              { moves: "U M'" },
+            ],
           }],
         },
       ],
@@ -628,8 +807,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "(L' U' L U) (L F' L') (L' U' L U) F",
-            shorthand: "{left-sexy} L F' L' {left-sexy} F",
+            decomposition: [
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "L F' L' F", trigger: '{left-sledge}' },
+              { moves: "F'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'F' },
+            ],
+            simplifiedResult: "(L' U' L U) (L F' L' ~F) F' (L'~ **L²** U' L U) F",
           }],
         },
         {
@@ -641,8 +826,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(R U R' U') (R' F R) (R U R' U') F'",
-            shorthand: "{sexy} R' F R {sexy} F'",
+            decomposition: [
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: 'F' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F'" },
+            ],
+            simplifiedResult: "(R U R' U') (R' F ~R F') F (R~ **R²** U R' U') F'",
           }],
         },
       ],
@@ -655,7 +846,13 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.TOP,
             Orientation.FRONT, Orientation.TOP, Orientation.TOP,
           ],
-          algorithms: [{ full: "R U² R² F R F' R U² R'" }],
+          algorithms: [{
+            decomposition: [
+              { moves: 'R U² R²' },
+              { moves: "F R F'" },
+              { moves: "R U² R'" },
+            ],
+          }],
         },
       ],
       [
@@ -668,8 +865,10 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(F R' F' R) (U R U' R')",
-            shorthand: "{sledge}' {sexy}'",
+            decomposition: [
+              { moves: "F R' F' R", trigger: "{sledge}'" },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+            ],
           }],
         },
       ],
@@ -689,8 +888,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "L' U' L (U' L' U L) U (L F' L' F)",
-            shorthand: "L' U' L {left-sexy}' U {left-sledge}",
+            decomposition: [
+              { moves: "L' U' L U'" },
+              { moves: "L' U L U" },
+              { moves: "L F' L' F", trigger: '{left-sledge}' },
+            ],
           }],
         },
         {
@@ -702,8 +904,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "R U R' (U R U' R') U' (R' F R F')",
-            shorthand: "R U R' {sexy}' U' {sledge}",
+            decomposition: [
+              { moves: "R U R' U" },
+              { moves: "R U' R' U'" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+            ],
           }],
         },
       ],
@@ -723,8 +928,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "L F' (L' U' L U) F U' L'",
-            shorthand: "L F' {left-sexy} F U' L'",
+            decomposition: [
+              { moves: "L F'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "F U' L'" },
+            ],
           }],
         },
         {
@@ -736,8 +944,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "R' F (R U R' U') F' U R",
-            shorthand: "R' F {sexy} F' U R",
+            decomposition: [
+              { moves: "R' F" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F' U R" },
+            ],
           }],
         },
       ],
@@ -756,7 +967,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.TOP,
             Orientation.FRONT, Orientation.FRONT, Orientation.TOP,
           ],
-          algorithms: [{ full: "(l' U l) U (l' U' l) (F U' F')" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "l' U l" },
+              { moves: 'U' },
+              { moves: "l' U' l" },
+              { moves: "F U' F'" },
+            ],
+          }],
         },
         {
           number: 13,
@@ -766,7 +984,14 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.TOP,
             Orientation.TOP, Orientation.FRONT, Orientation.FRONT,
           ],
-          algorithms: [{ full: "(r U' r') U' (r U r') (F' U F)" }],
+          algorithms: [{
+            decomposition: [
+              { moves: "r U' r'" },
+              { moves: "U'" },
+              { moves: "r U r'" },
+              { moves: "F' U F" },
+            ],
+          }],
         },
       ],
       [
@@ -779,8 +1004,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
           ],
           algorithms: [{
-            full: "(l' U' l) (L' U' L U) (l' U l)",
-            shorthand: "l' U' l {left-sexy} l' U l",
+            decomposition: [
+              { moves: "l' U' l" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "l' U l" },
+            ],
           }],
         },
         {
@@ -792,8 +1020,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "(r U r') (R U R' U') (r U' r')",
-            shorthand: "r U r' {sexy} r U' r'",
+            decomposition: [
+              { moves: "r U r'" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "r U' r'" },
+            ],
           }],
         },
       ],
@@ -813,8 +1044,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "M U' (L' U' L U) (L F' L' F) M'",
-            shorthand: "M U' {left-sexy} {left-sledge} M'",
+            decomposition: [
+              { moves: "M U'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "L F' L' F", trigger: '{left-sledge}' },
+              { moves: "M'" },
+            ],
           }],
         },
         {
@@ -826,8 +1061,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "M U (R U R' U') (R' F R F') M'",
-            shorthand: "M U {sexy} {sledge} M'",
+            decomposition: [
+              { moves: 'M U' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: "M'" },
+            ],
           }],
         },
       ],
@@ -841,8 +1080,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(L' U' L U' L' U² L) F' (L' U' L U) F",
-            shorthand: "{left-sune} F' {left-sexy} F",
+            decomposition: [
+              { moves: "L' U' L U' L' U² L", trigger: '{left-sune}' },
+              { moves: "F'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'F' },
+            ],
           }],
         },
         {
@@ -854,8 +1097,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(R U R' U R U² R') F (R U R' U') F'",
-            shorthand: "{sune} F {sexy} F'",
+            decomposition: [
+              { moves: "R U R' U R U² R'", trigger: '{sune}' },
+              { moves: 'F' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F'" },
+            ],
           }],
         },
       ],
@@ -875,8 +1122,12 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(R U R' U') B' (R' F R F') B",
-            shorthand: "{sexy} B' {sledge} B",
+            decomposition: [
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "B'" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: 'B' },
+            ],
           }],
         },
       ],
@@ -890,8 +1141,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
           ],
           algorithms: [{
-            full: "R' U' (R' F R F') U R",
-            shorthand: "R' U' {sledge} U R",
+            decomposition: [
+              { moves: "R' U'" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: 'U R' },
+            ],
           }],
         },
       ],
@@ -911,10 +1165,17 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(r U R' U') M (U R U' R')",
-            shorthand: "{fat-sexy} M {sexy}'",
+            decomposition: [
+              { moves: "r U R' U'", trigger: '{fat-sexy}' },
+              { moves: 'M' },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+            ],
           }, {
-            full: "M U M' U² M U M'",
+            decomposition: [
+              { moves: "M U M'" },
+              { moves: 'U²' },
+              { moves: "M U M'" },
+            ],
           }],
         },
       ],
@@ -928,8 +1189,11 @@ export const ollCategories: OLLCategory[] = [
             Orientation.TOP, Orientation.FRONT, Orientation.TOP,
           ],
           algorithms: [{
-            full: "(R U R' U') M' (U R U' r')",
-            shorthand: "{sexy} M' {fat-sexy}'",
+            decomposition: [
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "M'" },
+              { moves: "U R U' r'", trigger: "{fat-sexy}'" },
+            ],
           }],
         },
       ],
