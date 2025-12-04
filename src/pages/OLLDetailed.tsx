@@ -4,21 +4,30 @@ import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
 import AlgorithmBox from '../components/AlgorithmBox'
+import InverseBadge from '../components/InverseBadge'
 
 function OLLCaseCard({
-  ollCase, isHighlighted,
+  ollCase, isHighlighted, onNavigateToCase,
 }: {
   ollCase: OLLCase
   isHighlighted?: boolean
+  onNavigateToCase?: (caseNumber: number) => void
 }) {
   return (
-    <div className={`group case-card transition-all duration-300 ${isHighlighted ? 'case-card-highlight' : ''}`}>
-      <div className="flex flex-col items-center">
-        <h3 className="case-card-title">
+    <div className={`group case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
+      {ollCase.inverseOf && onNavigateToCase && (
+        <InverseBadge
+          inverseCaseNumber={ollCase.inverseOf}
+          onClick={onNavigateToCase}
+          className="absolute top-3 right-3"
+        />
+      )}
+      <div className="flex flex-col">
+        <h3 className="case-card-title text-left">
           OLL {ollCase.number} - {ollCase.name}
         </h3>
 
-        <div className="mb-6">
+        <div className="mb-6 flex justify-center">
           <OLLGrid orientations={ollCase.orientations} />
         </div>
 
@@ -36,7 +45,12 @@ export default function OLLDetailed() {
   const {
     highlightedOll,
     clearSearch,
+    setSearch,
   } = useOutletContext<OLLContextType>()
+
+  const handleNavigateToCase = (caseNumber: number) => {
+    setSearch(String(caseNumber))
+  }
 
   // Clear highlight when clicking outside cards (but not on nav/header/input)
   useEffect(() => {
@@ -99,8 +113,8 @@ export default function OLLDetailed() {
                   rendered.push(
                     <div key={entry[0].number} id={`oll-${entry[0].number}`} className="md:col-span-2">
                       <div id={`oll-${entry[1].number}`} className="pair-container">
-                        <OLLCaseCard ollCase={entry[0]} isHighlighted={highlightedOll === entry[0].number} />
-                        <OLLCaseCard ollCase={entry[1]} isHighlighted={highlightedOll === entry[1].number} />
+                        <OLLCaseCard ollCase={entry[0]} isHighlighted={highlightedOll === entry[0].number} onNavigateToCase={handleNavigateToCase} />
+                        <OLLCaseCard ollCase={entry[1]} isHighlighted={highlightedOll === entry[1].number} onNavigateToCase={handleNavigateToCase} />
                       </div>
                     </div>,
                   )
@@ -108,7 +122,7 @@ export default function OLLDetailed() {
                 } else {
                   rendered.push(
                     <div key={entry[0].number} id={`oll-${entry[0].number}`}>
-                      <OLLCaseCard ollCase={entry[0]} isHighlighted={highlightedOll === entry[0].number} />
+                      <OLLCaseCard ollCase={entry[0]} isHighlighted={highlightedOll === entry[0].number} onNavigateToCase={handleNavigateToCase} />
                     </div>,
                   )
                   position = (position + 1) % 2

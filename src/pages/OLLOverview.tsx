@@ -6,6 +6,7 @@ import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
 import AlgorithmBox from '../components/AlgorithmBox'
+import InverseBadge from '../components/InverseBadge'
 
 // Build a map from case number to category name
 const categoryByCase = new Map<number, string>()
@@ -78,11 +79,18 @@ const CompactCard = memo(function CompactCard({
       className={isExpanded ? 'compact-card-expanded' : 'compact-card'}
     >
       {isExpanded ? (
-        <div className="group flex flex-col items-center">
-          <h3 className="case-card-title">
+        <div className="group flex flex-col relative">
+          {ollCase.inverseOf && (
+            <InverseBadge
+              inverseCaseNumber={ollCase.inverseOf}
+              onClick={onSelect}
+              className="absolute top-0 right-0"
+            />
+          )}
+          <h3 className="case-card-title text-left">
             OLL {ollCase.number} - {ollCase.name}
           </h3>
-          <div className="mb-6">
+          <div className="mb-6 flex justify-center">
             <OLLGrid orientations={ollCase.orientations} size="medium" />
           </div>
           <div className="w-full space-y-2">
@@ -92,7 +100,13 @@ const CompactCard = memo(function CompactCard({
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
+          {ollCase.inverseOf && (
+            <span
+              className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full"
+              title={`Has inverse: OLL ${ollCase.inverseOf}`}
+            />
+          )}
           <OLLGrid orientations={ollCase.orientations} size="compact" />
           <span className="mt-1 text-xs font-medium text-gray-600">
             {ollCase.number}

@@ -15,6 +15,7 @@ export interface OLLCase {
   name: string
   orientations: OLLOrientations
   algorithms: Algorithm[]
+  inverseOf?: number  // Case number this algorithm is an inverse of
 }
 
 // Can be either a related pair of cases or a single case
@@ -136,6 +137,7 @@ export const ollCategories: OLLCategory[] = [
               ],
             },
           ],
+          inverseOf: 25,
         },
       ],
       [
@@ -163,6 +165,7 @@ export const ollCategories: OLLCategory[] = [
               ],
             },
           ],
+          inverseOf: 24,
         },
       ],
       [
@@ -233,6 +236,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "F'" },
             ],
           }],
+          inverseOf: 51,
         },
       ],
       [
@@ -385,6 +389,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "F'" },
             ],
           }],
+          inverseOf: 45,
         },
       ],
     ],
@@ -408,6 +413,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "R' F R F'", trigger: '{sledge}' },
             ],
           }],
+          inverseOf: 37,
         },
       ],
       [
@@ -426,6 +432,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "F'" },
             ],
           }],
+          inverseOf: 44,
         },
       ],
     ],
@@ -550,6 +557,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "R' F R F'", trigger: '{sledge}' },
             ],
           }],
+          inverseOf: 17,
         },
       ],
       [
@@ -563,12 +571,20 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [{
             decomposition: [
+              { moves: "F R' F' R", trigger: "{sledge}'" },
+              { moves: 'M' },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "U M'" },
+            ],
+          }, {
+            decomposition: [
               { moves: "R U R' U", trigger: '{half-sune}' },
               { moves: "R' F R F'", trigger: '{sledge}' },
               { moves: 'U²' },
               { moves: "R' F R F'", trigger: '{sledge}' },
             ],
           }],
+          inverseOf: 19,
         },
       ],
       [
@@ -601,24 +617,25 @@ export const ollCategories: OLLCategory[] = [
           number: 51,
           name: 'Line + T-Shape side',
           orientations: [
-            Orientation.LEFT, Orientation.BACK, Orientation.BACK,
+            Orientation.BACK, Orientation.BACK, Orientation.RIGHT,
             Orientation.TOP, Orientation.TOP, Orientation.TOP,
-            Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
+            Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
           ],
           algorithms: [{
             decomposition: [
-              { moves: 'f' },
-              { moves: "(R U R' U') (R U R' U')", trigger: '{sexy}²' },
-              { moves: "f'" },
-            ],
-          }, {
-            decomposition: [
-              { moves: '[u2]' },
               { moves: 'F' },
               { moves: "(U R U' R') (U R U' R')", trigger: "{sexy}'²" },
               { moves: "F'" },
             ],
+          }, {
+            decomposition: [
+              { moves: '[u2]' },
+              { moves: 'f' },
+              { moves: "(R U R' U') (R U R' U')", trigger: '{sexy}²' },
+              { moves: "f'" },
+            ],
           }],
+          inverseOf: 48,
         },
       ],
       [
@@ -688,33 +705,35 @@ export const ollCategories: OLLCategory[] = [
           number: 5,
           name: 'Square 1',
           orientations: [
+            Orientation.BACK, Orientation.BACK, Orientation.RIGHT,
             Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
-            Orientation.TOP, Orientation.TOP, Orientation.RIGHT,
-            Orientation.LEFT, Orientation.FRONT, Orientation.FRONT,
+            Orientation.TOP, Orientation.TOP, Orientation.FRONT,
           ],
           algorithms: [{
             decomposition: [
-              { moves: "l' U²" },
-              { moves: "L U L' U", trigger: "{left-half-sune}'" },
-              { moves: 'l' },
+              { moves: 'M U' },
+              { moves: "L' U² L U L' U L", trigger: '{left-chair}' },
+              { moves: "M'" },
             ],
           }],
+          inverseOf: 12,
         },
         {
           number: 6,
           name: 'Square 2',
           orientations: [
+            Orientation.LEFT, Orientation.BACK, Orientation.BACK,
             Orientation.LEFT, Orientation.TOP, Orientation.TOP,
-            Orientation.LEFT, Orientation.TOP, Orientation.TOP,
-            Orientation.FRONT, Orientation.FRONT, Orientation.RIGHT,
+            Orientation.FRONT, Orientation.TOP, Orientation.TOP,
           ],
           algorithms: [{
             decomposition: [
-              { moves: 'r U²' },
-              { moves: "R' U' R U'", trigger: "{half-sune}'" },
-              { moves: "r'" },
+              { moves: "M U'" },
+              { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
+              { moves: "M'" },
             ],
           }],
+          inverseOf: 11,
         },
       ],
     ],
@@ -773,6 +792,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "U' M'" },
             ],
           }],
+          inverseOf: 5,
         },
         {
           number: 11,
@@ -789,6 +809,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "U M'" },
             ],
           }],
+          inverseOf: 6,
         },
       ],
     ],
@@ -816,6 +837,7 @@ export const ollCategories: OLLCategory[] = [
             ],
             simplifiedResult: "(L' U' L U) (L F' L' ~F) F' (L'~ **L²** U' L U) F",
           }],
+          inverseOf: 14,
         },
         {
           number: 9,
@@ -835,6 +857,7 @@ export const ollCategories: OLLCategory[] = [
             ],
             simplifiedResult: "(R U R' U') (R' F ~R F') F (R~ **R²** U R' U') F'",
           }],
+          inverseOf: 13,
         },
       ],
       [
@@ -869,7 +892,14 @@ export const ollCategories: OLLCategory[] = [
               { moves: "F R' F' R", trigger: "{sledge}'" },
               { moves: "U R U' R'", trigger: "{sexy}'" },
             ],
+          }, {
+            decomposition: [
+              { moves: 'F' },
+              { moves: "R U' R' U' R U R'" },
+              { moves: "F'" },
+            ],
           }],
+          inverseOf: 33,
         },
       ],
     ],
@@ -969,12 +999,22 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [{
             decomposition: [
+              { moves: "F'" },
+              { moves: "U' L' U L", trigger: "{left-sexy}'" },
+              { moves: 'F' },
+              { moves: "F' L F L'", trigger: "{left-sledge}'" },
+              { moves: "U' L' U L'", trigger: "{left-sexy}'" },
+            ],
+            simplifiedResult: "F' (U' L' U ~L) F (F' L~ **L²** F L') (U' L' U L)",
+          }, {
+            decomposition: [
               { moves: "l' U l" },
               { moves: 'U' },
               { moves: "l' U' l" },
               { moves: "F U' F'" },
             ],
           }],
+          inverseOf: 10,
         },
         {
           number: 13,
@@ -986,12 +1026,22 @@ export const ollCategories: OLLCategory[] = [
           ],
           algorithms: [{
             decomposition: [
+              { moves: 'F' },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "F'" },
+              { moves: "F R' F' R", trigger: "{sledge}'" },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+            ],
+            simplifiedResult: "F (U R U' ~R') F' (F R'~ **R²** F' R') (U R U' R')",
+          }, {
+            decomposition: [
               { moves: "r U' r'" },
               { moves: "U'" },
               { moves: "r U r'" },
               { moves: "F' U F" },
             ],
           }],
+          inverseOf: 9,
         },
       ],
       [
@@ -1177,6 +1227,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "M U M'" },
             ],
           }],
+          inverseOf: 57,
         },
       ],
       [
@@ -1195,6 +1246,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "U R U' r'", trigger: "{fat-sexy}'" },
             ],
           }],
+          inverseOf: 28,
         },
       ],
     ],
