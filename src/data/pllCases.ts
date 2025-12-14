@@ -539,10 +539,10 @@ export const pllCategories: PLLCategory[] = [
         {
           name: 'Gc',
           sideColors: {
-            back: [R, G, B],
-            left: [G, O, B],
-            right: [O, B, O],
-            front: [R, R, G],
+            back: [B, R, O],
+            left: [R, G, O],
+            right: [G, O, G],
+            front: [B, B, R],
           },
           algorithms: [{
             decomposition: [
