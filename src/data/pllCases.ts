@@ -261,10 +261,12 @@ export const pllCategories: PLLCategory[] = [
           algorithms: [{
             decomposition: [
               { moves: "R U R' U'", trigger: '{sexy}' },
-              { moves: "R' F R²" },
-              { moves: "U' R' U' R U R'" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: 'F' },
+              { moves: "R U' R' U' R U R'" },
               { moves: "F'" },
             ],
+            simplifiedResult: "(R U R' U') (R' F ~R F') F (R~ **R²** U' R' U' R U R') F'",
           }],
           swaps: {
             corners: [{ positions: ['BR', 'FR'] }],
@@ -277,23 +279,26 @@ export const pllCategories: PLLCategory[] = [
         {
           name: 'F',
           sideColors: {
-            back: [R, G, O],
-            left: [G, R, O],
-            right: [G, O, R],
-            front: [B, B, B],
+            back: [O, R, G],
+            left: [B, B, B],
+            right: [R, G, O],
+            front: [R, O, G],
           },
           algorithms: [{
             decomposition: [
-              { moves: "R' U R U'" },
-              { moves: "R² F' U' F U R" },
-              { moves: "F R' F' R", trigger: "{sledge}'" },
+              { moves: "R'" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: "R'" },
+              { moves: "U' F' U F" },
+              { moves: 'R' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
               { moves: 'R' },
             ],
           }],
           swaps: {
-            corners: [{ positions: ['BL', 'BR'] }],
-            edges: [{ positions: ['R', 'L'] }],
-            description: 'Swap back corners, swap edges R↔L',
+            corners: [{ positions: ['FR', 'BR'] }],
+            edges: [{ positions: ['F', 'B'] }],
+            description: 'Swap right corners, swap edges F↔B',
           },
         },
       ],
@@ -406,9 +411,9 @@ export const pllCategories: PLLCategory[] = [
           },
           algorithms: [{
             decomposition: [
-              { moves: "F R U'" },
-              { moves: "R' U' R" },
-              { moves: "U R' F'" },
+              { moves: 'F' },
+              { moves: "R U' R' U' R U R' " },
+              { moves: "F'" },
               { moves: "R U R' U'", trigger: '{sexy}' },
               { moves: "R' F R F'", trigger: '{sledge}' },
             ],
@@ -462,12 +467,12 @@ export const pllCategories: PLLCategory[] = [
           },
           algorithms: [{
             decomposition: [
-              { moves: 'L' },
-              { moves: "U' L' U L", trigger: "{left-sexy}'" },
-              { moves: "F U F'" },
-              { moves: "L' U' L" },
-              { moves: "F' L F L'", trigger: "{left-sledge}'" },
-              { moves: "U L'" },
+              { moves: "L U'" },
+              { moves: "L F' L' F", trigger: '{left-sledge}' },
+              { moves: "L' U L" },
+              { moves: "F U' F'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: "L'" },
             ],
           }],
           swaps: {
@@ -486,12 +491,12 @@ export const pllCategories: PLLCategory[] = [
           },
           algorithms: [{
             decomposition: [
-              { moves: "R'" },
-              { moves: "U R U' R'", trigger: "{sexy}'" },
-              { moves: "F' U' F" },
-              { moves: "R U R'" },
-              { moves: "F R' F' R", trigger: "{sledge}'" },
-              { moves: "U' R" },
+              { moves: "R' U" },
+              { moves: "R' F R F'", trigger: '{sledge}' },
+              { moves: "R U' R'" },
+              { moves: "F' U F" },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: 'R' },
             ],
           }],
           swaps: {
