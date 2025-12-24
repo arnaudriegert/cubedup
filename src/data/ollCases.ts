@@ -356,6 +356,13 @@ export const ollCategories: OLLCategory[] = [
               { moves: "U' L' U L", trigger: "{left-sexy}'" },
               { moves: 'F' },
             ],
+          }, {
+            decomposition: [
+              { moves: '[u²]' },
+              { moves: "f'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'f' },
+            ],
           }],
         },
         {
@@ -371,6 +378,13 @@ export const ollCategories: OLLCategory[] = [
               { moves: 'F' },
               { moves: "U R U' R'", trigger: "{sexy}'" },
               { moves: "F'" },
+            ],
+          }, {
+            decomposition: [
+              { moves: '[u²]' },
+              { moves: 'f' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "f'" },
             ],
           }],
           inverseOf: 45,
@@ -479,8 +493,18 @@ export const ollCategories: OLLCategory[] = [
               { moves: "f'" },
               { moves: "L' U' L U", trigger: '{left-sexy}' },
               { moves: 'f' },
-              { moves: "U'" },
+              { moves: 'U' },
               { moves: 'F' },
+              { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: "F'" },
+            ],
+          }, {
+            decomposition: [
+              { moves: "f'" },
+              { moves: "L' U' L U", trigger: '{left-sexy}' },
+              { moves: 'f' },
+              { moves: "U'" },
+              { moves: "F'" },
               { moves: "L' U' L U", trigger: '{left-sexy}' },
               { moves: 'F' },
             ],
