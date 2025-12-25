@@ -21,6 +21,7 @@ interface UseAnimatedCubeReturn {
   setAnimationSpeed: (speed: number) => void
   clearQueue: () => void
   moveQueueLength: number
+  applyMovesInstantly: (moves: Move[]) => void
 }
 
 export function useAnimatedCube(options: UseAnimatedCubeOptions = {}): UseAnimatedCubeReturn {
@@ -102,6 +103,11 @@ export function useAnimatedCube(options: UseAnimatedCubeOptions = {}): UseAnimat
     setMoveQueue([])
   }, [])
 
+  // Apply moves instantly without animation (for setting up initial states)
+  const applyMovesInstantly = useCallback((moves: Move[]) => {
+    setCubeState(prev => moves.reduce((state, move) => applyMove(state, move), prev))
+  }, [])
+
   return {
     cubeState,
     currentMove,
@@ -114,5 +120,6 @@ export function useAnimatedCube(options: UseAnimatedCubeOptions = {}): UseAnimat
     setAnimationSpeed,
     clearQueue,
     moveQueueLength: moveQueue.length,
+    applyMovesInstantly,
   }
 }

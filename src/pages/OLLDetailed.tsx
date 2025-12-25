@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
 import AlgorithmBox from '../components/AlgorithmBox'
 import InverseBadge from '../components/InverseBadge'
+import { getPlaygroundUrl } from '../utils/algorithmLinks'
 
 function OLLCaseCard({
   ollCase, isHighlighted, onNavigateToCase,
@@ -15,6 +16,17 @@ function OLLCaseCard({
 }) {
   return (
     <div className={`group case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
+      {/* Demo button - visible on hover */}
+      <Link
+        to={getPlaygroundUrl(`oll-${ollCase.number}`)}
+        className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity
+          px-2.5 py-1 text-xs font-medium rounded-lg
+          bg-indigo-100 text-indigo-700 hover:bg-indigo-200
+          flex items-center gap-1"
+      >
+        <span>▶</span>
+        <span>Demo</span>
+      </Link>
       {ollCase.inverseOf && onNavigateToCase && (
         <InverseBadge
           inverseCaseNumber={ollCase.inverseOf}

@@ -1,12 +1,13 @@
 import {
   memo, useRef, useEffect, useCallback, useMemo,
 } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
 import AlgorithmBox from '../components/AlgorithmBox'
 import { Color } from '../types/cube'
+import { getPlaygroundUrl } from '../utils/algorithmLinks'
 
 // Build a map from case name to category name
 const categoryByCase = new Map<string, string>()
@@ -81,7 +82,19 @@ const CompactCard = memo(function CompactCard({
       className={isExpanded ? 'compact-card-expanded' : 'compact-card'}
     >
       {isExpanded ? (
-        <div className="group flex flex-col items-center">
+        <div className="group flex flex-col items-center relative">
+          {/* Demo button - visible on hover */}
+          <Link
+            to={getPlaygroundUrl(`pll-${pllCase.name.toLowerCase()}`)}
+            onClick={(e) => e.stopPropagation()}
+            className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
+              px-2.5 py-1 text-xs font-medium rounded-lg
+              bg-indigo-100 text-indigo-700 hover:bg-indigo-200
+              flex items-center gap-1"
+          >
+            <span>▶</span>
+            <span>Demo</span>
+          </Link>
           <h3 className="case-card-title">
             {pllCase.name}
           </h3>

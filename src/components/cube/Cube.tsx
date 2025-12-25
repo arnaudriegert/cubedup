@@ -218,10 +218,13 @@ export default function Cube({
   const faceSize = FACE_SIZE_REM[size]
   const stickerSize = STICKER_SIZE_REM[size]
 
-  // Animation state - start at 0, animate to target
+  // Animation state - two-phase approach to prevent flashing:
+  // Phase 1: Reset rotation to 0 with transition disabled (instant)
+  // Phase 2: Enable transition, then animate to target
   const [rotation, setRotation] = useState(0)
+  const [transitionEnabled, setTransitionEnabled] = useState(false)
   const hasCalledEndRef = useRef(false)
-  const prevMoveRef = useRef<Move | null>(null)
+  const animationIdRef = useRef(0) // Track animation sequence to handle cleanup
 
   // Get animation info
   const animationInfo = useMemo(() => {
@@ -270,34 +273,33 @@ export default function Cube({
     }
   }, [currentMove, isAnimating, view])
 
-  // Trigger animation
+  // Trigger animation with two-phase approach to prevent flashing
   useEffect(() => {
     if (animationInfo?.hasVisibleRotation) {
-      const moveChanged = currentMove !== prevMoveRef.current
-      prevMoveRef.current = currentMove
       hasCalledEndRef.current = false
+      const currentAnimationId = ++animationIdRef.current
 
-      // If move changed, reset to 0 first then animate
-      if (moveChanged) {
-        // Reset in first RAF, animate in subsequent RAFs
-        const raf = requestAnimationFrame(() => {
-          setRotation(0)
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              setRotation(animationInfo.animation.degrees)
-            })
-          })
-        })
-        return () => cancelAnimationFrame(raf)
-      } else {
-        // No reset needed, animate directly
-        const raf = requestAnimationFrame(() => {
+      // Phase 1: Reset rotation to 0 with transition disabled (instant reset)
+      setRotation(0)
+      setTransitionEnabled(false)
+
+      // Phase 2: After browser paints the reset, enable transition
+      const raf1 = requestAnimationFrame(() => {
+        if (animationIdRef.current !== currentAnimationId) return
+        setTransitionEnabled(true)
+
+        // Phase 3: After browser applies transition property, animate to target
+        const raf2 = requestAnimationFrame(() => {
+          if (animationIdRef.current !== currentAnimationId) return
           setRotation(animationInfo.animation.degrees)
         })
-        return () => cancelAnimationFrame(raf)
-      }
+        // Store raf2 for potential cleanup (not strictly needed since we check animationId)
+        return () => cancelAnimationFrame(raf2)
+      })
+
+      return () => cancelAnimationFrame(raf1)
     }
-  }, [animationInfo, currentMove])
+  }, [animationInfo])
 
   // Handle non-visible rotations (complete immediately)
   useEffect(() => {
@@ -409,7 +411,7 @@ export default function Cube({
             className="absolute inset-0 transform-3d"
             style={{
               transform: getRotationTransform(animationInfo.animation.axis, rotation),
-              transition: rotation !== 0 ? `transform ${animationSpeed}ms ease-out` : 'none',
+              transition: transitionEnabled ? `transform ${animationSpeed}ms ease-out` : 'none',
               transformOrigin: 'center center',
             }}
             onTransitionEnd={handleTransitionEnd}

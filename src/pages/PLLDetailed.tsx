@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
 import AlgorithmBox from '../components/AlgorithmBox'
 import { Color } from '../types/cube'
 import { CORNER_COLOR, EDGE_COLOR } from '../components/PLLArrowOverlay'
+import { getPlaygroundUrl } from '../utils/algorithmLinks'
 
 // Highlights "corner(s)" and "edge(s)" words with their respective colors
 function ColorCodedDescription({ text }: { text: string }) {
@@ -40,7 +41,18 @@ function PLLCaseCard({
   selectedColor: Color
 }) {
   return (
-    <div className={`group case-card transition-all duration-300 ${isHighlighted ? 'case-card-highlight' : ''}`}>
+    <div className={`group case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
+      {/* Demo button - visible on hover */}
+      <Link
+        to={getPlaygroundUrl(`pll-${pllCase.name.toLowerCase()}`)}
+        className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity
+          px-2.5 py-1 text-xs font-medium rounded-lg
+          bg-indigo-100 text-indigo-700 hover:bg-indigo-200
+          flex items-center gap-1"
+      >
+        <span>▶</span>
+        <span>Demo</span>
+      </Link>
       <div className="flex flex-col items-center">
         <h3 className="case-card-title">
           {pllCase.name}

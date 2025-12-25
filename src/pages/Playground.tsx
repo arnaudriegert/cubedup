@@ -1,20 +1,17 @@
-import {
-  useState, useMemo, useEffect,
-} from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { useAnimatedCube } from '../hooks/useAnimatedCube'
-import {
-  Move, CubeState, CubeView,
-} from '../types/cubeState'
+import { Move, CubeState, CubeView } from '../types/cubeState'
 import {
   parseMoves, cleanAlgorithmString, invertAlgorithmString, moveToNotation,
 } from '../utils/moveParser'
-import {
-  ollCategories, OLLCase, Algorithm,
-} from '../data/ollCases'
+import { ollCategories, OLLCase, Algorithm } from '../data/ollCases'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { Color } from '../types/cube'
+import { lookupCase, CaseLookupResult } from '../utils/caseLookup'
+import { getCasePageUrl } from '../utils/algorithmLinks'
 
 // Helper to get algorithm string from Algorithm object
 function getAlgorithmString(algorithm: Algorithm): string {
@@ -201,6 +198,50 @@ function getVisibleFaces(view: CubeView): { face: FaceName; position: 'top' | 'l
   }
 }
 
+// Compute initial state from URL params (runs once on module load)
+function getInitialStateFromURL() {
+  const params = new URLSearchParams(window.location.search)
+  const caseParam = params.get('case')
+  const algoParam = params.get('algo')
+
+  if (caseParam) {
+    const result = lookupCase(caseParam)
+    if (result) {
+      const algoString = getAlgorithmString(result.algorithm)
+      const cleanedAlgo = cleanAlgorithmString(algoString)
+      // Compute inverse moves to apply on load (so cube shows "problem" state)
+      const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
+      return {
+        inputValue: cleanedAlgo,
+        loadedCase: result,
+        selectedOLL: result.type === 'oll' ? result.caseId : '',
+        selectedPLL: result.type === 'pll' ? result.caseId : '',
+        inverseMoves,
+      }
+    }
+  }
+
+  if (algoParam) {
+    const cleanedAlgo = cleanAlgorithmString(decodeURIComponent(algoParam))
+    const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
+    return {
+      inputValue: cleanedAlgo,
+      loadedCase: null,
+      selectedOLL: '',
+      selectedPLL: '',
+      inverseMoves,
+    }
+  }
+
+  return {
+    inputValue: '',
+    loadedCase: null,
+    selectedOLL: '',
+    selectedPLL: '',
+    inverseMoves: [] as Move[],
+  }
+}
+
 export default function Playground() {
   const {
     cubeState,
@@ -213,17 +254,35 @@ export default function Playground() {
     reset,
     setAnimationSpeed,
     moveQueueLength,
+    applyMovesInstantly,
   } = useAnimatedCube({ animationSpeed: 300 })
 
+  // Initialize state from URL params
+  const [initialState] = useState(getInitialStateFromURL)
   const [view, setView] = useState<CubeView>('top-front-right')
-  const [inputValue, setInputValue] = useState('')
-  const [selectedOLL, setSelectedOLL] = useState<string>('')
-  const [selectedPLL, setSelectedPLL] = useState<string>('')
+  const [inputValue, setInputValue] = useState(initialState.inputValue)
+  const [selectedOLL, setSelectedOLL] = useState(initialState.selectedOLL)
+  const [selectedPLL, setSelectedPLL] = useState(initialState.selectedPLL)
 
   // Track the algorithm being played for progress display
   const [playingMoves, setPlayingMoves] = useState<Move[]>([])
   const [playingLabel, setPlayingLabel] = useState<string>('')
   const [isInputFocused, setIsInputFocused] = useState(false)
+
+  // Track loaded case from URL (for breadcrumb)
+  const [loadedCase] = useState<CaseLookupResult | null>(initialState.loadedCase)
+
+  // Track if we've applied initial moves (prevents double-apply in React Strict Mode)
+  const hasAppliedInitialMoves = useRef(false)
+
+  // Apply inverse algorithm on mount (so cube shows "problem" state ready to solve)
+  useEffect(() => {
+    if (hasAppliedInitialMoves.current) return
+    if (initialState.inverseMoves.length > 0) {
+      hasAppliedInitialMoves.current = true
+      applyMovesInstantly(initialState.inverseMoves)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Flatten OLL cases for dropdown
   const ollOptions = useMemo(() => {
@@ -379,6 +438,18 @@ export default function Playground() {
       </header>
 
       <main className="main-content-narrow">
+        {/* Breadcrumb when loaded from a case */}
+        {loadedCase && (
+          <div className="mb-4">
+            <Link
+              to={getCasePageUrl(loadedCase.caseId)}
+              className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              <span>←</span>
+              <span>Back to {loadedCase.displayName}</span>
+            </Link>
+          </div>
+        )}
         {/* Algorithm Control Panel - Token-first design */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-4 md:p-5 mb-6">
           {/* Token display - always visible, clickable to edit */}
