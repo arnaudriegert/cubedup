@@ -16,6 +16,7 @@ const PLL = lazy(() => import('./pages/PLL'))
 const PLLOverview = lazy(() => import('./pages/PLLOverview'))
 const PLLDetailed = lazy(() => import('./pages/PLLDetailed'))
 const Triggers = lazy(() => import('./pages/Triggers'))
+const Playground = lazy(() => import('./pages/Playground'))
 const Privacy = lazy(() => import('./pages/Privacy'))
 
 // Loading fallback
@@ -56,6 +57,7 @@ function App() {
                 <Route path="overview" element={<PLLOverview />} />
               </Route>
               <Route path="/triggers" element={<Triggers />} />
+              <Route path="/playground" element={<Playground />} />
               <Route path="/privacy" element={<Privacy />} />
             </Routes>
           </Suspense>

@@ -27,6 +27,11 @@ export const GRID_SPACING_CLASS = 'gap-0.5 p-0.5'
 const parseTwSize = (cls: string) => parseInt(cls.match(/size-(\d+)/)?.[1] ?? '0') * 0.25
 const parseTwSpacing = (cls: string) => parseFloat(cls.match(/gap-([\d.]+)/)?.[1] ?? '0') * 0.25
 
+// Sticker size in rem
+export const STICKER_SIZE_REM = Object.fromEntries(
+  GRID_SIZES.map(size => [size, parseTwSize(STICKER_CLASSES[size])]),
+) as Record<GridSize, number>
+
 // Face = 3 stickers + 2 gaps + 2 paddings
 export const FACE_SIZE_REM = Object.fromEntries(
   GRID_SIZES.map(size => [

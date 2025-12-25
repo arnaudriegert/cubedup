@@ -1,7 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 
-const navLinks = [
+const topLinks = [
   { path: '/', label: 'Home' },
+  { path: '/playground', label: 'Playground' },
+]
+
+const stepsLinks = [
   { path: '/cross', label: 'Cross' },
   { path: '/f2l', label: 'F2L' },
   { path: '/oll', label: 'OLL' },
@@ -27,22 +31,36 @@ export default function NavLinks({ onLinkClick, showDivider }: Props) {
 
   return (
     <>
-      {navLinks.map((link, index) => (
-        <div key={link.path}>
-          {showDivider && index === 1 && (
-            <div className="mt-6 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider px-3">
-              Steps
-            </div>
-          )}
-          <Link
-            to={link.path}
-            onClick={onLinkClick}
-            className={isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'}
-          >
-            {link.label}
-          </Link>
-        </div>
+      {/* Top level links */}
+      {topLinks.map((link) => (
+        <Link
+          key={link.path}
+          to={link.path}
+          onClick={onLinkClick}
+          className={isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'}
+        >
+          {link.label}
+        </Link>
       ))}
+
+      {/* Steps section */}
+      {showDivider && (
+        <div className="mt-6 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider px-3">
+          Steps
+        </div>
+      )}
+      {stepsLinks.map((link) => (
+        <Link
+          key={link.path}
+          to={link.path}
+          onClick={onLinkClick}
+          className={isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'}
+        >
+          {link.label}
+        </Link>
+      ))}
+
+      {/* Reference section */}
       {showDivider && (
         <div className="mt-6 mb-2 text-xs font-semibold text-slate-400 uppercase tracking-wider px-3">
           Reference

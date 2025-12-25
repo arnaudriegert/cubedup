@@ -6,3 +6,5 @@ export { default as LastLayerGrid } from './LastLayerGrid'
 export {
   default as IsometricCube, type CubeFaces,
 } from './IsometricCube'
+export { default as AnimatedCube } from './AnimatedCube'
+export { default as Sticker3D } from './Sticker3D'
