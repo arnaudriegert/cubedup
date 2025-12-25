@@ -1,9 +1,9 @@
 import AlgorithmBox from '../components/AlgorithmBox'
-import { IsometricCube } from '../components/cube'
+import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { Color, FaceColors } from '../types/cube'
 import { Algorithm } from '../data/ollCases'
-import { solidFace, f2lFace } from '../utils/cubeHelpers'
+import { solidFace, f2lFace, buildCubeState } from '../utils/cubeHelpers'
 import { getColorRotations } from '../utils/colors'
 import {
   makeFace,
@@ -45,12 +45,13 @@ function F2LCaseCard({
       <h4 className="case-card-title text-center">{label}</h4>
       <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-4 justify-items-center mb-4 md:mb-6">
         {colorRotations.map((colors, i) => (
-          <IsometricCube
-            key={i}
-            faces={generateFaces(colors)}
-            view={view}
-            size="medium"
-          />
+          <CubeDisplay key={i}>
+            <Cube
+              cubeState={buildCubeState(generateFaces(colors))}
+              view={view}
+              size="medium"
+            />
+          </CubeDisplay>
         ))}
       </div>
       <AlgorithmBox algorithm={algorithm} />
@@ -79,15 +80,17 @@ export default function F2L() {
         <div className="section-card text-center mb-8">
           <h2 className="section-subtitle">The Goal</h2>
           <div className="flex flex-wrap justify-center items-center gap-8">
-            <IsometricCube
-              faces={{
-                bottom: solidFace(Color.WHITE),
-                front: f2lFace(Color.BLUE),
-                right: f2lFace(Color.RED),
-              }}
-              view="bottom-front-right"
-              size="normal"
-            />
+            <CubeDisplay>
+              <Cube
+                cubeState={buildCubeState({
+                  bottom: solidFace(Color.WHITE),
+                  front: f2lFace(Color.BLUE),
+                  right: f2lFace(Color.RED),
+                })}
+                view="bottom-front-right"
+                size="normal"
+              />
+            </CubeDisplay>
             <div className="text-left max-w-md">
               <p className="body-text mb-2">
                 <strong>Insert corner-edge pairs</strong> into the 4 slots around the bottom layer.

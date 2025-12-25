@@ -1,8 +1,11 @@
 import { Color, FaceColors } from '../types/cube'
 import {
   CubeState, Move, FaceMove, WideMove, SliceMove, CubeRotation, MoveAnimation,
-  RotationAxis, isFaceMove, isWideMove, isSliceMove, isCubeRotation,
+  isFaceMove, isWideMove, isSliceMove, isCubeRotation,
 } from '../types/cubeState'
+import {
+  MOVE_METADATA, isFullCubeMove, getDegreesForModifier,
+} from './moveMetadata'
 
 /**
  * Create a solved cube with standard color orientation:
@@ -442,84 +445,14 @@ export function applyMoves(state: CubeState, moves: Move[]): CubeState {
  */
 export function getMoveAnimation(move: Move): MoveAnimation {
   const { base, modifier } = move
+  const { axis, sign } = MOVE_METADATA[base]
+  const degrees = getDegreesForModifier(modifier)
 
-  // Determine rotation degrees based on modifier
-  let degrees: number
-  if (modifier === '2') {
-    degrees = 180
-  } else if (modifier === "'") {
-    degrees = -90
-  } else {
-    degrees = 90
-  }
-
-  // Map face moves to axis
-  // Signs are determined by CSS 3D transform behavior in the isometric view
-  const faceAxisMap: Record<FaceMove, { axis: RotationAxis; sign: number }> = {
-    R: { axis: 'x', sign: 1 },
-    L: { axis: 'x', sign: -1 },
-    U: { axis: 'y', sign: -1 },
-    D: { axis: 'y', sign: 1 },
-    F: { axis: 'z', sign: 1 },
-    B: { axis: 'z', sign: -1 },
-  }
-
-  // Map slice moves to axis (M follows L, S follows F, E follows D)
-  const sliceAxisMap: Record<SliceMove, { axis: RotationAxis; sign: number }> = {
-    M: { axis: 'x', sign: -1 }, // follows L
-    S: { axis: 'z', sign: 1 },  // follows F
-    E: { axis: 'y', sign: 1 },  // follows D
-  }
-
-  // Map wide moves to axis (same axis as corresponding face move)
-  const wideAxisMap: Record<WideMove, { axis: RotationAxis; sign: number }> = {
-    r: { axis: 'x', sign: 1 },  // follows R
-    l: { axis: 'x', sign: -1 }, // follows L
-    u: { axis: 'y', sign: -1 }, // follows U
-    d: { axis: 'y', sign: 1 },  // follows D
-    f: { axis: 'z', sign: 1 },  // follows F
-    b: { axis: 'z', sign: -1 }, // follows B
-  }
-
-  // Map cube rotations to axis
-  const cubeRotationAxisMap: Record<CubeRotation, { axis: RotationAxis; sign: number }> = {
-    x: { axis: 'x', sign: 1 },
-    y: { axis: 'y', sign: -1 },
-    z: { axis: 'z', sign: 1 },
-  }
-
-  if (isFaceMove(base)) {
-    const { axis, sign } = faceAxisMap[base]
-    return {
-      move: base,
-      axis,
-      degrees: degrees * sign,
-      isFullCube: false,
-    }
-  } else if (isWideMove(base)) {
-    const { axis, sign } = wideAxisMap[base]
-    return {
-      move: base,
-      axis,
-      degrees: degrees * sign,
-      isFullCube: false,
-    }
-  } else if (isSliceMove(base)) {
-    const { axis, sign } = sliceAxisMap[base]
-    return {
-      move: base,
-      axis,
-      degrees: degrees * sign,
-      isFullCube: false,
-    }
-  } else {
-    const { axis, sign } = cubeRotationAxisMap[base]
-    return {
-      move: base,
-      axis,
-      degrees: degrees * sign,
-      isFullCube: true,
-    }
+  return {
+    move: base,
+    axis,
+    degrees: degrees * sign,
+    isFullCube: isFullCubeMove(base),
   }
 }
 

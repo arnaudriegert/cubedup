@@ -6,25 +6,11 @@ import {
   STICKER_CLASSES,
   SIDE_HORIZONTAL_CLASSES,
   SIDE_VERTICAL_CLASSES,
+  TOP_FACE_BORDER_RADIUS,
+  SIDE_MIDDLE_BORDER_RADIUS,
 } from './constants'
 
-// Border radius classes for top face stickers (CSS grid positions 0-8)
-const topFaceBorderRadius: Record<number, string> = {
-  1: 'rounded-b-xl',  // top-middle
-  3: 'rounded-r-xl',  // middle-left
-  4: 'rounded-2xl',   // center
-  5: 'rounded-l-xl',  // middle-right
-  7: 'rounded-t-xl',  // bottom-middle
-}
-
 export type StickerLocation = 'top' | 'back' | 'front' | 'left' | 'right'
-
-const middleBorderRadius: Record<Exclude<StickerLocation, 'top'>, string> = {
-  back: 'rounded-t-xl',
-  front: 'rounded-b-xl',
-  left: 'rounded-l-xl',
-  right: 'rounded-r-xl',
-}
 
 interface StickerProps {
   color: Color
@@ -57,9 +43,9 @@ export default function Sticker({
   // Determine border radius based on location and position
   const borderRadius = useMemo(() => {
     if (location === 'top') {
-      return topFaceBorderRadius[position] || 'rounded-sm'
+      return TOP_FACE_BORDER_RADIUS[position] ?? 'rounded-sm'
     } else if (position === 1) {
-      return middleBorderRadius[location]
+      return SIDE_MIDDLE_BORDER_RADIUS[location] ?? 'rounded-sm'
     } else {
       return 'rounded-sm'
     }

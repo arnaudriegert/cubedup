@@ -1,7 +1,7 @@
-import { IsometricCube } from '../components/cube'
+import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { Color, FaceColors } from '../types/cube'
-import { crossFace } from '../utils/cubeHelpers'
+import { crossFace, buildCubeState } from '../utils/cubeHelpers'
 
 // Helper to create a face with specific stickers highlighted
 function makeFace(
@@ -40,15 +40,17 @@ export default function Cross() {
         <div className="section-card text-center mb-8">
           <h2 className="section-subtitle">Building an Efficient Cross</h2>
           <div className="flex flex-wrap justify-center items-center gap-8">
-            <IsometricCube
-              faces={{
-                bottom: crossFace(Color.WHITE, Color.WHITE),
-                front: makeFace(Color.BLUE, { 7: Color.BLUE }),
-                right: makeFace(Color.RED, { 7: Color.RED }),
-              }}
-              view="bottom-front-right"
-              size="normal"
-            />
+            <CubeDisplay>
+              <Cube
+                cubeState={buildCubeState({
+                  bottom: crossFace(Color.WHITE, Color.WHITE),
+                  front: makeFace(Color.BLUE, { 7: Color.BLUE }),
+                  right: makeFace(Color.RED, { 7: Color.RED }),
+                })}
+                view="bottom-front-right"
+                size="normal"
+              />
+            </CubeDisplay>
             <div className="text-left max-w-md">
               <p className="body-text mb-2">
                 <strong>Cross on bottom</strong>, with edges matching center colors.

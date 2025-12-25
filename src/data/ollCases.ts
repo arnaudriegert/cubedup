@@ -1,14 +1,8 @@
 import { Orientation, OLLOrientations } from '../types/cube'
+import { Algorithm, AlgorithmStep } from '../types/algorithm'
 
-export interface AlgorithmStep {
-  moves: string           // The raw moves for this segment
-  trigger?: string        // Optional trigger notation e.g., '{sexy}'
-}
-
-export interface Algorithm {
-  decomposition: AlgorithmStep[]  // Source of truth - full is built from this
-  simplifiedResult?: string       // Optional simplified result with cancellations marked (contains ~)
-}
+// Re-export for backwards compatibility
+export type { Algorithm, AlgorithmStep }
 
 export interface OLLCase {
   number: number

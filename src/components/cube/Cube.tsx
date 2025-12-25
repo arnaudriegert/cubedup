@@ -8,6 +8,7 @@ import {
 import { getMoveAnimation } from '../../utils/cubeState'
 import {
   GridSize, FACE_SIZE_REM, STICKER_SIZE_REM,
+  CUBE_VIEW_TRANSFORMS, CUBE_PERSPECTIVE_REM, TOP_FACE_BORDER_RADIUS,
 } from './constants'
 import { getStickerTransform } from './stickerUtils'
 import { Color } from '../../types/cube'
@@ -16,30 +17,19 @@ import { colorToTailwind } from '../../utils/colors'
 // All faces for cube rotations
 const ALL_FACES: (keyof CubeState)[] = ['top', 'bottom', 'front', 'back', 'left', 'right']
 
-// Border radius for stickers based on position (matching original Sticker component)
-const STICKER_BORDER_RADIUS: Record<number, string> = {
-  0: 'rounded-sm',     // corner
-  1: 'rounded-b-xl',   // top-middle (rounded on bottom/inner side)
-  2: 'rounded-sm',     // corner
-  3: 'rounded-r-xl',   // middle-left (rounded on right/inner side)
-  4: 'rounded-2xl',    // center
-  5: 'rounded-l-xl',   // middle-right (rounded on left/inner side)
-  6: 'rounded-sm',     // corner
-  7: 'rounded-t-xl',   // bottom-middle (rounded on top/inner side)
-  8: 'rounded-sm',     // corner
-}
-
 // Gap/padding around each sticker (half of gap-0.5 = 0.0625rem on each side)
 const STICKER_PADDING_REM = 0.0625
 
-interface AnimatedCubeProps {
+interface CubeProps {
   cubeState: CubeState
-  currentMove: Move | null
-  isAnimating: boolean
-  animationSpeed: number
+  // Animation props (all optional for static display)
+  currentMove?: Move | null
+  isAnimating?: boolean
+  animationSpeed?: number
+  onAnimationEnd?: () => void
+  // Display props
   view?: CubeView
   size?: GridSize
-  onAnimationEnd: () => void
   className?: string
 }
 
@@ -211,19 +201,20 @@ function isInRotatingLayer(
 }
 
 /**
- * AnimatedCube renders a 3D cube with individual stickers.
- * During animation, stickers in the rotating layer are grouped and rotated together.
+ * Cube renders a 3D cube with individual stickers.
+ * Supports optional animation - pass currentMove/isAnimating/onAnimationEnd for animated mode.
+ * For static display, just pass cubeState.
  */
-export default function AnimatedCube({
+export default function Cube({
   cubeState,
-  currentMove,
-  isAnimating,
-  animationSpeed,
+  currentMove = null,
+  isAnimating = false,
+  animationSpeed = 200,
+  onAnimationEnd,
   view = 'top-front-right',
   size = 'normal',
-  onAnimationEnd,
   className = '',
-}: AnimatedCubeProps) {
+}: CubeProps) {
   const faceSize = FACE_SIZE_REM[size]
   const stickerSize = STICKER_SIZE_REM[size]
 
@@ -312,7 +303,7 @@ export default function AnimatedCube({
   useEffect(() => {
     if (animationInfo && !animationInfo.hasVisibleRotation && !hasCalledEndRef.current) {
       hasCalledEndRef.current = true
-      const timer = setTimeout(onAnimationEnd, 10)
+      const timer = setTimeout(() => onAnimationEnd?.(), 10)
       return () => clearTimeout(timer)
     }
     if (!animationInfo) {
@@ -323,22 +314,13 @@ export default function AnimatedCube({
   const handleTransitionEnd = () => {
     if (!hasCalledEndRef.current) {
       hasCalledEndRef.current = true
-      onAnimationEnd()
+      onAnimationEnd?.()
     }
   }
 
   // Get cube transform based on view
   const getCubeTransform = (): string => {
-    switch (view) {
-      case 'top-front-right':
-        return 'rotateX(-20deg) rotateY(-20deg)'
-      case 'top-front-left':
-        return 'rotateX(-20deg) rotateY(20deg)'
-      case 'bottom-front-right':
-        return 'rotateX(20deg) rotateY(-30deg)'
-      default:
-        return 'rotateX(-20deg) rotateY(-20deg)'
-    }
+    return CUBE_VIEW_TRANSFORMS[view] ?? CUBE_VIEW_TRANSFORMS['top-front-right']
   }
 
   // Get rotation axis CSS property
@@ -353,7 +335,7 @@ export default function AnimatedCube({
   const renderSticker = (face: keyof CubeState, index: number, color: Color) => {
     const bgColor = colorToTailwind[color] || colorToTailwind[Color.GRAY]
     const transform = getStickerTransform(face, index, size)
-    const borderRadius = STICKER_BORDER_RADIUS[index]
+    const borderRadius = TOP_FACE_BORDER_RADIUS[index]
 
     // Container size includes the padding for the black border
     const containerSize = stickerSize + STICKER_PADDING_REM * 2
@@ -411,7 +393,7 @@ export default function AnimatedCube({
       style={{
         width: `${faceSize * 1.8}rem`,
         height: `${faceSize * 1.8}rem`,
-        perspective: '37.5rem',
+        perspective: `${CUBE_PERSPECTIVE_REM}rem`,
       }}
     >
       <div

@@ -1,5 +1,5 @@
 import { Color } from '../types/cube'
-import { Algorithm } from './ollCases'
+import { Algorithm } from '../types/algorithm'
 
 export type PLLSideColors = [Color, Color, Color]
 

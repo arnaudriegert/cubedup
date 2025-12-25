@@ -1,7 +1,7 @@
 import {
   useState, useMemo, useEffect,
 } from 'react'
-import { AnimatedCube } from '../components/cube'
+import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { useAnimatedCube } from '../hooks/useAnimatedCube'
 import {
@@ -570,21 +570,17 @@ export default function Playground() {
                     <FacePanel face={leftFace.face} cubeState={cubeState} onMove={handleSingleMove} vertical />
 
                     {/* The Cube */}
-                    <div className="relative">
-                      <div className="absolute inset-0 bg-linear-to-br from-indigo-500/10 via-transparent to-blue-500/10 rounded-3xl blur-xl" />
-                      <div className="relative bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl p-6 shadow-2xl border border-gray-700/50">
-                        <div className="absolute inset-2 bg-linear-to-t from-transparent via-white/5 to-white/10 rounded-xl pointer-events-none" />
-                        <AnimatedCube
-                          cubeState={cubeState}
-                          currentMove={currentMove}
-                          isAnimating={isAnimating}
-                          animationSpeed={animationSpeed}
-                          view={view}
-                          size="normal"
-                          onAnimationEnd={handleAnimationEnd}
-                        />
-                      </div>
-                    </div>
+                    <CubeDisplay size="large">
+                      <Cube
+                        cubeState={cubeState}
+                        currentMove={currentMove}
+                        isAnimating={isAnimating}
+                        animationSpeed={animationSpeed}
+                        view={view}
+                        size="normal"
+                        onAnimationEnd={handleAnimationEnd}
+                      />
+                    </CubeDisplay>
 
                     {/* Right face control */}
                     <FacePanel face={rightFace.face} cubeState={cubeState} onMove={handleSingleMove} vertical />
