@@ -468,6 +468,7 @@ export const ollCategories: OLLCategory[] = [
               { moves: "F'" },
               { moves: 'f' },
               { moves: "R U R' U'", trigger: '{sexy}' },
+              { moves: '' },  // Empty step to align f/f' colors
               { moves: "f'" },
             ],
           }],
@@ -672,7 +673,8 @@ export const ollCategories: OLLCategory[] = [
               { moves: "r' U' r" },
               { moves: "U' R'" },
               { moves: "U R U' R'", trigger: "{sexy}'" },
-              { moves: "U R r' U r" },
+              { moves: 'U R' },
+              { moves: "r' U r" },
             ],
           }],
         },

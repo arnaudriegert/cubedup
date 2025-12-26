@@ -71,6 +71,20 @@ const TOKEN_STATES = {
   trigger: 'bg-indigo-100 text-indigo-700 border border-indigo-200',
 }
 
+// Alternating colors for consecutive same-category steps
+const PARITY_COLORS = {
+  // For moves that came from a trigger expansion (indigo tints - subtle variation)
+  trigger: {
+    even: 'bg-indigo-100 text-indigo-800',
+    odd: 'bg-indigo-50 text-indigo-700',
+  },
+  // For regular non-trigger moves (more visible contrast)
+  moves: {
+    even: 'bg-slate-200 text-slate-700',
+    odd: 'bg-slate-50 text-slate-600',
+  },
+}
+
 interface TokenProps {
   token: AlgorithmToken
   state: 'default' | 'current' | 'completed'
@@ -87,9 +101,14 @@ function Token({ token, state, size }: TokenProps) {
 
   // Handle trigger tokens (shown as distinct pill badge)
   if (token.type === 'trigger') {
-    let baseStyle = TOKEN_STATES.trigger
+    // Apply parity-based alternation for consecutive triggers
+    // Using subtle indigo variation (same hue, different shade) - darker first
+    const parity = token.stepParity || 'even'
+    let baseStyle = parity === 'even'
+      ? 'bg-indigo-200 text-indigo-800 border border-indigo-400'
+      : 'bg-indigo-100 text-indigo-700 border border-indigo-300'
     if (token.isCancelled) baseStyle = TOKEN_STATES.cancelled
-    if (token.isHighlighted) baseStyle = `${TOKEN_STATES.trigger} ${TOKEN_STATES.highlighted}`
+    if (token.isHighlighted) baseStyle = `${baseStyle} ${TOKEN_STATES.highlighted}`
 
     return (
       <span
@@ -119,14 +138,18 @@ function Token({ token, state, size }: TokenProps) {
     )
   }
 
-  // Regular move tokens
-  let baseStyle = TOKEN_STATES[state]
-  if (token.isCancelled) baseStyle = `${TOKEN_STATES.default} ${TOKEN_STATES.cancelled}`
-  if (token.isHighlighted) baseStyle = `${TOKEN_STATES.default} ${TOKEN_STATES.highlighted}`
+  // Regular move tokens - apply parity-based color alternation
+  const parity = token.stepParity || 'even'
+  const parityCategory = token.isFromTrigger ? 'trigger' : 'moves'
+  const parityStyle = PARITY_COLORS[parityCategory][parity]
+
+  let baseStyle = state === 'default' ? parityStyle : TOKEN_STATES[state]
+  if (token.isCancelled) baseStyle = `${parityStyle} ${TOKEN_STATES.cancelled}`
+  if (token.isHighlighted) baseStyle = `${parityStyle} ${TOKEN_STATES.highlighted}`
 
   return (
     <span
-      className={`${sizeStyle.token} rounded-md transition-all duration-200 ${baseStyle}`}
+      className={`${sizeStyle.token} rounded-md shadow-sm transition-all duration-200 ${baseStyle}`}
     >
       {token.value}
     </span>
@@ -134,62 +157,37 @@ function Token({ token, state, size }: TokenProps) {
 }
 
 /**
- * Render tokens with proper grouping - parenthesized groups don't line-break
+ * Render tokens - groups tokens by stepIndex to prevent line breaks within a step
  */
 function TokenList({ tokens, state, size }: { tokens: AlgorithmToken[]; state: 'default' | 'current' | 'completed'; size: DisplaySize }) {
-  const result: React.ReactNode[] = []
-  let i = 0
+  // Group tokens by stepIndex to prevent line breaks within a step
+  const groups: Array<{ stepIndex: number | undefined; tokens: AlgorithmToken[] }> = []
+  let currentGroup: { stepIndex: number | undefined; tokens: AlgorithmToken[] } | null = null
 
-  while (i < tokens.length) {
-    const token = tokens[i]
-
-    // Start of a parenthesized group - collect all tokens until groupEnd
-    if (token.type === 'groupStart') {
-      const groupTokens: React.ReactNode[] = []
-      groupTokens.push(
-        <span key="start" className={`text-slate-500 self-center ${SIZE_STYLES[size].text}`}>
-          {token.value}
-        </span>,
-      )
-      i++
-
-      // Collect tokens until we hit groupEnd
-      while (i < tokens.length && tokens[i].type !== 'groupEnd') {
-        groupTokens.push(
-          <Token key={i} token={tokens[i]} state={state} size={size} />,
-        )
-        i++
-      }
-
-      // Add the closing paren
-      if (i < tokens.length && tokens[i].type === 'groupEnd') {
-        groupTokens.push(
-          <span key="end" className={`text-slate-500 self-center ${SIZE_STYLES[size].text}`}>
-            {tokens[i].value}
-          </span>,
-        )
-        i++
-      }
-
-      // Wrap the group in a nowrap container
-      result.push(
-        <span key={`group-${result.length}`} className="inline-flex items-center gap-1 whitespace-nowrap">
-          {groupTokens}
-        </span>,
-      )
-    } else if (token.type === 'groupEnd') {
-      // Orphan groupEnd - shouldn't happen but handle gracefully
-      i++
-    } else {
-      // Regular token outside of groups
-      result.push(
-        <Token key={i} token={token} state={state} size={size} />,
-      )
-      i++
+  for (const token of tokens) {
+    // Skip groupStart/groupEnd tokens
+    if (token.type === 'groupStart' || token.type === 'groupEnd' || token.type === 'space') {
+      continue
     }
+
+    if (currentGroup === null || currentGroup.stepIndex !== token.stepIndex) {
+      currentGroup = { stepIndex: token.stepIndex, tokens: [] }
+      groups.push(currentGroup)
+    }
+    currentGroup.tokens.push(token)
   }
 
-  return <>{result}</>
+  return (
+    <>
+      {groups.map((group, groupIdx) => (
+        <span key={groupIdx} className="inline-flex flex-wrap items-center gap-1">
+          {group.tokens.map((token, tokenIdx) => (
+            <Token key={tokenIdx} token={token} state={state} size={size} />
+          ))}
+        </span>
+      ))}
+    </>
+  )
 }
 
 /**
@@ -345,7 +343,7 @@ export default function AlgorithmDisplay({
       const hasShorthandView = shorthand !== full
 
       const shortTokens = hasShorthandView
-        ? tokenizeNotation(shorthand, { expandTriggers: false })
+        ? tokenizeAlgorithm(algorithm, { expandTriggers: false, useSimplified: false })
         : fullTokens
 
       // Parse moves for playback mode

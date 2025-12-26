@@ -37,37 +37,35 @@ function OLLCaseCard({
             return (
               <div
                 key={i}
-                className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3"
+                className="group/algocard relative rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3"
               >
-                <div className="flex items-center gap-2">
-                  {/* Play button - shown on hover */}
-                  <Link
-                    to={getPlaygroundUrlForAlgorithm(algorithmId)}
-                    title="Demo"
-                    className="shrink-0 w-6 h-6 flex items-center justify-center rounded
-                      text-indigo-600 hover:bg-indigo-100 transition-opacity
-                      opacity-0 group-hover/algocard:opacity-100"
-                  >
-                    <span className="text-sm">▶</span>
-                  </Link>
-                  {/* Algorithm display */}
-                  <div className="flex-1 min-w-0">
-                    <AlgorithmDisplay
-                      algorithm={algorithm}
-                      size="sm"
-                      pinnable
-                      parentHoverGroup="algocard"
-                    />
-                  </div>
-                  {/* Inverse badge */}
-                  {isFirstAlgo && ollCase.inverseOf && onNavigateToCase ? (
-                    <InverseBadge
-                      inverseCaseNumber={ollCase.inverseOf}
-                      onClick={onNavigateToCase}
-                      className="shrink-0 opacity-0 group-hover/algocard:opacity-100 transition-opacity"
-                    />
-                  ) : null}
+                {/* Play button - positioned left, shown on hover */}
+                <Link
+                  to={getPlaygroundUrlForAlgorithm(algorithmId)}
+                  title="Demo"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded
+                    text-indigo-600 hover:bg-indigo-100 transition-opacity
+                    opacity-0 group-hover/algocard:opacity-100 z-10"
+                >
+                  <span className="text-sm">▶</span>
+                </Link>
+                {/* Algorithm display - centered with padding for buttons */}
+                <div className="px-6">
+                  <AlgorithmDisplay
+                    algorithm={algorithm}
+                    size="sm"
+                    pinnable
+                    parentHoverGroup="algocard"
+                  />
                 </div>
+                {/* Inverse badge - positioned right, shown on hover */}
+                {isFirstAlgo && ollCase.inverseOf && onNavigateToCase ? (
+                  <InverseBadge
+                    inverseCaseNumber={ollCase.inverseOf}
+                    onClick={onNavigateToCase}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/algocard:opacity-100 transition-opacity z-10"
+                  />
+                ) : null}
               </div>
             )
           })}
