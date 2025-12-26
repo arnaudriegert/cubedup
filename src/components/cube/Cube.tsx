@@ -1,5 +1,5 @@
 import React, {
-  useState, useEffect, useMemo, useRef,
+  useEffect, useMemo, useRef,
 } from 'react'
 import {
   CubeState, Move, FaceMove, WideMove, SliceMove, RotationAxis,
@@ -19,6 +19,11 @@ const ALL_FACES: (keyof CubeState)[] = ['top', 'bottom', 'front', 'back', 'left'
 
 // Gap/padding around each sticker (half of gap-0.5 = 0.0625rem on each side)
 const STICKER_PADDING_REM = 0.0625
+
+// Get rotation axis CSS transform
+const getRotationTransform = (axis: RotationAxis, degrees: number): string => {
+  return `rotate${axis.toUpperCase()}(${degrees}deg)`
+}
 
 interface CubeProps {
   cubeState: CubeState
@@ -218,11 +223,11 @@ export default function Cube({
   const faceSize = FACE_SIZE_REM[size]
   const stickerSize = STICKER_SIZE_REM[size]
 
-  // Animation state - two-phase approach to prevent flashing:
+  // Animation refs - using refs for direct DOM manipulation to avoid cascading renders
+  // Two-phase approach to prevent flashing:
   // Phase 1: Reset rotation to 0 with transition disabled (instant)
   // Phase 2: Enable transition, then animate to target
-  const [rotation, setRotation] = useState(0)
-  const [transitionEnabled, setTransitionEnabled] = useState(false)
+  const rotatingLayerRef = useRef<HTMLDivElement>(null)
   const hasCalledEndRef = useRef(false)
   const animationIdRef = useRef(0) // Track animation sequence to handle cleanup
 
@@ -273,33 +278,38 @@ export default function Cube({
     }
   }, [currentMove, isAnimating, view])
 
-  // Trigger animation with two-phase approach to prevent flashing
+  // Animate rotation using double-RAF to prevent flashing:
+  // 1. Reset instantly (no transition)
+  // 2. RAF: enable transition after browser paints reset
+  // 3. RAF: animate to target after transition property applies
   useEffect(() => {
-    if (animationInfo?.hasVisibleRotation) {
-      hasCalledEndRef.current = false
-      const currentAnimationId = ++animationIdRef.current
+    const el = rotatingLayerRef.current
+    if (!animationInfo?.hasVisibleRotation || !el) return
 
-      // Phase 1: Reset rotation to 0 with transition disabled (instant reset)
-      setRotation(0)
-      setTransitionEnabled(false)
+    hasCalledEndRef.current = false
+    const currentAnimationId = ++animationIdRef.current
+    const pendingFrames: number[] = []
 
-      // Phase 2: After browser paints the reset, enable transition
-      const raf1 = requestAnimationFrame(() => {
+    // Instant reset
+    el.style.transition = 'none'
+    el.style.transform = getRotationTransform(animationInfo.animation.axis, 0)
+
+    // After paint: enable transition, then animate
+    pendingFrames.push(requestAnimationFrame(() => {
+      if (animationIdRef.current !== currentAnimationId) return
+      el.style.transition = `transform ${animationSpeed}ms ease-out`
+
+      pendingFrames.push(requestAnimationFrame(() => {
         if (animationIdRef.current !== currentAnimationId) return
-        setTransitionEnabled(true)
+        el.style.transform = getRotationTransform(
+          animationInfo.animation.axis,
+          animationInfo.animation.degrees,
+        )
+      }))
+    }))
 
-        // Phase 3: After browser applies transition property, animate to target
-        const raf2 = requestAnimationFrame(() => {
-          if (animationIdRef.current !== currentAnimationId) return
-          setRotation(animationInfo.animation.degrees)
-        })
-        // Store raf2 for potential cleanup (not strictly needed since we check animationId)
-        return () => cancelAnimationFrame(raf2)
-      })
-
-      return () => cancelAnimationFrame(raf1)
-    }
-  }, [animationInfo])
+    return () => pendingFrames.forEach(id => cancelAnimationFrame(id))
+  }, [animationInfo, animationSpeed])
 
   // Handle non-visible rotations (complete immediately)
   useEffect(() => {
@@ -323,11 +333,6 @@ export default function Cube({
   // Get cube transform based on view
   const getCubeTransform = (): string => {
     return CUBE_VIEW_TRANSFORMS[view] ?? CUBE_VIEW_TRANSFORMS['top-front-right']
-  }
-
-  // Get rotation axis CSS property
-  const getRotationTransform = (axis: RotationAxis, degrees: number): string => {
-    return `rotate${axis.toUpperCase()}(${degrees}deg)`
   }
 
   const visibleFaces = VISIBLE_FACES[view]
@@ -408,10 +413,9 @@ export default function Cube({
         {/* Rotating layer with animation */}
         {animationInfo?.hasVisibleRotation && (
           <div
+            ref={rotatingLayerRef}
             className="absolute inset-0 transform-3d"
             style={{
-              transform: getRotationTransform(animationInfo.animation.axis, rotation),
-              transition: transitionEnabled ? `transform ${animationSpeed}ms ease-out` : 'none',
               transformOrigin: 'center center',
             }}
             onTransitionEnd={handleTransitionEnd}

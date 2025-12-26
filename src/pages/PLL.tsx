@@ -44,20 +44,12 @@ export interface PLLContextType {
 export default function PLL() {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
-  const [searchValue, setSearchValue] = useState('')
-  const [instantValue, setInstantValue] = useState('')
+  const initialSelect = searchParams.get('select') || ''
+  const [searchValue, setSearchValue] = useState(initialSelect)
+  const [instantValue, setInstantValue] = useState(initialSelect)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedColor, setSelectedColor] = useState<Color>(Color.BLUE)
   const searchInputRef = useRef<HTMLInputElement>(null)
-
-  // Read select param from URL on mount
-  useEffect(() => {
-    const selectParam = searchParams.get('select')
-    if (selectParam) {
-      setSearchValue(selectParam)
-      setInstantValue(selectParam)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const debouncedFromInput = useDebounce(searchValue, 500)
 

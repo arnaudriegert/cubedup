@@ -1,5 +1,5 @@
 /**
- * Algorithm tokenizer - converts algorithms to displayable tokens
+ * Algorithm tokenizer - converts algorithm decompositions to displayable tokens
  *
  * Handles:
  * - Decomposition steps with triggers
@@ -150,14 +150,13 @@ function parseSegment(
     stepIndex?: number
     isCancelled?: boolean
     isHighlighted?: boolean
-    expandTriggers: boolean
     stepParity?: 'even' | 'odd'
     isFromTrigger?: boolean
   },
   moveCounter: { current: number },
 ): AlgorithmToken[] {
   const tokens: AlgorithmToken[] = []
-  const { stepIndex, isCancelled, isHighlighted, expandTriggers, stepParity, isFromTrigger } = options
+  const { stepIndex, isCancelled, isHighlighted, stepParity, isFromTrigger } = options
 
   // Split by parentheses first
   const parenParts = text.split(PAREN_REGEX)
@@ -257,9 +256,9 @@ function parseSegment(
  */
 export function tokenizeNotation(
   notation: string,
-  options: { expandTriggers?: boolean; stepIndex?: number } = {},
+  options: { stepIndex?: number } = {},
 ): AlgorithmToken[] {
-  const { expandTriggers = false, stepIndex } = options
+  const { stepIndex } = options
   const tokens: AlgorithmToken[] = []
   const moveCounter = { current: 0 }
 
@@ -273,7 +272,6 @@ export function tokenizeNotation(
         stepIndex,
         isCancelled: segment.isCancelled,
         isHighlighted: segment.isHighlighted,
-        expandTriggers,
       },
       moveCounter,
     )
@@ -297,7 +295,7 @@ export function tokenizeAlgorithm(
   if (useSimplified && algorithm.simplifiedResult) {
     // Check if all decomposition steps are from triggers
     const allFromTriggers = algorithm.decomposition.every(step => !!step.trigger)
-    const tokens = tokenizeNotation(algorithm.simplifiedResult, { expandTriggers })
+    const tokens = tokenizeNotation(algorithm.simplifiedResult)
     // Mark all move tokens as from trigger if all steps were triggers
     if (allFromTriggers) {
       for (const token of tokens) {
@@ -384,7 +382,7 @@ export function tokenizeAlgorithm(
           const subStepParity = (baseParityNum + i) % 2 === 0 ? 'even' : 'odd' as const
           const stepTokens = parseSegment(
             groups[i].replace(/^\(|\)$/g, ''), // Remove outer parens
-            { stepIndex: stepIndex * 100 + i, expandTriggers, stepParity: subStepParity, isFromTrigger },
+            { stepIndex: stepIndex * 100 + i, stepParity: subStepParity, isFromTrigger },
             moveCounter,
           )
           tokens.push(...stepTokens)
@@ -392,7 +390,7 @@ export function tokenizeAlgorithm(
       } else {
         const stepTokens = parseSegment(
           step.moves,
-          { stepIndex, expandTriggers, stepParity: baseParity, isFromTrigger },
+          { stepIndex, stepParity: baseParity, isFromTrigger },
           moveCounter,
         )
         tokens.push(...stepTokens)

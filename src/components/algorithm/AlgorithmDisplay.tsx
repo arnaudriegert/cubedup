@@ -360,9 +360,7 @@ export default function AlgorithmDisplay({
 
     if (notation) {
       // Use raw notation
-      const fullTokens = tokenizeNotation(notation, {
-        expandTriggers: expandTriggers === 'always',
-      })
+      const fullTokens = tokenizeNotation(notation)
       const parsedMoves = parseMoves(notation)
 
       return {
