@@ -48,15 +48,3 @@
   @apply text-sm text-gray-600 cursor-pointer;
 }
 
-/* Algorithm Text Styling */
-.algo-strikethrough {
-  @apply line-through opacity-50;
-}
-
-.algo-bold {
-  @apply font-bold text-blue-600;
-}
-
-.algo-brackets {
-  @apply text-purple-600;
-}

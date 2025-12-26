@@ -1,17 +1,27 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import {
+  useState, useMemo, useEffect, useRef,
+} from 'react'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
+import { AlgorithmBreadcrumb } from '../components/algorithm'
 import { useAnimatedCube } from '../hooks/useAnimatedCube'
-import { Move, CubeState, CubeView } from '../types/cubeState'
+import {
+  Move, CubeState, CubeView,
+} from '../types/cubeState'
+import { AlgorithmId } from '../types/algorithm'
 import {
   parseMoves, cleanAlgorithmString, invertAlgorithmString, moveToNotation,
 } from '../utils/moveParser'
-import { ollCategories, OLLCase, Algorithm } from '../data/ollCases'
+import {
+  ollCategories, OLLCase, Algorithm,
+} from '../data/ollCases'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { Color } from '../types/cube'
-import { lookupCase, CaseLookupResult } from '../utils/caseLookup'
-import { getCasePageUrl } from '../utils/algorithmLinks'
+import {
+  lookupCase, lookupAlgorithm, AlgorithmLookupResult,
+} from '../utils/caseLookup'
+import { parsePlaygroundUrl } from '../utils/algorithmLinks'
+import { buildFullFromSteps } from '../utils/algorithmTokenizer'
 
 // Helper to get algorithm string from Algorithm object
 function getAlgorithmString(algorithm: Algorithm): string {
@@ -201,19 +211,19 @@ function getVisibleFaces(view: CubeView): { face: FaceName; position: 'top' | 'l
 // Compute initial state from URL params (runs once on module load)
 function getInitialStateFromURL() {
   const params = new URLSearchParams(window.location.search)
-  const caseParam = params.get('case')
-  const algoParam = params.get('algo')
+  const parsed = parsePlaygroundUrl(params)
 
-  if (caseParam) {
-    const result = lookupCase(caseParam)
+  // Algorithm ID takes priority (specific variant)
+  if (parsed.algorithmId) {
+    const result = lookupAlgorithm(parsed.algorithmId)
     if (result) {
-      const algoString = getAlgorithmString(result.algorithm)
+      const algoString = buildFullFromSteps(result.algorithm.decomposition)
       const cleanedAlgo = cleanAlgorithmString(algoString)
-      // Compute inverse moves to apply on load (so cube shows "problem" state)
       const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
       return {
         inputValue: cleanedAlgo,
-        loadedCase: result,
+        loadedAlgorithmId: parsed.algorithmId,
+        loadedCase: null as AlgorithmLookupResult | null,
         selectedOLL: result.type === 'oll' ? result.caseId : '',
         selectedPLL: result.type === 'pll' ? result.caseId : '',
         inverseMoves,
@@ -221,21 +231,43 @@ function getInitialStateFromURL() {
     }
   }
 
-  if (algoParam) {
-    const cleanedAlgo = cleanAlgorithmString(decodeURIComponent(algoParam))
-    const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
+  // Case ID (backward compatible - uses first algorithm)
+  if (parsed.caseId) {
+    const result = lookupCase(parsed.caseId)
+    if (result) {
+      const algoString = getAlgorithmString(result.algorithm)
+      const cleanedAlgo = cleanAlgorithmString(algoString)
+      const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
+      return {
+        inputValue: cleanedAlgo,
+        loadedAlgorithmId: `${result.caseId}-1` as AlgorithmId,
+        loadedCase: null as AlgorithmLookupResult | null,
+        selectedOLL: result.type === 'oll' ? result.caseId : '',
+        selectedPLL: result.type === 'pll' ? result.caseId : '',
+        inverseMoves,
+      }
+    }
+  }
+
+  // Raw notation (from triggers page or manual input)
+  // Unlike OLL/PLL cases where we show the "problem state" by running the inverse,
+  // triggers are meant to be practiced on a solved cube to build muscle memory.
+  if (parsed.notation) {
+    const cleanedAlgo = cleanAlgorithmString(parsed.notation)
     return {
       inputValue: cleanedAlgo,
-      loadedCase: null,
+      loadedAlgorithmId: null as AlgorithmId | null,
+      loadedCase: null as AlgorithmLookupResult | null,
       selectedOLL: '',
       selectedPLL: '',
-      inverseMoves,
+      inverseMoves: [] as Move[],
     }
   }
 
   return {
     inputValue: '',
-    loadedCase: null,
+    loadedAlgorithmId: null as AlgorithmId | null,
+    loadedCase: null as AlgorithmLookupResult | null,
     selectedOLL: '',
     selectedPLL: '',
     inverseMoves: [] as Move[],
@@ -269,8 +301,8 @@ export default function Playground() {
   const [playingLabel, setPlayingLabel] = useState<string>('')
   const [isInputFocused, setIsInputFocused] = useState(false)
 
-  // Track loaded case from URL (for breadcrumb)
-  const [loadedCase] = useState<CaseLookupResult | null>(initialState.loadedCase)
+  // Track loaded algorithm from URL (for breadcrumb)
+  const [loadedAlgorithmId] = useState<AlgorithmId | null>(initialState.loadedAlgorithmId)
 
   // Track if we've applied initial moves (prevents double-apply in React Strict Mode)
   const hasAppliedInitialMoves = useRef(false)
@@ -282,7 +314,7 @@ export default function Playground() {
       hasAppliedInitialMoves.current = true
       applyMovesInstantly(initialState.inverseMoves)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [applyMovesInstantly, initialState.inverseMoves])
 
   // Flatten OLL cases for dropdown
   const ollOptions = useMemo(() => {
@@ -438,17 +470,9 @@ export default function Playground() {
       </header>
 
       <main className="main-content-narrow">
-        {/* Breadcrumb when loaded from a case */}
-        {loadedCase && (
-          <div className="mb-4">
-            <Link
-              to={getCasePageUrl(loadedCase.caseId)}
-              className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-800 transition-colors"
-            >
-              <span>←</span>
-              <span>Back to {loadedCase.displayName}</span>
-            </Link>
-          </div>
+        {/* Breadcrumb when loaded from a case/algorithm */}
+        {loadedAlgorithmId && (
+          <AlgorithmBreadcrumb algorithmId={loadedAlgorithmId} className="mb-4" />
         )}
         {/* Algorithm Control Panel - Token-first design */}
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-4 md:p-5 mb-6">

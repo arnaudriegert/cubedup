@@ -3,9 +3,10 @@ import { Link, useOutletContext } from 'react-router-dom'
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
-import AlgorithmBox from '../components/AlgorithmBox'
+import { AlgorithmDisplay } from '../components/algorithm'
 import InverseBadge from '../components/InverseBadge'
-import { getPlaygroundUrl } from '../utils/algorithmLinks'
+import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
+import type { AlgorithmId } from '../types/algorithm'
 
 function OLLCaseCard({
   ollCase, isHighlighted, onNavigateToCase,
@@ -14,26 +15,11 @@ function OLLCaseCard({
   isHighlighted?: boolean
   onNavigateToCase?: (caseNumber: number) => void
 }) {
+  // Construct algorithm IDs for this case
+  const caseId = `oll-${ollCase.number}`
+
   return (
-    <div className={`group case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
-      {/* Demo button - visible on hover */}
-      <Link
-        to={getPlaygroundUrl(`oll-${ollCase.number}`)}
-        className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity
-          px-2.5 py-1 text-xs font-medium rounded-lg
-          bg-indigo-100 text-indigo-700 hover:bg-indigo-200
-          flex items-center gap-1"
-      >
-        <span>▶</span>
-        <span>Demo</span>
-      </Link>
-      {ollCase.inverseOf && onNavigateToCase && (
-        <InverseBadge
-          inverseCaseNumber={ollCase.inverseOf}
-          onClick={onNavigateToCase}
-          className="absolute top-3 right-3"
-        />
-      )}
+    <div className={`case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
       <div className="flex flex-col">
         <h3 className="case-card-title text-left">
           OLL {ollCase.number} - {ollCase.name}
@@ -43,10 +29,48 @@ function OLLCaseCard({
           <OLLGrid orientations={ollCase.orientations} />
         </div>
 
-        <div className="w-full space-y-2">
-          {ollCase.algorithms.map((algorithm, i) => (
-            <AlgorithmBox key={i} algorithm={algorithm} />
-          ))}
+        <div className="w-full space-y-3">
+          {ollCase.algorithms.map((algorithm, i) => {
+            const algorithmId: AlgorithmId = `${caseId}-${i + 1}`
+            const isFirstAlgo = i === 0
+
+            return (
+              <div
+                key={i}
+                className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3"
+              >
+                <div className="flex items-center gap-2">
+                  {/* Play button - shown on hover */}
+                  <Link
+                    to={getPlaygroundUrlForAlgorithm(algorithmId)}
+                    title="Demo"
+                    className="shrink-0 w-6 h-6 flex items-center justify-center rounded
+                      text-indigo-600 hover:bg-indigo-100 transition-opacity
+                      opacity-0 group-hover/algocard:opacity-100"
+                  >
+                    <span className="text-sm">▶</span>
+                  </Link>
+                  {/* Algorithm display */}
+                  <div className="flex-1 min-w-0">
+                    <AlgorithmDisplay
+                      algorithm={algorithm}
+                      size="sm"
+                      pinnable
+                      parentHoverGroup="algocard"
+                    />
+                  </div>
+                  {/* Inverse badge */}
+                  {isFirstAlgo && ollCase.inverseOf && onNavigateToCase ? (
+                    <InverseBadge
+                      inverseCaseNumber={ollCase.inverseOf}
+                      onClick={onNavigateToCase}
+                      className="shrink-0 opacity-0 group-hover/algocard:opacity-100 transition-opacity"
+                    />
+                  ) : null}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
@@ -125,8 +149,16 @@ export default function OLLDetailed() {
                   rendered.push(
                     <div key={entry[0].number} id={`oll-${entry[0].number}`} className="md:col-span-2">
                       <div id={`oll-${entry[1].number}`} className="pair-container">
-                        <OLLCaseCard ollCase={entry[0]} isHighlighted={highlightedOll === entry[0].number} onNavigateToCase={handleNavigateToCase} />
-                        <OLLCaseCard ollCase={entry[1]} isHighlighted={highlightedOll === entry[1].number} onNavigateToCase={handleNavigateToCase} />
+                        <OLLCaseCard
+                          ollCase={entry[0]}
+                          isHighlighted={highlightedOll === entry[0].number}
+                          onNavigateToCase={handleNavigateToCase}
+                        />
+                        <OLLCaseCard
+                          ollCase={entry[1]}
+                          isHighlighted={highlightedOll === entry[1].number}
+                          onNavigateToCase={handleNavigateToCase}
+                        />
                       </div>
                     </div>,
                   )
@@ -134,7 +166,11 @@ export default function OLLDetailed() {
                 } else {
                   rendered.push(
                     <div key={entry[0].number} id={`oll-${entry[0].number}`}>
-                      <OLLCaseCard ollCase={entry[0]} isHighlighted={highlightedOll === entry[0].number} onNavigateToCase={handleNavigateToCase} />
+                      <OLLCaseCard
+                        ollCase={entry[0]}
+                        isHighlighted={highlightedOll === entry[0].number}
+                        onNavigateToCase={handleNavigateToCase}
+                      />
                     </div>,
                   )
                   position = (position + 1) % 2

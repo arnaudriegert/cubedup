@@ -1,9 +1,11 @@
-import AlgorithmBox from '../components/AlgorithmBox'
+import { AlgorithmDisplay } from '../components/algorithm'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { Color, FaceColors } from '../types/cube'
 import { Algorithm } from '../data/ollCases'
-import { solidFace, f2lFace, buildCubeState } from '../utils/cubeHelpers'
+import {
+  solidFace, f2lFace, buildCubeState,
+} from '../utils/cubeHelpers'
 import { getColorRotations } from '../utils/colors'
 import {
   makeFace,
@@ -54,7 +56,7 @@ function F2LCaseCard({
           </CubeDisplay>
         ))}
       </div>
-      <AlgorithmBox algorithm={algorithm} />
+      <AlgorithmDisplay algorithm={algorithm} size="sm" pinnable />
     </div>
   )
 }

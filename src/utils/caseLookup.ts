@@ -1,6 +1,16 @@
+/**
+ * Case and Algorithm lookup utilities
+ *
+ * Provides unified access to OLL/PLL cases and algorithms using the registry.
+ * Supports both case-level lookups (returns first algorithm) and
+ * algorithm-level lookups (returns specific variant).
+ */
+
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { pllCategories, PLLCase } from '../data/pllCases'
-import { Algorithm } from '../types/algorithm'
+import { Algorithm, AlgorithmId } from '../types/algorithm'
+import { algorithmRegistry, RegisteredAlgorithm } from '../data/algorithmRegistry'
+import { getCaseIdFromAlgorithmId } from './algorithmId'
 
 export type CaseType = 'oll' | 'pll'
 
@@ -12,7 +22,16 @@ export interface CaseLookupResult {
   displayName: string
 }
 
-// Flatten OLL cases for quick lookup
+export interface AlgorithmLookupResult {
+  type: CaseType
+  caseId: string
+  displayName: string
+  algorithm: RegisteredAlgorithm
+  allAlgorithms: RegisteredAlgorithm[]
+  variantIndex: number
+}
+
+// Flatten OLL cases for quick lookup (keep for backward compatibility)
 const ollCasesMap = new Map<number, OLLCase>()
 for (const category of ollCategories) {
   for (const entry of category.cases) {
@@ -22,7 +41,7 @@ for (const category of ollCategories) {
   }
 }
 
-// Flatten PLL cases for quick lookup (by lowercase name)
+// Flatten PLL cases for quick lookup (keep for backward compatibility)
 const pllCasesMap = new Map<string, PLLCase>()
 for (const category of pllCategories) {
   for (const entry of category.cases) {
@@ -33,16 +52,16 @@ for (const category of pllCategories) {
 }
 
 /**
- * Look up a case by ID string
+ * Look up a case by ID string (backward compatible)
  * @param caseId - Format: "oll-21" or "pll-ua"
- * @returns Case data with algorithm, or null if not found
+ * @returns Case data with first algorithm, or null if not found
  */
 export function lookupCase(caseId: string): CaseLookupResult | null {
   const lower = caseId.toLowerCase()
 
   if (lower.startsWith('oll-')) {
     const num = parseInt(lower.slice(4), 10)
-    if (isNaN(num)) return null
+    if (Number.isNaN(num)) return null
 
     const ollCase = ollCasesMap.get(num)
     if (!ollCase || ollCase.algorithms.length === 0) return null
@@ -74,6 +93,54 @@ export function lookupCase(caseId: string): CaseLookupResult | null {
 }
 
 /**
+ * Look up a specific algorithm by ID
+ * @param algorithmId - Format: "oll-21-1" or "pll-ua-1"
+ * @returns Algorithm data with all variants, or null if not found
+ */
+export function lookupAlgorithm(algorithmId: AlgorithmId): AlgorithmLookupResult | null {
+  const algorithm = algorithmRegistry.get(algorithmId)
+  if (!algorithm) return null
+
+  const caseId = getCaseIdFromAlgorithmId(algorithmId)
+  const allAlgorithms = algorithmRegistry.getAlgorithmsForCase(caseId)
+  const type: CaseType = caseId.startsWith('oll-') ? 'oll' : 'pll'
+
+  return {
+    type,
+    caseId,
+    displayName: algorithm.displayName,
+    algorithm,
+    allAlgorithms,
+    variantIndex: algorithm.variantIndex - 1, // 0-indexed
+  }
+}
+
+/**
+ * Look up algorithm by case ID and optional variant index
+ * @param caseId - Format: "oll-21" or "pll-ua"
+ * @param variantIndex - 0-based index (default: 0)
+ */
+export function lookupCaseAlgorithm(
+  caseId: string,
+  variantIndex: number = 0,
+): AlgorithmLookupResult | null {
+  const algorithms = algorithmRegistry.getAlgorithmsForCase(caseId)
+  if (algorithms.length === 0) return null
+
+  const algorithm = algorithms[variantIndex] || algorithms[0]
+  const type: CaseType = caseId.startsWith('oll-') ? 'oll' : 'pll'
+
+  return {
+    type,
+    caseId,
+    displayName: algorithm.displayName,
+    algorithm,
+    allAlgorithms: algorithms,
+    variantIndex: algorithm.variantIndex - 1,
+  }
+}
+
+/**
  * Get all OLL case numbers
  */
 export function getAllOLLNumbers(): number[] {
@@ -85,4 +152,18 @@ export function getAllOLLNumbers(): number[] {
  */
 export function getAllPLLNames(): string[] {
   return Array.from(pllCasesMap.keys())
+}
+
+/**
+ * Get OLL case data by number
+ */
+export function getOLLCase(number: number): OLLCase | undefined {
+  return ollCasesMap.get(number)
+}
+
+/**
+ * Get PLL case data by name
+ */
+export function getPLLCase(name: string): PLLCase | undefined {
+  return pllCasesMap.get(name.toLowerCase())
 }

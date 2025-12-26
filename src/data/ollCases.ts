@@ -108,10 +108,10 @@ export const ollCategories: OLLCategory[] = [
             },
             {
               decomposition: [
-                { moves: "[f']" },
+                { moves: 'z' },
                 { moves: "R U² R' U' R U' R'", trigger: '{chair}' },
                 { moves: "L' U² L U L' U L", trigger: '{left-chair}' },
-                { moves: '[f]' },
+                { moves: "z'" },
               ],
             },
           ],
@@ -352,7 +352,7 @@ export const ollCategories: OLLCategory[] = [
             ],
           }, {
             decomposition: [
-              { moves: '[u²]' },
+              { moves: 'y2' },
               { moves: "f'" },
               { moves: "L' U' L U", trigger: '{left-sexy}' },
               { moves: 'f' },
@@ -375,7 +375,7 @@ export const ollCategories: OLLCategory[] = [
             ],
           }, {
             decomposition: [
-              { moves: '[u²]' },
+              { moves: 'y2' },
               { moves: 'f' },
               { moves: "R U R' U'", trigger: '{sexy}' },
               { moves: "f'" },
@@ -589,25 +589,6 @@ export const ollCategories: OLLCategory[] = [
           inverseOf: 19,
         },
       ],
-      [
-        {
-          number: 20,
-          name: 'Checkers',
-          orientations: [
-            Orientation.TOP, Orientation.BACK, Orientation.TOP,
-            Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
-            Orientation.TOP, Orientation.FRONT, Orientation.TOP,
-          ],
-          algorithms: [{
-            decomposition: [
-              { moves: "r U R' U'", trigger: '{fat-sexy}' },
-              { moves: 'M²' },
-              { moves: "U R U' R'", trigger: "{sexy}'" },
-              { moves: "U' M'" },
-            ],
-          }],
-        },
-      ],
     ],
   },
   {
@@ -631,7 +612,7 @@ export const ollCategories: OLLCategory[] = [
             ],
           }, {
             decomposition: [
-              { moves: '[u2]' },
+              { moves: 'y2' },
               { moves: 'f' },
               { moves: "(R U R' U') (R U R' U')", trigger: '{sexy}²' },
               { moves: "f'" },
@@ -888,7 +869,7 @@ export const ollCategories: OLLCategory[] = [
             ],
           }, {
             decomposition: [
-              { moves: "[u']" },
+              { moves: "y'" },
               { moves: "R U² R'" },
               { moves: "F R' F' R", trigger: "{sledge}'" },
               { moves: "R U² R'" },
@@ -1242,6 +1223,25 @@ export const ollCategories: OLLCategory[] = [
             ],
           }],
           inverseOf: 28,
+        },
+      ],
+      [
+        {
+          number: 20,
+          name: 'Checkers',
+          orientations: [
+            Orientation.TOP, Orientation.BACK, Orientation.TOP,
+            Orientation.LEFT, Orientation.TOP, Orientation.RIGHT,
+            Orientation.TOP, Orientation.FRONT, Orientation.TOP,
+          ],
+          algorithms: [{
+            decomposition: [
+              { moves: "r U R' U'", trigger: '{fat-sexy}' },
+              { moves: 'M²' },
+              { moves: "U R U' R'", trigger: "{sexy}'" },
+              { moves: "U' M'" },
+            ],
+          }],
         },
       ],
     ],

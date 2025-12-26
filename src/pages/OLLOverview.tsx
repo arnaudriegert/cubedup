@@ -5,9 +5,10 @@ import { Link, useOutletContext } from 'react-router-dom'
 import { ollCategories, OLLCase } from '../data/ollCases'
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
-import AlgorithmBox from '../components/AlgorithmBox'
+import { AlgorithmDisplay } from '../components/algorithm'
 import InverseBadge from '../components/InverseBadge'
-import { getPlaygroundUrl } from '../utils/algorithmLinks'
+import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
+import type { AlgorithmId } from '../types/algorithm'
 
 // Build a map from case number to category name
 const categoryByCase = new Map<number, string>()
@@ -80,38 +81,43 @@ const CompactCard = memo(function CompactCard({
       className={isExpanded ? 'compact-card-expanded' : 'compact-card'}
     >
       {isExpanded ? (
-        <div className="group flex flex-col relative">
-          {/* Demo button - visible on hover */}
-          <Link
-            to={getPlaygroundUrl(`oll-${ollCase.number}`)}
-            onClick={(e) => e.stopPropagation()}
-            className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
-              px-2.5 py-1 text-xs font-medium rounded-lg
-              bg-indigo-100 text-indigo-700 hover:bg-indigo-200
-              flex items-center gap-1"
-          >
-            <span>▶</span>
-            <span>Demo</span>
-          </Link>
-          {ollCase.inverseOf && (
-            <InverseBadge
-              inverseCaseNumber={ollCase.inverseOf}
-              onClick={onSelect}
-              className="absolute top-0 right-0"
-            />
-          )}
-          <h3 className="case-card-title text-left">
-            OLL {ollCase.number} - {ollCase.name}
-          </h3>
-          <div className="mb-6 flex justify-center">
-            <OLLGrid orientations={ollCase.orientations} size="medium" />
-          </div>
-          <div className="w-full space-y-2">
-            {ollCase.algorithms.map((algorithm, i) => (
-              <AlgorithmBox key={i} algorithm={algorithm} />
-            ))}
-          </div>
-        </div>
+        (() => {
+          const firstAlgorithmId: AlgorithmId = `oll-${ollCase.number}-1`
+          return (
+            <div className="group flex flex-col relative">
+              {/* Demo button - visible on hover */}
+              <Link
+                to={getPlaygroundUrlForAlgorithm(firstAlgorithmId)}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
+                  px-2.5 py-1 text-xs font-medium rounded-lg
+                  bg-indigo-100 text-indigo-700 hover:bg-indigo-200
+                  flex items-center gap-1"
+              >
+                <span>▶</span>
+                <span>Demo</span>
+              </Link>
+              {ollCase.inverseOf && (
+                <InverseBadge
+                  inverseCaseNumber={ollCase.inverseOf}
+                  onClick={onSelect}
+                  className="absolute top-0 right-0"
+                />
+              )}
+              <h3 className="case-card-title text-left">
+                OLL {ollCase.number} - {ollCase.name}
+              </h3>
+              <div className="mb-6 flex justify-center">
+                <OLLGrid orientations={ollCase.orientations} size="medium" />
+              </div>
+              <div className="w-full space-y-3">
+                {ollCase.algorithms.map((algorithm, i) => (
+                  <AlgorithmDisplay key={i} algorithm={algorithm} size="sm" pinnable />
+                ))}
+              </div>
+            </div>
+          )
+        })()
       ) : (
         <div className="flex flex-col items-center relative">
           {ollCase.inverseOf && (

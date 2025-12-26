@@ -5,9 +5,10 @@ import { Link, useOutletContext } from 'react-router-dom'
 import { pllCategories, PLLCase } from '../data/pllCases'
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
-import AlgorithmBox from '../components/AlgorithmBox'
+import { AlgorithmDisplay } from '../components/algorithm'
 import { Color } from '../types/cube'
-import { getPlaygroundUrl } from '../utils/algorithmLinks'
+import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
+import type { AlgorithmId } from '../types/algorithm'
 
 // Build a map from case name to category name
 const categoryByCase = new Map<string, string>()
@@ -82,31 +83,36 @@ const CompactCard = memo(function CompactCard({
       className={isExpanded ? 'compact-card-expanded' : 'compact-card'}
     >
       {isExpanded ? (
-        <div className="group flex flex-col items-center relative">
-          {/* Demo button - visible on hover */}
-          <Link
-            to={getPlaygroundUrl(`pll-${pllCase.name.toLowerCase()}`)}
-            onClick={(e) => e.stopPropagation()}
-            className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
-              px-2.5 py-1 text-xs font-medium rounded-lg
-              bg-indigo-100 text-indigo-700 hover:bg-indigo-200
-              flex items-center gap-1"
-          >
-            <span>▶</span>
-            <span>Demo</span>
-          </Link>
-          <h3 className="case-card-title">
-            {pllCase.name}
-          </h3>
-          <div className="mb-6">
-            <PLLGrid pllCase={pllCase} selectedColor={selectedColor} size="medium" />
-          </div>
-          <div className="w-full space-y-2">
-            {pllCase.algorithms.map((algorithm, i) => (
-              <AlgorithmBox key={i} algorithm={algorithm} />
-            ))}
-          </div>
-        </div>
+        (() => {
+          const firstAlgorithmId: AlgorithmId = `pll-${pllCase.name.toLowerCase()}-1`
+          return (
+            <div className="group flex flex-col items-center relative">
+              {/* Demo button - visible on hover */}
+              <Link
+                to={getPlaygroundUrlForAlgorithm(firstAlgorithmId)}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
+                  px-2.5 py-1 text-xs font-medium rounded-lg
+                  bg-indigo-100 text-indigo-700 hover:bg-indigo-200
+                  flex items-center gap-1"
+              >
+                <span>▶</span>
+                <span>Demo</span>
+              </Link>
+              <h3 className="case-card-title">
+                {pllCase.name}
+              </h3>
+              <div className="mb-6">
+                <PLLGrid pllCase={pllCase} selectedColor={selectedColor} size="medium" />
+              </div>
+              <div className="w-full space-y-3">
+                {pllCase.algorithms.map((algorithm, i) => (
+                  <AlgorithmDisplay key={i} algorithm={algorithm} size="sm" pinnable />
+                ))}
+              </div>
+            </div>
+          )
+        })()
       ) : (
         <div className="flex flex-col items-center">
           <PLLGrid pllCase={pllCase} size="compact" selectedColor={selectedColor} />
