@@ -989,21 +989,3 @@ export function getOLLCases(): Case[] {
 export function getPLLCases(): Case[] {
   return Array.from(cases.values()).filter((c) => c.category === 'pll')
 }
-
-/**
- * Get OLL case by number.
- */
-export function getOLLCaseByNumber(num: number): Case | undefined {
-  return Array.from(cases.values()).find(
-    (c) => c.category === 'oll' && c.number === num,
-  )
-}
-
-/**
- * Get PLL case by name.
- */
-export function getPLLCaseByName(name: string): Case | undefined {
-  return Array.from(cases.values()).find(
-    (c) => c.category === 'pll' && c.name.toLowerCase() === name.toLowerCase(),
-  )
-}

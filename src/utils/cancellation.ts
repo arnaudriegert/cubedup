@@ -339,14 +339,3 @@ export function applyCancellations(stepMoves: StepMoves[]): MoveWithMeta[] {
 export function getEffectiveMoves(movesWithMeta: MoveWithMeta[]): Move[] {
   return movesWithMeta.filter((m) => !m.isCancelled).map((m) => m.move)
 }
-
-/**
- * Check if a base is the same move type (for advanced cancellation rules).
- * Currently just checks equality, but could be extended for parallel moves
- * like R and L which don't interfere.
- */
-export function areParallelMoves(_base1: MoveBase, _base2: MoveBase): boolean {
-  // Parallel pairs that don't interfere: R/L, U/D, F/B
-  // For now, we don't apply this - just return false
-  return false
-}
