@@ -24,14 +24,14 @@ const triggerCategories: TriggerCategory[] = [
     tag: 'core',
   },
   {
+    name: 'Sune Family',
+    description: 'Corner orientation algorithms. Each card shows the inverse (Chair/Anti-Sune). Our OLL algorithms favor Chair when possible—it\'s part of the beginner method.',
+    tag: 'sune-family',
+  },
+  {
     name: 'Wide Triggers',
     description: 'Triggers using wide moves (lowercase r/l = two layers together). These affect the M slice, making them useful for edge-related cases.',
     tag: 'wide',
-  },
-  {
-    name: 'Sune Family',
-    description: 'The Sune family algorithms orient corners. Chair (Anti-Sune) and Sune are inverses—learning one gives you both. These are standalone OLL solutions and building blocks for other algorithms.',
-    tag: 'sune-family',
   },
 ]
 
@@ -44,8 +44,10 @@ const triggerDescriptions: Record<string, string> = {
   'left-fat-sexy': 'Wide version of left sexy move.',
   'fat-sledge': 'Wide version of sledgehammer.',
   'left-fat-sledge': 'Wide version of left sledgehammer.',
-  'chair': 'Also known as Anti-Sune. Inverse is Sune.',
-  'left-chair': 'Mirror of Chair. Inverse is Left Sune.',
+  'fat-sune': 'Wide version of Sune. Inverse is Fat Chair.',
+  'left-fat-sune': 'Wide version of Left Sune.',
+  'sune': 'Classic corner orientation trigger. Inverse is Chair (Anti-Sune).',
+  'left-sune': 'Mirror of Sune. Inverse is Left Chair.',
   'half-sune': 'First half of Sune. Appears in many OLL/PLL algorithms.',
   'left-half-sune': 'First half of Left Sune. Mirror of Half Sune.',
 }

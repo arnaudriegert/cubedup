@@ -74,7 +74,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     steps: [{ moves: "R U2 R' U' R U' R'" }],
     inverse: 'sune',
     mirror: 'left-chair',
-    tags: ['trigger', 'sune-family'],
+    tags: ['trigger'],
   }],
   ['sune', {
     id: 'sune',
@@ -88,7 +88,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     steps: [{ moves: "L' U2 L U L' U L" }],
     inverse: 'left-sune',
     mirror: 'chair',
-    tags: ['trigger', 'sune-family'],
+    tags: ['trigger'],
   }],
   ['left-sune', {
     id: 'left-sune',
@@ -114,28 +114,28 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     steps: [{ moves: "r U R' U R U2 r'" }],
     inverse: 'fat-chair',
     mirror: 'left-fat-sune',
-    tags: ['trigger', 'sune-family', 'wide'],
+    tags: ['trigger', 'wide'],
   }],
   ['fat-chair', {
     id: 'fat-chair',
     steps: [{ moves: "r U2 R' U' R U' r'" }],
     inverse: 'fat-sune',
     mirror: 'left-fat-chair',
-    tags: ['trigger', 'sune-family', 'wide'],
+    tags: ['trigger'],
   }],
   ['left-fat-sune', {
     id: 'left-fat-sune',
     steps: [{ moves: "l' U' L U' L' U2 l" }],
     inverse: 'left-fat-chair',
     mirror: 'fat-sune',
-    tags: ['trigger', 'sune-family', 'wide'],
+    tags: ['trigger', 'wide'],
   }],
   ['left-fat-chair', {
     id: 'left-fat-chair',
     steps: [{ moves: "l' U2 L U L' U l" }],
     inverse: 'left-fat-sune',
     mirror: 'fat-chair',
-    tags: ['trigger', 'sune-family', 'wide'],
+    tags: ['trigger'],
   }],
 
   // ==========================================================================
