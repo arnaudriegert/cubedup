@@ -7,7 +7,7 @@ import {
 } from '../data/cases'
 
 import { PLLContextType } from './PLL'
-import PLLGrid from '../components/PLLGrid'
+import CaseGrid from '../components/CaseGrid'
 import { AlgoCardRow } from '../components/algorithm'
 import { Color } from '../types/cube'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
@@ -101,7 +101,7 @@ const CompactCard = memo(function CompactCard({
                 {caseData.name}
               </h3>
               <div className="mb-6">
-                <PLLGrid caseId={caseData.id} selectedColor={selectedColor} size="medium" />
+                <CaseGrid caseId={caseData.id} selectedColor={selectedColor} size="medium" />
               </div>
               <div className="w-full space-y-3" onClick={(e) => e.stopPropagation()}>
                 {algorithms.map((algorithm, i) => (
@@ -117,7 +117,7 @@ const CompactCard = memo(function CompactCard({
         })()
       ) : (
         <div className="flex flex-col items-center">
-          <PLLGrid caseId={caseData.id} size="compact" selectedColor={selectedColor} />
+          <CaseGrid caseId={caseData.id} size="compact" selectedColor={selectedColor} />
           <span className="mt-1 text-xs font-medium text-gray-600">
             {caseData.name}
           </span>

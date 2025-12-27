@@ -7,7 +7,7 @@ import {
 } from '../data/cases'
 
 import { OLLContextType } from './OLL'
-import OLLGrid from '../components/OLLGrid'
+import CaseGrid from '../components/CaseGrid'
 import { AlgoCardRow } from '../components/algorithm'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { useClickOutside, useEscapeKey } from '../hooks'
@@ -99,7 +99,7 @@ const CompactCard = memo(function CompactCard({
                 OLL {caseNumber} - {caseData.name}
               </h3>
               <div className="mb-6 flex justify-center">
-                <OLLGrid caseId={caseData.id} size="medium" />
+                <CaseGrid caseId={caseData.id} size="medium" />
               </div>
               <div className="w-full space-y-3" onClick={(e) => e.stopPropagation()}>
                 {algorithms.map((algorithm, i) => (
@@ -116,7 +116,7 @@ const CompactCard = memo(function CompactCard({
         })()
       ) : (
         <div className="flex flex-col items-center">
-          <OLLGrid caseId={caseData.id} size="compact" />
+          <CaseGrid caseId={caseData.id} size="compact" />
           <span className="mt-1 text-xs font-medium text-gray-600">
             {caseNumber}
           </span>

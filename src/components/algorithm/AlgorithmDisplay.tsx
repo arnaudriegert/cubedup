@@ -9,7 +9,7 @@
  */
 
 import {
-  useState, useEffect, useMemo,
+  useState, useMemo,
 } from 'react'
 import type { Algorithm } from '../../types/algorithm'
 import {
@@ -360,13 +360,8 @@ function TokenList({ tokens, state, size }: { tokens: AlgorithmToken[]; state: '
  * On touch devices, we use tap to toggle; on desktop, CSS hover works
  */
 function useIsTouchDevice() {
-  const [isTouch, setIsTouch] = useState(false)
-
-  useEffect(() => {
-    // hover: none means touch device
-    setIsTouch(!window.matchMedia('(hover: hover)').matches)
-  }, [])
-
+  const [isTouch] = useState(() =>
+    typeof window !== 'undefined' && !window.matchMedia('(hover: hover)').matches)
   return isTouch
 }
 
