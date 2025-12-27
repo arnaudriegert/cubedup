@@ -5,18 +5,17 @@ import { Color } from '../types/cube'
 import {
   getDerivedPattern,
   getOLLOrientations,
-  getPLLSideColorsRotated,
-  type PLLSideColors,
+  getSideColorsRotated,
 } from '../utils/derivedPatterns'
-import type { DerivedPattern } from '../utils/patternDerivation'
+import type { DerivedPattern, SideColors } from '../utils/patternDerivation'
 
 export interface UseDerivedPatternResult {
   /** Full derived pattern (for advanced use) */
   pattern: DerivedPattern | null
   /** OLL orientations (for OLL cases) */
   ollOrientations: OLLOrientations | null
-  /** PLL side colors (for PLL cases, with rotation applied) */
-  pllSideColors: PLLSideColors | null
+  /** Side colors (for PLL cases, with rotation applied) */
+  sideColors: SideColors | null
 }
 
 /**
@@ -36,7 +35,7 @@ export function useDerivedPattern(
       return {
         pattern: null,
         ollOrientations: null,
-        pllSideColors: null,
+        sideColors: null,
       }
     }
 
@@ -48,17 +47,17 @@ export function useDerivedPattern(
       ? getOLLOrientations(caseId)
       : null
 
-    const pllSideColors = caseId.startsWith('pll-')
-      ? getPLLSideColorsRotated(caseId, selectedColor)
+    const sideColors = caseId.startsWith('pll-')
+      ? getSideColorsRotated(caseId, selectedColor)
       : null
 
     return {
       pattern,
       ollOrientations,
-      pllSideColors,
+      sideColors,
     }
   }, [caseId, selectedColor])
 }
 
 // Re-export types for convenience
-export type { DerivedPattern, PLLSideColors }
+export type { DerivedPattern, SideColors }

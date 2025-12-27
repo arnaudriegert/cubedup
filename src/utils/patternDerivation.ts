@@ -97,9 +97,9 @@ function findYellowOrientation(cube: CubeState, topIndex: number): Orientation {
 }
 
 /**
- * PLL side colors - top row of each side face.
+ * Side colors - top row of each side face (for top-down last layer view).
  */
-export interface PLLSideColors {
+export interface SideColors {
   back: SideRowColors
   left: SideRowColors
   right: SideRowColors
@@ -107,14 +107,15 @@ export interface PLLSideColors {
 }
 
 /**
- * Derive PLL side colors from a cube state.
- * Extracts the top row (indices 0, 1, 2) of each side face.
+ * Derive side colors from a cube state.
+ * Extracts the top row of each side face, adjusted for top-down visual perspective.
+ * Back and right are reversed to match how they appear when viewed from above.
  */
-export function derivePLLSideColors(cube: CubeState): PLLSideColors {
+export function deriveSideColors(cube: CubeState): SideColors {
   return {
-    back: [cube.back[0], cube.back[1], cube.back[2]] as SideRowColors,
+    back: [cube.back[2], cube.back[1], cube.back[0]] as SideRowColors,
     left: [cube.left[0], cube.left[1], cube.left[2]] as SideRowColors,
-    right: [cube.right[0], cube.right[1], cube.right[2]] as SideRowColors,
+    right: [cube.right[2], cube.right[1], cube.right[0]] as SideRowColors,
     front: [cube.front[0], cube.front[1], cube.front[2]] as SideRowColors,
   }
 }
@@ -126,10 +127,7 @@ export function derivePLLSideColors(cube: CubeState): PLLSideColors {
 export function deriveLastLayerColors(cube: CubeState): LastLayerColors {
   return {
     top: cube.top as FaceColors,
-    back: [cube.back[0], cube.back[1], cube.back[2]] as SideRowColors,
-    left: [cube.left[0], cube.left[1], cube.left[2]] as SideRowColors,
-    right: [cube.right[0], cube.right[1], cube.right[2]] as SideRowColors,
-    front: [cube.front[0], cube.front[1], cube.front[2]] as SideRowColors,
+    ...deriveSideColors(cube),
   }
 }
 
@@ -139,7 +137,7 @@ export function deriveLastLayerColors(cube: CubeState): LastLayerColors {
 export interface DerivedPattern {
   cubeState: CubeState
   ollOrientations?: OLLOrientations
-  pllSideColors?: PLLSideColors
+  sideColors?: SideColors
   lastLayerColors: LastLayerColors
 }
 
@@ -182,7 +180,7 @@ export function deriveCasePattern(
   if (caseId.startsWith('oll-')) {
     pattern.ollOrientations = deriveOLLOrientations(problemState)
   } else if (caseId.startsWith('pll-')) {
-    pattern.pllSideColors = derivePLLSideColors(problemState)
+    pattern.sideColors = deriveSideColors(problemState)
   }
 
   return pattern

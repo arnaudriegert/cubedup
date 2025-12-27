@@ -12,7 +12,7 @@ import {
   deriveCasePattern,
   getRotationForColor,
   type DerivedPattern,
-  type PLLSideColors,
+  type SideColors,
 } from './patternDerivation'
 
 // Pattern cache
@@ -41,36 +41,36 @@ export function getOLLOrientations(caseId: CaseId): OLLOrientations | null {
 }
 
 /**
- * Get PLL side colors for a case
+ * Get side colors for a case
  */
-export function getPLLSideColors(caseId: CaseId): PLLSideColors | null {
+export function getSideColors(caseId: CaseId): SideColors | null {
   const pattern = getDerivedPattern(caseId)
-  return pattern?.pllSideColors ?? null
+  return pattern?.sideColors ?? null
 }
 
 // Cache for rotated patterns: "caseId:color" -> DerivedPattern
 const rotatedPatternCache = new Map<string, DerivedPattern>()
 
 /**
- * Get PLL side colors for a case with a specific front color.
+ * Get side colors for a case with a specific front color.
  *
  * The rotation is applied BEFORE the inverse algorithm, simulating
  * what the pattern looks like when viewing from a different angle.
  */
-export function getPLLSideColorsRotated(
+export function getSideColorsRotated(
   caseId: CaseId,
   selectedColor: Color,
-): PLLSideColors | null {
+): SideColors | null {
   // Default color (blue) uses non-rotated pattern
   if (selectedColor === Color.BLUE) {
-    return getPLLSideColors(caseId)
+    return getSideColors(caseId)
   }
 
   // Check cache
   const cacheKey = `${caseId}:${selectedColor}`
   const cached = rotatedPatternCache.get(cacheKey)
   if (cached) {
-    return cached.pllSideColors ?? null
+    return cached.sideColors ?? null
   }
 
   // Derive with rotation
@@ -80,6 +80,6 @@ export function getPLLSideColorsRotated(
     rotatedPatternCache.set(cacheKey, pattern)
   }
 
-  return pattern?.pllSideColors ?? null
+  return pattern?.sideColors ?? null
 }
 

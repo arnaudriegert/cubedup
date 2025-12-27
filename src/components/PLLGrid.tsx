@@ -4,7 +4,7 @@ import {
   Color, type LastLayerColors, type FaceColors,
 } from '../types/cube'
 import PLLArrowOverlay from './PLLArrowOverlay'
-import { getPLLSideColorsRotated } from '../utils/derivedPatterns'
+import { getSideColorsRotated } from '../utils/derivedPatterns'
 
 interface PLLGridProps {
   /** Case ID to derive patterns from (e.g., "pll-ua") */
@@ -34,7 +34,7 @@ export default function PLLGrid({
   }
 
   // Derive side colors with rotation applied BEFORE inverse algorithm
-  const sideColors = getPLLSideColorsRotated(caseId, selectedColor)
+  const sideColors = getSideColorsRotated(caseId, selectedColor)
 
   if (!sideColors) {
     return null
