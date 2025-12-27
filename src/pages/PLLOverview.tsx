@@ -2,37 +2,46 @@ import {
   memo, useRef, useEffect, useCallback, useMemo,
 } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { pllCategories, PLLCase } from '../data/pllCases'
+import {
+  pllGroups, getCase, getAlgorithmsForCase,
+} from '../data/cases'
+
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
 import { AlgorithmDisplay } from '../components/algorithm'
 import { Color } from '../types/cube'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
-import type { AlgorithmId } from '../types/algorithm'
+import type { AlgorithmId, Case } from '../types/algorithm'
 
 // Build a map from case name to category name
 const categoryByCase = new Map<string, string>()
-for (const category of pllCategories) {
-  for (const entry of category.cases) {
-    for (const c of entry) {
-      categoryByCase.set(c.name.toLowerCase(), category.name)
+for (const group of pllGroups) {
+  for (const entry of group.cases) {
+    for (const caseId of entry) {
+      const c = getCase(caseId)
+      if (c) {
+        categoryByCase.set(c.name.toLowerCase(), group.name)
+      }
     }
   }
 }
 
 // Flatten all PLL cases for the overview grid (static, computed once)
-const allCases: PLLCase[] = (() => {
-  const cases: PLLCase[] = []
-  for (const category of pllCategories) {
-    for (const entry of category.cases) {
-      cases.push(...entry)
+const allCases: Case[] = (() => {
+  const caseList: Case[] = []
+  for (const group of pllGroups) {
+    for (const entry of group.cases) {
+      for (const caseId of entry) {
+        const c = getCase(caseId)
+        if (c) caseList.push(c)
+      }
     }
   }
-  return cases
+  return caseList
 })()
 
 interface CompactCardProps {
-  pllCase: PLLCase
+  caseData: Case
   isExpanded: boolean
   onSelect: (pllName: string) => void
   onDeselect: () => void
@@ -40,7 +49,7 @@ interface CompactCardProps {
 }
 
 const CompactCard = memo(function CompactCard({
-  pllCase,
+  caseData,
   isExpanded,
   onSelect,
   onDeselect,
@@ -62,7 +71,7 @@ const CompactCard = memo(function CompactCard({
     if (isExpanded) {
       onDeselect()
     } else {
-      onSelect(pllCase.name)
+      onSelect(caseData.name)
     }
   }
 
@@ -72,7 +81,7 @@ const CompactCard = memo(function CompactCard({
       role="button"
       tabIndex={0}
       aria-expanded={isExpanded}
-      aria-label={`PLL ${pllCase.name}`}
+      aria-label={`PLL ${caseData.name}`}
       onClick={handleClick}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -84,7 +93,8 @@ const CompactCard = memo(function CompactCard({
     >
       {isExpanded ? (
         (() => {
-          const firstAlgorithmId: AlgorithmId = `pll-${pllCase.name.toLowerCase()}-1`
+          const algorithms = getAlgorithmsForCase(caseData.id)
+          const firstAlgorithmId: AlgorithmId = algorithms[0]?.id ?? caseData.id
           return (
             <div className="group flex flex-col items-center relative">
               {/* Demo button - visible on hover */}
@@ -100,13 +110,13 @@ const CompactCard = memo(function CompactCard({
                 <span>Demo</span>
               </Link>
               <h3 className="case-card-title">
-                {pllCase.name}
+                {caseData.name}
               </h3>
               <div className="mb-6">
-                <PLLGrid pllCase={pllCase} selectedColor={selectedColor} size="medium" />
+                <PLLGrid caseId={caseData.id} selectedColor={selectedColor} size="medium" />
               </div>
               <div className="w-full space-y-3">
-                {pllCase.algorithms.map((algorithm, i) => (
+                {algorithms.map((algorithm, i) => (
                   <AlgorithmDisplay key={i} algorithm={algorithm} size="sm" pinnable />
                 ))}
               </div>
@@ -115,9 +125,9 @@ const CompactCard = memo(function CompactCard({
         })()
       ) : (
         <div className="flex flex-col items-center">
-          <PLLGrid pllCase={pllCase} size="compact" selectedColor={selectedColor} />
+          <PLLGrid caseId={caseData.id} size="compact" selectedColor={selectedColor} />
           <span className="mt-1 text-xs font-medium text-gray-600">
-            {pllCase.name}
+            {caseData.name}
           </span>
         </div>
       )}
@@ -188,11 +198,11 @@ export default function PLLOverview() {
         className="grid gap-4"
         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(7rem, 1fr))' }}
       >
-        {filteredCases.map((pllCase) => (
+        {filteredCases.map((caseData) => (
           <CompactCard
-            key={pllCase.name}
-            pllCase={pllCase}
-            isExpanded={expandedCase === pllCase.name}
+            key={caseData.name}
+            caseData={caseData}
+            isExpanded={expandedCase === caseData.name}
             onSelect={handleSelect}
             onDeselect={clearSearch}
             selectedColor={selectedColor}

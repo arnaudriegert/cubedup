@@ -30,13 +30,19 @@ export function ollToColors(orientations: OLLOrientations): LastLayerColors {
       // Adjacent sides remain gray
     } else if (orientation === Orientation.BACK && adjacentSides?.back !== undefined) {
       topColors[topIndex] = Color.GRAY
-      backColors[adjacentSides.back] = Color.YELLOW
+      // Reverse back face index for visual display: cube state coordinates differ from visual layout
+      // Position 0 (back-left) should show at left of strip (index 0)
+      // Position 2 (back-right) should show at right of strip (index 2)
+      backColors[2 - adjacentSides.back] = Color.YELLOW
     } else if (orientation === Orientation.LEFT && adjacentSides?.left !== undefined) {
       topColors[topIndex] = Color.GRAY
       leftColors[adjacentSides.left] = Color.YELLOW
     } else if (orientation === Orientation.RIGHT && adjacentSides?.right !== undefined) {
       topColors[topIndex] = Color.GRAY
-      rightColors[adjacentSides.right] = Color.YELLOW
+      // Reverse right face index for visual display: cube state uses [2,1,0] but visual needs [0,1,2]
+      // Position 2 (back-right) should show at top of strip (index 0)
+      // Position 8 (front-right) should show at bottom of strip (index 2)
+      rightColors[2 - adjacentSides.right] = Color.YELLOW
     } else if (orientation === Orientation.FRONT && adjacentSides?.front !== undefined) {
       topColors[topIndex] = Color.GRAY
       frontColors[adjacentSides.front] = Color.YELLOW

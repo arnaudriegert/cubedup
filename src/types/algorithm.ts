@@ -1,31 +1,73 @@
 // Algorithm types - shared across OLL, PLL, F2L, and Triggers
 
-import type { AlgorithmId } from '../utils/algorithmId'
+// Algorithm ID is a string key: "sexy", "oll-21", "oll-21-2", "pll-ua"
+export type AlgorithmId = string
 
-// Re-export for convenience
-export type { AlgorithmId } from '../utils/algorithmId'
+// Case ID is a string key: "oll-21", "pll-ua"
+export type CaseId = string
 
-export interface AlgorithmStep {
-  moves: string           // The raw moves for this segment
-  trigger?: string        // Optional trigger notation e.g., '{sexy}'
-  triggerId?: AlgorithmId // Optional type-safe reference to trigger algorithm
+// A step is either raw moves OR a reference to another algorithm
+export type AlgorithmStep =
+  | { moves: string }
+  | { ref: AlgorithmId; repeat?: number; inverse?: boolean } // inverse: true inverts the referenced algorithm
+
+// Type guards for AlgorithmStep
+export function isMovesStep(step: AlgorithmStep): step is { moves: string } {
+  return 'moves' in step
+}
+
+export function isRefStep(
+  step: AlgorithmStep,
+): step is { ref: AlgorithmId; repeat?: number; inverse?: boolean } {
+  return 'ref' in step
 }
 
 export interface Algorithm {
-  id?: AlgorithmId                // Unique algorithm identifier
-  decomposition: AlgorithmStep[]  // Source of truth - full is built from this
-  simplifiedResult?: string       // Optional simplified result with cancellations marked
-  inverseOf?: AlgorithmId         // Algorithm-level inverse relationship
-  caseId?: string                 // Back-reference to parent case e.g., "oll-21"
+  id: AlgorithmId
+  steps: AlgorithmStep[]
+  inverse?: AlgorithmId // Inverse algorithm reference
+  mirror?: AlgorithmId // Left/right symmetry
+  tags?: string[] // ["trigger", "2-look", "solved-cross"]
 }
 
-// Algorithm category for organizing cases
-export type AlgorithmCategory = 'OLL' | 'PLL' | 'F2L' | 'Trigger'
+export type CaseCategory = 'oll' | 'pll'
 
-// Metadata for algorithm identification and search
-export interface AlgorithmMetadata {
-  id: string              // e.g., "oll-21" or "pll-ua"
-  category: AlgorithmCategory
-  caseNumber?: number     // OLL: 1-57
-  caseName?: string       // PLL: "Ua", "T", etc.
+export interface Case {
+  id: CaseId
+  name: string
+  category: CaseCategory
+  number?: number // OLL: 1-57
+  inverseOf?: CaseId
+  algorithms?: AlgorithmId[] // Algorithms that solve this case
 }
+
+// Case entry: single case or pair (for mirror/inverse relationships displayed side-by-side)
+export type CaseEntry = [CaseId] | [CaseId, CaseId]
+
+export interface CaseGroup {
+  name: string
+  description?: string
+  cases: CaseEntry[]
+}
+
+// ==========================================================================
+// PLL-specific types for arrow overlay
+// ==========================================================================
+
+// Positions on the last layer grid
+export type CornerPosition = 'FL' | 'FR' | 'BL' | 'BR'
+export type EdgePosition = 'F' | 'R' | 'B' | 'L'
+
+// A cycle describes pieces that rotate through positions
+// 2 positions = swap, 3 positions = 3-cycle
+export interface Cycle {
+  positions: (CornerPosition | EdgePosition)[]
+  direction?: 'cw' | 'ccw' // Visual hint for 3-cycles
+}
+
+export interface PLLSwapInfo {
+  corners?: Cycle[]
+  edges?: Cycle[]
+  description: string
+}
+

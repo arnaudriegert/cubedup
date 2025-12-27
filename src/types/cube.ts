@@ -34,13 +34,15 @@ type SideMapping = {
 
 export const TOP_TO_SIDES: Record<number, SideMapping> = {
   // Corners
+  // Note: back face is indexed as viewed from behind, so its left/right are swapped
+  // relative to the cube's left/right faces
   0: {
-    back: 0,
+    back: 2,  // top[0] (back-left corner) → back[2] (top-right when viewing back from behind)
     left: 0,
   },
   2: {
-    back: 2,
-    right: 0,
+    back: 0,  // top[2] (back-right corner) → back[0] (top-left when viewing back from behind)
+    right: 2, // Matches cube state R move cycling
   },
   6: {
     front: 0,
@@ -48,7 +50,7 @@ export const TOP_TO_SIDES: Record<number, SideMapping> = {
   },
   8: {
     front: 2,
-    right: 2,
+    right: 0, // Matches cube state R move cycling
   },
   // Edges
   1: { back: 1 },

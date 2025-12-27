@@ -1,5 +1,5 @@
 import type {
-  MoveBase, FaceMove, WideMove, SliceMove, CubeRotation, RotationAxis,
+  MoveBase, CubeRotation, RotationAxis,
 } from '../types/cubeState'
 
 // Move info for animation and analysis

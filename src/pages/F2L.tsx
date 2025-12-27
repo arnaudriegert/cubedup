@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom'
 import { AlgorithmDisplay } from '../components/algorithm'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { Color, FaceColors } from '../types/cube'
-import { Algorithm } from '../data/ollCases'
+import type { Algorithm } from '../types/algorithm'
 import {
   solidFace, f2lFace, buildCubeState,
 } from '../utils/cubeHelpers'
@@ -14,6 +15,9 @@ import {
   makeRightFront,
   makeRightSide,
 } from '../utils/f2lHelpers'
+import { expandAlgorithmObject } from '../utils/algorithmExpander'
+import { movesToNotation } from '../utils/moveParser'
+import { getPlaygroundUrlForNotation } from '../utils/algorithmLinks'
 
 // Color rotations for showing all 4 orientations of a pattern
 // For RIGHT slot view (front+right visible): start with blue-front
@@ -42,6 +46,10 @@ function F2LCaseCard({
   const view = isLeft ? 'top-front-left' : 'top-front-right'
   const colorRotations = isLeft ? colorRotationsLeft : colorRotationsRight
 
+  // Expand algorithm to get notation for playground link
+  const expanded = expandAlgorithmObject(algorithm)
+  const notation = movesToNotation(expanded.moves)
+
   return (
     <div className="case-card">
       <h4 className="case-card-title text-center">{label}</h4>
@@ -56,7 +64,22 @@ function F2LCaseCard({
           </CubeDisplay>
         ))}
       </div>
-      <AlgorithmDisplay algorithm={algorithm} size="sm" pinnable />
+      <div className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3">
+        <div className="flex items-center gap-2">
+          <Link
+            to={getPlaygroundUrlForNotation(notation)}
+            title="Demo"
+            className="shrink-0 w-6 h-6 flex items-center justify-center rounded
+              text-indigo-600 hover:bg-indigo-100 transition-opacity
+              opacity-0 group-hover/algocard:opacity-100"
+          >
+            <span className="text-sm">▶</span>
+          </Link>
+          <div className="flex-1 min-w-0">
+            <AlgorithmDisplay algorithm={algorithm} size="sm" pinnable parentHoverGroup="algocard" />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -135,7 +158,7 @@ export default function F2L() {
                 For U' L' U L: U' hides pair, L' opens slot, U brings pair over, L closes */}
             <F2LCaseCard
               slot="left"
-              algorithm={{ decomposition: [{ moves: "U' L' U L", trigger: "{left-sexy}'" }] }}
+              algorithm={{ id: 'f2l-1-left', steps: [{ ref: 'left-sexy', inverse: true }] }}
               generateFaces={(c) => ({
                 // Joined pair: corner at UFL (white front), edge at UL
                 top: makeFace(Color.YELLOW, {
@@ -156,9 +179,7 @@ export default function F2L() {
                 For U R U' R': U hides pair, R opens slot, U' brings pair over, R' closes */}
             <F2LCaseCard
               slot="right"
-              algorithm={{
-                decomposition: [{ moves: "U R U' R'", trigger: "{sexy}'" }],
-              }}
+              algorithm={{ id: 'f2l-1-right', steps: [{ ref: 'sexy', inverse: true }] }}
               generateFaces={(c) => ({
                 // Joined pair: corner at UFR (white front), edge at UR
                 top: makeFace(Color.YELLOW, {
@@ -189,7 +210,7 @@ export default function F2L() {
                 Edge at UB: F-color faces UP (top[1]) */}
             <F2LCaseCard
               slot="left"
-              algorithm={{ decomposition: [{ moves: "L' U' L" }] }}
+              algorithm={{ id: 'f2l-2-left', steps: [{ moves: "L' U' L" }] }}
               generateFaces={(c) => ({
                 // Split pair: corner at UFL (white left), edge at UB
                 top: makeFace(Color.YELLOW, {
@@ -206,7 +227,7 @@ export default function F2L() {
                 Edge at UB: F-color faces UP (top[1]) */}
             <F2LCaseCard
               slot="right"
-              algorithm={{ decomposition: [{ moves: "R U R'" }] }}
+              algorithm={{ id: 'f2l-2-right', steps: [{ moves: "R U R'" }] }}
               generateFaces={(c) => ({
                 // Split pair: corner at UFR (white right), edge at UB
                 top: makeFace(Color.YELLOW, {

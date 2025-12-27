@@ -1,13 +1,18 @@
 import { useEffect } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { pllCategories, PLLCase } from '../data/pllCases'
+import {
+  pllGroups, getCase, getPLLSwaps, getAlgorithmsForCase,
+} from '../data/cases'
+
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
 import { AlgorithmDisplay } from '../components/algorithm'
 import { Color } from '../types/cube'
 import { CORNER_COLOR, EDGE_COLOR } from '../components/PLLArrowOverlay'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
-import type { AlgorithmId } from '../types/algorithm'
+import type {
+  AlgorithmId, Case, CaseId,
+} from '../types/algorithm'
 
 // Highlights "corner(s)" and "edge(s)" words with their respective colors
 function ColorCodedDescription({ text }: { text: string }) {
@@ -35,35 +40,36 @@ function ColorCodedDescription({ text }: { text: string }) {
 }
 
 function PLLCaseCard({
-  pllCase, isHighlighted, selectedColor,
+  caseData, isHighlighted, selectedColor,
 }: {
-  pllCase: PLLCase
+  caseData: Case
   isHighlighted?: boolean
   selectedColor: Color
 }) {
-  // Construct algorithm IDs for this case
-  const caseId = `pll-${pllCase.name.toLowerCase()}`
+  const caseId = caseData.id
+  const algorithms = getAlgorithmsForCase(caseId)
+  const swaps = getPLLSwaps(caseId)
 
   return (
     <div className={`case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
       <div className="flex flex-col items-center">
         <h3 className="case-card-title">
-          {pllCase.name}
+          {caseData.name}
         </h3>
 
         <div className="mb-4">
-          <PLLGrid pllCase={pllCase} selectedColor={selectedColor} showArrows />
+          <PLLGrid caseId={caseId} swaps={swaps} selectedColor={selectedColor} showArrows />
         </div>
 
-        {pllCase.swaps && (
+        {swaps && (
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
-            <ColorCodedDescription text={pllCase.swaps.description} />
+            <ColorCodedDescription text={swaps.description} />
           </p>
         )}
 
         <div className="w-full space-y-3">
-          {pllCase.algorithms.map((algorithm, i) => {
-            const algorithmId: AlgorithmId = `${caseId}-${i + 1}`
+          {algorithms.map((algorithm, i) => {
+            const algorithmId: AlgorithmId = algorithm.id
 
             return (
               <div
@@ -98,6 +104,11 @@ function PLLCaseCard({
       </div>
     </div>
   )
+}
+
+// Helper to get PLL name from case ID (e.g., "pll-ua" -> "ua")
+function getPLLName(caseId: CaseId): string {
+  return caseId.replace('pll-', '')
 }
 
 export default function PLLDetailed() {
@@ -147,36 +158,47 @@ export default function PLLDetailed() {
         </div>
       </details>
 
-      {pllCategories.map((category, categoryIndex) => (
-        <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
-          <h2 className="section-title">{category.name}</h2>
-          <p className="section-description">{category.description}</p>
+      {pllGroups.map((group, groupIndex) => (
+        <section key={groupIndex} id={group.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
+          <h2 className="section-title">{group.name}</h2>
+          <p className="section-description">{group.description}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(() => {
               const rendered = []
               let position = 0
 
-              for (const entry of category.cases) {
+              for (const entry of group.cases) {
                 const isRelatedPair = entry.length === 2
+                const firstCaseId = entry[0]
+                const firstCase = getCase(firstCaseId)
+                if (!firstCase) continue
+
+                const firstName = getPLLName(firstCaseId)
 
                 if (isRelatedPair && position === 1) {
-                  rendered.push(<div key={`spacer-${entry[0].name}`} className="hidden md:block" />)
+                  rendered.push(<div key={`spacer-${firstName}`} className="hidden md:block" />)
                   position = (position + 1) % 2
                 }
 
                 if (isRelatedPair) {
+                  const secondCaseId = entry[1]
+                  const secondCase = getCase(secondCaseId)
+                  if (!secondCase) continue
+
+                  const secondName = getPLLName(secondCaseId)
+
                   rendered.push(
-                    <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`} className="md:col-span-2">
-                      <div id={`pll-${entry[1].name.toLowerCase()}`} className="pair-container">
+                    <div key={firstName} id={`pll-${firstName}`} className="md:col-span-2">
+                      <div id={`pll-${secondName}`} className="pair-container">
                         <PLLCaseCard
-                          pllCase={entry[0]}
-                          isHighlighted={highlightedPll === entry[0].name.toLowerCase()}
+                          caseData={firstCase}
+                          isHighlighted={highlightedPll === firstName}
                           selectedColor={selectedColor}
                         />
                         <PLLCaseCard
-                          pllCase={entry[1]}
-                          isHighlighted={highlightedPll === entry[1].name.toLowerCase()}
+                          caseData={secondCase}
+                          isHighlighted={highlightedPll === secondName}
                           selectedColor={selectedColor}
                         />
                       </div>
@@ -185,10 +207,10 @@ export default function PLLDetailed() {
                   position = 0
                 } else {
                   rendered.push(
-                    <div key={entry[0].name} id={`pll-${entry[0].name.toLowerCase()}`}>
+                    <div key={firstName} id={`pll-${firstName}`}>
                       <PLLCaseCard
-                        pllCase={entry[0]}
-                        isHighlighted={highlightedPll === entry[0].name.toLowerCase()}
+                        caseData={firstCase}
+                        isHighlighted={highlightedPll === firstName}
                         selectedColor={selectedColor}
                       />
                     </div>,

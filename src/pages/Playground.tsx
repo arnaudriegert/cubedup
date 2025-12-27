@@ -13,31 +13,21 @@ import {
   parseMoves, cleanAlgorithmString, invertAlgorithmString, moveToNotation,
 } from '../utils/moveParser'
 import {
-  ollCategories, OLLCase, Algorithm,
-} from '../data/ollCases'
-import { pllCategories, PLLCase } from '../data/pllCases'
+  ollGroups, pllGroups, getCase, getAlgorithmsForCase,
+} from '../data/cases'
+import { getAlgorithm } from '../data/algorithms'
+import type { Case } from '../types/algorithm'
 import { Color } from '../types/cube'
 import {
   lookupCase, lookupAlgorithm, AlgorithmLookupResult,
 } from '../utils/caseLookup'
 import { parsePlaygroundUrl } from '../utils/algorithmLinks'
-import { buildFullFromSteps } from '../utils/algorithmTokenizer'
+import { getAlgorithmNotation } from '../utils/algorithmExpander'
 
-// Helper to get algorithm string from Algorithm object
-function getAlgorithmString(algorithm: Algorithm): string {
-  return algorithm.decomposition.map(step => step.moves).join(' ')
-}
-
-// Flatten OLL cases for dropdown
-interface OLLOption {
+// Flatten cases for dropdown
+interface CaseOption {
   label: string
-  case: OLLCase
-}
-
-// Flatten PLL cases for dropdown
-interface PLLOption {
-  label: string
-  case: PLLCase
+  caseData: Case
 }
 
 // Color to Tailwind classes - used for dynamic button colors
@@ -216,8 +206,9 @@ function getInitialStateFromURL() {
   // Algorithm ID takes priority (specific variant)
   if (parsed.algorithmId) {
     const result = lookupAlgorithm(parsed.algorithmId)
-    if (result) {
-      const algoString = buildFullFromSteps(result.algorithm.decomposition)
+    const algo = getAlgorithm(parsed.algorithmId)
+    if (result && algo) {
+      const algoString = getAlgorithmNotation(parsed.algorithmId)
       const cleanedAlgo = cleanAlgorithmString(algoString)
       const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
       return {
@@ -235,16 +226,19 @@ function getInitialStateFromURL() {
   if (parsed.caseId) {
     const result = lookupCase(parsed.caseId)
     if (result) {
-      const algoString = getAlgorithmString(result.algorithm)
-      const cleanedAlgo = cleanAlgorithmString(algoString)
-      const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
-      return {
-        inputValue: cleanedAlgo,
-        loadedAlgorithmId: `${result.caseId}-1` as AlgorithmId,
-        loadedCase: null as AlgorithmLookupResult | null,
-        selectedOLL: result.type === 'oll' ? result.caseId : '',
-        selectedPLL: result.type === 'pll' ? result.caseId : '',
-        inverseMoves,
+      const algorithms = getAlgorithmsForCase(result.caseId)
+      if (algorithms.length > 0) {
+        const algoString = getAlgorithmNotation(algorithms[0].id)
+        const cleanedAlgo = cleanAlgorithmString(algoString)
+        const inverseMoves = parseMoves(invertAlgorithmString(cleanedAlgo))
+        return {
+          inputValue: cleanedAlgo,
+          loadedAlgorithmId: algorithms[0].id as AlgorithmId,
+          loadedCase: null as AlgorithmLookupResult | null,
+          selectedOLL: result.type === 'oll' ? result.caseId : '',
+          selectedPLL: result.type === 'pll' ? result.caseId : '',
+          inverseMoves,
+        }
       }
     }
   }
@@ -318,34 +312,40 @@ export default function Playground() {
 
   // Flatten OLL cases for dropdown
   const ollOptions = useMemo(() => {
-    const options: OLLOption[] = []
-    for (const category of ollCategories) {
-      for (const entry of category.cases) {
-        for (const ollCase of entry) {
-          options.push({
-            label: `OLL ${ollCase.number} - ${ollCase.name}`,
-            case: ollCase,
-          })
+    const options: CaseOption[] = []
+    for (const group of ollGroups) {
+      for (const entry of group.cases) {
+        for (const caseId of entry) {
+          const caseData = getCase(caseId)
+          if (caseData) {
+            options.push({
+              label: `OLL ${caseData.number} - ${caseData.name}`,
+              caseData,
+            })
+          }
         }
       }
     }
-    return options.sort((a, b) => a.case.number - b.case.number)
+    return options.sort((a, b) => (a.caseData.number ?? 0) - (b.caseData.number ?? 0))
   }, [])
 
   // Flatten PLL cases for dropdown
   const pllOptions = useMemo(() => {
-    const options: PLLOption[] = []
-    for (const category of pllCategories) {
-      for (const entry of category.cases) {
-        for (const pllCase of entry) {
-          options.push({
-            label: `PLL ${pllCase.name}`,
-            case: pllCase,
-          })
+    const options: CaseOption[] = []
+    for (const group of pllGroups) {
+      for (const entry of group.cases) {
+        for (const caseId of entry) {
+          const caseData = getCase(caseId)
+          if (caseData) {
+            options.push({
+              label: `PLL ${caseData.name}`,
+              caseData,
+            })
+          }
         }
       }
     }
-    return options.sort((a, b) => a.case.name.localeCompare(b.case.name))
+    return options.sort((a, b) => a.caseData.name.localeCompare(b.caseData.name))
   }, [])
 
   // Calculate current position in the playing algorithm
@@ -368,10 +368,13 @@ export default function Playground() {
   const handleOLLSelect = (label: string) => {
     setSelectedOLL(label)
     setSelectedPLL('')
-    const ollCase = ollOptions.find(o => o.label === label)?.case
-    if (ollCase && ollCase.algorithms.length > 0) {
-      const algoString = getAlgorithmString(ollCase.algorithms[0])
-      setInputValue(cleanAlgorithmString(algoString))
+    const caseData = ollOptions.find(o => o.label === label)?.caseData
+    if (caseData) {
+      const algorithms = getAlgorithmsForCase(caseData.id)
+      if (algorithms.length > 0) {
+        const algoString = getAlgorithmNotation(algorithms[0].id)
+        setInputValue(cleanAlgorithmString(algoString))
+      }
     }
   }
 
@@ -379,10 +382,13 @@ export default function Playground() {
   const handlePLLSelect = (label: string) => {
     setSelectedPLL(label)
     setSelectedOLL('')
-    const pllCase = pllOptions.find(o => o.label === label)?.case
-    if (pllCase && pllCase.algorithms.length > 0) {
-      const algoString = getAlgorithmString(pllCase.algorithms[0])
-      setInputValue(cleanAlgorithmString(algoString))
+    const caseData = pllOptions.find(o => o.label === label)?.caseData
+    if (caseData) {
+      const algorithms = getAlgorithmsForCase(caseData.id)
+      if (algorithms.length > 0) {
+        const algoString = getAlgorithmNotation(algorithms[0].id)
+        setInputValue(cleanAlgorithmString(algoString))
+      }
     }
   }
 

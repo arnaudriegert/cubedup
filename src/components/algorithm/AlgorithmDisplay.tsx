@@ -11,18 +11,20 @@
 import { useState, useMemo } from 'react'
 import type { Algorithm } from '../../types/algorithm'
 import {
-  tokenizeAlgorithm,
   tokenizeNotation,
-  buildShorthandFromSteps,
-  buildFullFromSteps,
+  tokenizeExpandedAlgorithm,
+  tokenizeNewAlgorithmShorthand,
+  buildShorthandFromNewAlgorithm,
   type AlgorithmToken,
 } from '../../utils/algorithmTokenizer'
-import { parseMoves, moveToNotation } from '../../utils/moveParser'
+import { expandAlgorithmObject } from '../../utils/algorithmExpander'
+import {
+  parseMoves, moveToNotation, movesToNotation,
+} from '../../utils/moveParser'
 import type { Move } from '../../types/cubeState'
 import PinBadge from '../PinBadge'
 
 export type DisplayMode = 'static' | 'playback'
-export type TriggerExpansion = 'hover' | 'always' | 'never'
 export type DisplaySize = 'sm' | 'md' | 'lg'
 
 export interface AlgorithmDisplayProps {
@@ -39,7 +41,6 @@ export interface AlgorithmDisplayProps {
   playingLabel?: string
 
   // Decomposition features
-  expandTriggers?: TriggerExpansion
   showCancellations?: boolean
   pinnable?: boolean
 
@@ -318,7 +319,6 @@ export default function AlgorithmDisplay({
   currentMoveIndex = -1,
   totalMoves,
   playingLabel,
-  expandTriggers = 'hover',
   showCancellations = true,
   pinnable = false,
   size = 'md',
@@ -329,32 +329,24 @@ export default function AlgorithmDisplay({
   // Parse tokens based on input type
   const { tokens, shorthandTokens, hasShorthand, moves } = useMemo(() => {
     if (algorithm) {
-      // Use algorithm decomposition
-      // For hover mode, fullTokens needs expanded triggers to show on hover
-      const shouldExpandForFull = expandTriggers === 'always' || expandTriggers === 'hover'
-      const fullTokens = tokenizeAlgorithm(algorithm, {
-        expandTriggers: shouldExpandForFull,
-        useSimplified: showCancellations,
-      })
+      // Expand algorithm and tokenize
+      const expanded = expandAlgorithmObject(algorithm)
+      const fullTokens = tokenizeExpandedAlgorithm(expanded, { showCancellations })
 
-      // Build shorthand if triggers exist
-      const shorthand = buildShorthandFromSteps(algorithm.decomposition)
-      const full = algorithm.simplifiedResult || buildFullFromSteps(algorithm.decomposition)
+      // Build shorthand (shows trigger names)
+      const shorthand = buildShorthandFromNewAlgorithm(algorithm)
+      const full = movesToNotation(expanded.moves)
       const hasShorthandView = shorthand !== full
 
       const shortTokens = hasShorthandView
-        ? tokenizeAlgorithm(algorithm, { expandTriggers: false, useSimplified: false })
+        ? tokenizeNewAlgorithmShorthand(algorithm)
         : fullTokens
-
-      // Parse moves for playback mode
-      const cleanFull = full.replace(/[()[\]{}~*]/g, '').replace(/\s+/g, ' ').trim()
-      const parsedMoves = parseMoves(cleanFull)
 
       return {
         tokens: fullTokens,
         shorthandTokens: shortTokens,
         hasShorthand: hasShorthandView,
-        moves: parsedMoves,
+        moves: expanded.moves,
       }
     }
 
@@ -377,7 +369,7 @@ export default function AlgorithmDisplay({
       hasShorthand: false,
       moves: [],
     }
-  }, [algorithm, notation, expandTriggers, showCancellations])
+  }, [algorithm, notation, showCancellations])
 
   // Playback mode
   if (mode === 'playback') {
@@ -394,13 +386,12 @@ export default function AlgorithmDisplay({
     )
   }
 
-  // Static mode
-  const shouldShowHoverExpand = expandTriggers === 'hover' && hasShorthand
+  // Static mode - hover to expand triggers when shorthand is available
   return (
     <StaticDisplay
       tokens={tokens}
       shorthandTokens={shorthandTokens}
-      hasShorthand={shouldShowHoverExpand}
+      hasShorthand={hasShorthand}
       pinnable={pinnable}
       size={size}
       className={className}

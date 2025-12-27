@@ -4,7 +4,7 @@ import {
 import {
   Outlet, Link, useLocation,
 } from 'react-router-dom'
-import { pllCategories } from '../data/pllCases'
+import { pllGroups, getPLLCases } from '../data/cases'
 import CategoryNav from '../components/CategoryNav'
 import ColorRemote from '../components/ColorRemote'
 import SEOHead from '../components/SEOHead'
@@ -28,8 +28,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 // Get all PLL case names for validation
-const allPLLNames = pllCategories.flatMap(cat =>
-  cat.cases.flatMap(entry => entry.map(c => c.name.toLowerCase())))
+const allPLLNames = getPLLCases().map(c => c.name.toLowerCase())
 
 // Context type exported for child routes
 export interface PLLContextType {
@@ -177,7 +176,7 @@ export default function PLL() {
 
           {/* Category navigation */}
           <CategoryNav
-            categories={pllCategories}
+            categories={pllGroups}
             mode={isOverview ? 'filter' : 'jump'}
             selectedCategory={selectedCategory}
             onCategorySelect={setSelectedCategory}

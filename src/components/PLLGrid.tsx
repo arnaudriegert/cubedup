@@ -1,12 +1,16 @@
 import { LastLayerGrid, GridSize } from './cube'
-import { pllToColors } from '../utils/pllToColors'
-import { PLLCase } from '../data/pllCases'
-import { rotatePLLColors } from '../utils/rotateColors'
-import { Color } from '../types/cube'
+import type { PLLSwapInfo } from '../types/algorithm'
+import {
+  Color, type LastLayerColors, type FaceColors,
+} from '../types/cube'
 import PLLArrowOverlay from './PLLArrowOverlay'
+import { getPLLSideColorsRotated } from '../utils/derivedPatterns'
 
 interface PLLGridProps {
-  pllCase: PLLCase
+  /** Case ID to derive patterns from (e.g., "pll-ua") */
+  caseId?: string
+  /** Swaps for arrow overlay */
+  swaps?: PLLSwapInfo
   size?: GridSize
   selectedColor?: Color
   showArrows?: boolean
@@ -14,29 +18,48 @@ interface PLLGridProps {
 
 /**
  * PLLGrid - Specialized grid for PLL cases
- * @param pllCase - The PLL case containing side colors
- * @param size - 'normal' (default) or 'compact' for smaller display
- * @param selectedColor - The target color to rotate to (optional)
- * @param showArrows - Show swap/cycle arrows overlay (default false)
+ *
+ * Uses caseId to derive side colors from algorithms.
+ * Provide swaps separately for arrow overlay.
  */
 export default function PLLGrid({
-  pllCase, size = 'normal', selectedColor, showArrows = false,
+  caseId,
+  swaps,
+  size = 'normal',
+  selectedColor = Color.BLUE,
+  showArrows = false,
 }: PLLGridProps) {
-  // Apply color rotation if a different color is selected (all cases use blue as reference)
-  const sideColors = selectedColor && selectedColor !== Color.BLUE
-    ? rotatePLLColors(pllCase, selectedColor)
-    : pllCase.sideColors
+  if (!caseId) {
+    return null
+  }
 
-  const colors = pllToColors({
-    ...pllCase,
-    sideColors,
-  })
+  // Derive side colors with rotation applied BEFORE inverse algorithm
+  const sideColors = getPLLSideColorsRotated(caseId, selectedColor)
+
+  if (!sideColors) {
+    return null
+  }
+
+  // Build LastLayerColors (PLL always has solved yellow top)
+  const solvedTop: FaceColors = [
+    Color.YELLOW, Color.YELLOW, Color.YELLOW,
+    Color.YELLOW, Color.YELLOW, Color.YELLOW,
+    Color.YELLOW, Color.YELLOW, Color.YELLOW,
+  ]
+
+  const colors: LastLayerColors = {
+    top: solvedTop,
+    back: sideColors.back,
+    left: sideColors.left,
+    right: sideColors.right,
+    front: sideColors.front,
+  }
 
   return (
     <div className="relative">
       <LastLayerGrid colors={colors} size={size} />
-      {showArrows && pllCase.swaps && (
-        <PLLArrowOverlay swaps={pllCase.swaps} size={size} />
+      {showArrows && swaps && (
+        <PLLArrowOverlay swaps={swaps} size={size} />
       )}
     </div>
   )

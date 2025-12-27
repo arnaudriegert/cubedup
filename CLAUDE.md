@@ -39,23 +39,28 @@ yarn lint      # ESLint check
 yarn lint:fix  # ESLint auto-fix
 ```
 
+The user will run the development server themself — ask them to do it if you're testing your code in the browser MCP and you see it's not running.
+The development server makes the app available under http://localhost:5173/cubedup/ (don't forget the /cubedup/).
+
 ## Architecture
 
 ```
 src/
-├── components/algorithm/   # AlgorithmDisplay, Breadcrumb, VariantSelector
+├── components/algorithm/   # AlgorithmDisplay, Breadcrumb
 ├── components/cube/        # Cube, CubeDisplay, Face, Sticker
-├── data/                   # ollCases, pllCases, triggers, algorithmRegistry
+├── data/                   # algorithms (static Map), cases (metadata)
 ├── pages/                  # OLL, PLL, Triggers, Playground, F2L, Cross
 ├── types/                  # algorithm, cube, cubeState
-├── utils/                  # algorithmTokenizer, moveParser, cubeState
+├── utils/                  # algorithmExpander, patternDerivation, cancellation
 └── styles/                 # design system (@apply)
 ```
 
 | Area | Primary Files |
 |------|---------------|
-| Case data | `data/ollCases.ts`, `data/pllCases.ts`, `data/triggers.ts` |
+| Algorithm data | `data/algorithms.ts` (static Map), `data/cases.ts` (metadata) |
+| Pattern derivation | `utils/patternDerivation.ts`, `utils/derivedPatterns.ts` (from algorithms) |
 | Algorithm display | `components/algorithm/AlgorithmDisplay.tsx` |
+| Algorithm expansion | `utils/algorithmExpander.ts`, `utils/cancellation.ts` |
 | Algorithm parsing | `utils/algorithmTokenizer.ts`, `utils/moveParser.ts` |
 | Cube rendering | `components/cube/Cube.tsx`, `components/cube/Face.tsx` |
 | Cube state | `utils/cubeState.ts`, `types/cubeState.ts` |
@@ -64,18 +69,34 @@ src/
 
 ### Algorithms
 
-**ID Format:** `{category}-{caseKey}-{variantIndex}` — e.g., `oll-21-1`, `pll-ua-2`, `trigger-sexy`
+**ID Format:** `{category}-{caseKey}-{variantIndex}` — e.g., `oll-21-1`, `pll-ua-2`, `sexy`
 
-**Structure:**
+**Structure (static Map):**
 ```typescript
+// data/algorithms.ts - single static Map
+algorithms.get('sexy')      // Direct access by ID
+algorithms.get('oll-21-1')  // OLL case variant
+
 interface Algorithm {
-  decomposition: AlgorithmStep[]  // Source of truth
-  simplifiedResult?: string       // With cancellation markup (~cancelled~)
+  id: AlgorithmId             // Required
+  steps: AlgorithmStep[]      // Source of truth
+  inverse?: AlgorithmId       // Inverse reference
+  mirror?: AlgorithmId        // Left/right mirror
+  tags?: string[]             // ['trigger', 'oll', 'solved-cross']
 }
-interface AlgorithmStep {
-  moves: string        // "R U R' U'"
-  trigger?: string     // "{sexy}"
-}
+
+// Steps can be raw moves OR references to other algorithms
+type AlgorithmStep =
+  | { moves: string }                    // "R U R' U'"
+  | { ref: AlgorithmId; repeat?: number } // { ref: 'sexy', repeat: 2 }
+```
+
+**Algorithm Expansion:**
+```typescript
+// Recursively resolves refs and computes cancellations at runtime
+const expanded = expandAlgorithmObject(algo)
+expanded.moves          // Final move sequence
+expanded.movesWithMeta  // Moves with cancellation flags
 ```
 
 **Tokenizer:** Converts to `AlgorithmToken[]` with types: `move`, `rotation`, `trigger`, `groupStart`, `groupEnd`, `space`
@@ -98,11 +119,16 @@ Interactive 3D cube to visualize algorithms in motion. Animates moves step-by-st
 
 ## Patterns
 
-**Registry:**
+**Algorithm Lookups:**
 ```typescript
-algorithmRegistry.get('oll-21-1')
-algorithmRegistry.expandTrigger('{sexy}')
-algorithmRegistry.getOLLCase(21)
+// data/algorithms.ts
+getAlgorithm('oll-21-1')           // Get algorithm by ID
+getTriggers()                       // All trigger algorithms
+
+// data/cases.ts
+getCase('oll-21')                  // Case metadata
+getAlgorithmsForCase('oll-21')     // All algorithm variants for a case
+ollGroups, pllGroups               // Case groupings
 ```
 
 **Type guards** (`types/cubeState.ts`):

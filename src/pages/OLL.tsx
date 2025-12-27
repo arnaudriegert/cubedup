@@ -4,7 +4,7 @@ import {
 import {
   Outlet, Link, useLocation,
 } from 'react-router-dom'
-import { ollCategories } from '../data/ollCases'
+import { ollGroups } from '../data/cases'
 import CategoryNav from '../components/CategoryNav'
 import SEOHead from '../components/SEOHead'
 
@@ -173,7 +173,7 @@ export default function OLL() {
 
           {/* Category navigation */}
           <CategoryNav
-            categories={ollCategories}
+            categories={ollGroups}
             mode={isOverview ? 'filter' : 'jump'}
             selectedCategory={selectedCategory}
             onCategorySelect={setSelectedCategory}

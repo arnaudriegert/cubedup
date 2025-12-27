@@ -1,10 +1,10 @@
-import {
-  SwapInfo, CornerPosition, EdgePosition,
-} from '../data/pllCases'
+import type {
+  PLLSwapInfo, CornerPosition, EdgePosition,
+} from '../types/algorithm'
 import { GridSize } from './cube'
 
 interface PLLArrowOverlayProps {
-  swaps: SwapInfo
+  swaps: PLLSwapInfo
   size?: GridSize
 }
 

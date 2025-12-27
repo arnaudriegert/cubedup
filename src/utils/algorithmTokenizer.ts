@@ -1,16 +1,20 @@
 /**
- * Algorithm tokenizer - converts algorithm decompositions to displayable tokens
+ * Algorithm tokenizer - converts algorithms to displayable tokens
  *
  * Handles:
- * - Decomposition steps with triggers
+ * - Algorithm with steps (moves or refs to other algorithms)
+ * - Runtime cancellation detection
  * - Markup: ~strikethrough~, **bold**
  * - Grouping: parentheses, brackets [rotations]
  * - Trigger notation: {sexy}, {chair}
  */
 
-import type { Algorithm, AlgorithmStep } from '../types/algorithm'
+import type { Algorithm } from '../types/algorithm'
+import { isMovesStep, isRefStep } from '../types/algorithm'
 import { isCubeRotation } from '../types/cubeState'
 import { parseMoves, moveToNotation } from './moveParser'
+import type { ExpandedAlgorithm } from './algorithmExpander'
+import type { MoveWithMeta } from './cancellation'
 
 export type TokenType = 'move' | 'trigger' | 'rotation' | 'groupStart' | 'groupEnd' | 'space'
 
@@ -21,7 +25,7 @@ export interface AlgorithmToken {
   triggerName?: string    // e.g., "sexy" (without braces)
   isCancelled?: boolean   // For ~strikethrough~ markup
   isHighlighted?: boolean // For **bold** markup
-  stepIndex?: number      // Which decomposition step this belongs to
+  stepIndex?: number      // Which algorithm step this belongs to
   moveIndex?: number      // Global move index (for playback tracking)
   stepParity?: 'even' | 'odd'  // For alternating colors within consecutive same-category steps
   isFromTrigger?: boolean      // True if this move came from a trigger expansion
@@ -30,94 +34,6 @@ export interface AlgorithmToken {
 // Regex patterns for parsing algorithm notation
 const OUTER_REGEX = /(~[^~]+~|\*\*[^*]+\*\*)/g
 const PAREN_REGEX = /(\([^)]+\))/g
-
-/**
- * Check if step needs parentheses wrapping
- * Skip if: single move, already has parens, or only contains rotations [...]
- */
-function needsParens(moves: string): boolean {
-  const isSingleMove = !moves.includes(' ')
-  const alreadyGrouped = moves.includes('(')
-  const onlyRotations = /^(\[[^\]]+\]\s*)+$/.test(moves)
-  return !isSingleMove && !alreadyGrouped && !onlyRotations
-}
-
-/**
- * Build the full algorithm string from decomposition steps
- * No parentheses - visual separation is handled by color alternation
- */
-export function buildFullFromSteps(steps: AlgorithmStep[]): string {
-  if (steps.length === 1) return steps[0].moves
-  return steps.map(step => step.moves).join(' ')
-}
-
-/**
- * Determine the category of a step for parity tracking
- * Categories: 'rotation' | 'trigger' | 'moves'
- */
-type StepCategory = 'rotation' | 'trigger' | 'moves'
-
-function getStepCategory(step: AlgorithmStep): StepCategory {
-  // If step has a trigger, it's a trigger step
-  if (step.trigger) return 'trigger'
-  // If step only contains rotations (bracketed [x y z] or standalone x/y/z with modifiers)
-  const onlyBracketedRotations = /^(\[[^\]]+\]\s*)+$/.test(step.moves)
-  const onlyStandaloneRotations = /^[xyz]['2]?$/i.test(step.moves.trim())
-  if (onlyBracketedRotations || onlyStandaloneRotations) return 'rotation'
-  // Otherwise it's regular moves
-  return 'moves'
-}
-
-/**
- * Check if a step at given index is isolated (surrounded by steps of different categories)
- * Isolated steps don't need parentheses for visual separation
- */
-function isIsolatedStep(steps: AlgorithmStep[], index: number): boolean {
-  if (steps.length <= 1) return true
-
-  const currentCategory = getStepCategory(steps[index])
-  const prevCategory = index > 0 ? getStepCategory(steps[index - 1]) : null
-  const nextCategory = index < steps.length - 1 ? getStepCategory(steps[index + 1]) : null
-
-  // Step is isolated if neither neighbor has the same category
-  return prevCategory !== currentCategory && nextCategory !== currentCategory
-}
-
-/**
- * Build shorthand string from decomposition steps
- * Parentheses are only added when there are consecutive non-trigger steps
- */
-export function buildShorthandFromSteps(steps: AlgorithmStep[]): string {
-  if (steps.length === 1) {
-    const step = steps[0]
-    if (step.trigger) {
-      // Expand exponents: {sexy}³ → {sexy} {sexy} {sexy}
-      const exponentMatch = step.trigger.match(/^(\{.+\}['2]?)([²³⁴])$/)
-      if (exponentMatch) {
-        const base = exponentMatch[1]
-        const count = { '²': 2, '³': 3, '⁴': 4 }[exponentMatch[2]] || 1
-        return Array(count).fill(base).join(' ')
-      }
-      return step.trigger
-    }
-    return step.moves
-  }
-  return steps.map((step, index) => {
-    if (step.trigger) {
-      // Expand exponents: {sexy}³ → {sexy} {sexy} {sexy}
-      const exponentMatch = step.trigger.match(/^(\{.+\}['2]?)([²³⁴])$/)
-      if (exponentMatch) {
-        const base = exponentMatch[1]
-        const count = { '²': 2, '³': 3, '⁴': 4 }[exponentMatch[2]] || 1
-        return Array(count).fill(base).join(' ')
-      }
-      return step.trigger
-    }
-    // Skip parens if step is isolated (surrounded by triggers or different categories)
-    if (isIsolatedStep(steps, index)) return step.moves
-    return needsParens(step.moves) ? `(${step.moves})` : step.moves
-  }).join(' ')
-}
 
 /**
  * Parse markup and return tokens with cancelled/highlighted flags
@@ -282,41 +198,186 @@ export function tokenizeNotation(
 }
 
 /**
- * Tokenize an Algorithm object into display tokens
+ * Count the total number of moves in tokens (for playback progress)
  */
-export function tokenizeAlgorithm(
-  algorithm: Algorithm,
-  options: { expandTriggers?: boolean; useSimplified?: boolean } = {},
-): AlgorithmToken[] {
-  const { expandTriggers = false, useSimplified = true } = options
+export function countMoves(tokens: AlgorithmToken[]): number {
+  return tokens.filter(t => t.type === 'move' || t.type === 'rotation').length
+}
 
-  // If simplifiedResult exists and we want to use it, tokenize that
-  // This shows cancellation markup properly
-  if (useSimplified && algorithm.simplifiedResult) {
-    // Check if all decomposition steps are from triggers
-    const allFromTriggers = algorithm.decomposition.every(step => !!step.trigger)
-    const tokens = tokenizeNotation(algorithm.simplifiedResult)
-    // Mark all move tokens as from trigger if all steps were triggers
-    if (allFromTriggers) {
-      for (const token of tokens) {
-        if (token.type === 'move') {
-          token.isFromTrigger = true
-        }
-      }
-    }
-    return tokens
+/**
+ * Get the move at a specific index from tokens
+ */
+export function getMoveAtIndex(tokens: AlgorithmToken[], moveIndex: number): AlgorithmToken | undefined {
+  return tokens.find(t => t.moveIndex === moveIndex)
+}
+
+// =========================================================================
+// New Algorithm Format Support
+// =========================================================================
+
+/**
+ * Determine step category from MoveWithMeta for expanded algorithm
+ */
+type ExpandedStepCategory = 'rotation' | 'trigger' | 'moves'
+
+function getExpandedStepCategory(stepMoves: MoveWithMeta[]): ExpandedStepCategory {
+  if (stepMoves.length === 0) return 'moves'
+
+  // If any move is from a ref, it's a trigger step
+  if (stepMoves.some(m => m.isFromRef)) return 'trigger'
+
+  // If all moves are rotations, it's a rotation step
+  if (stepMoves.every(m => isCubeRotation(m.move.base))) return 'rotation'
+
+  return 'moves'
+}
+
+/**
+ * Tokenize an ExpandedAlgorithm (new format with computed cancellations)
+ *
+ * This function works with the new algorithm structure where:
+ * - Algorithms have `steps` with refs or moves
+ * - Cancellations are computed at runtime
+ * - movesWithMeta contains cancellation flags
+ */
+export function tokenizeExpandedAlgorithm(
+  expanded: ExpandedAlgorithm,
+  options: { showCancellations?: boolean } = {},
+): AlgorithmToken[] {
+  const { showCancellations = true } = options
+  const tokens: AlgorithmToken[] = []
+
+  // Group moves by stepIndex to determine categories
+  const stepGroups = new Map<number, MoveWithMeta[]>()
+  for (const meta of expanded.movesWithMeta) {
+    const group = stepGroups.get(meta.stepIndex) || []
+    group.push(meta)
+    stepGroups.set(meta.stepIndex, group)
   }
 
-  // Otherwise, build from decomposition
+  // Get sorted step indices
+  const stepIndices = Array.from(stepGroups.keys()).sort((a, b) => a - b)
+
+  // Pre-compute categories and parities - parity resets when category changes
+  const stepCategories = stepIndices.map(idx => getExpandedStepCategory(stepGroups.get(idx)!))
+  const stepParityMap = new Map<number, 'even' | 'odd'>()
+
+  let prevCategory: ExpandedStepCategory | null = null
+  let categoryCount = 0
+
+  for (let i = 0; i < stepIndices.length; i++) {
+    const category = stepCategories[i]
+    if (category === prevCategory) {
+      categoryCount++
+    } else {
+      categoryCount = 0
+      prevCategory = category
+    }
+    stepParityMap.set(stepIndices[i], categoryCount % 2 === 0 ? 'even' : 'odd')
+  }
+
+  // Track step boundaries for spacing
+  let currentStepIndex = -1
+
+  for (let i = 0; i < expanded.movesWithMeta.length; i++) {
+    const meta = expanded.movesWithMeta[i]
+    const { move, stepIndex, isCancelled, isResult, isFromRef } = meta
+
+    // Add space when step changes
+    if (stepIndex !== currentStepIndex) {
+      currentStepIndex = stepIndex
+
+      // Add space between steps (except first)
+      if (tokens.length > 0) {
+        tokens.push({ type: 'space', value: ' ' })
+      }
+    }
+
+    // Skip cancelled moves if not showing cancellations
+    if (isCancelled && !showCancellations) {
+      continue
+    }
+
+    const isRotation = isCubeRotation(move.base)
+    const stepParity = stepParityMap.get(stepIndex) || 'even'
+
+    tokens.push({
+      type: isRotation ? 'rotation' : 'move',
+      value: moveToNotation(move),
+      isCancelled,
+      isHighlighted: isResult,
+      stepIndex,
+      moveIndex: i,
+      stepParity,
+      isFromTrigger: isFromRef,
+    })
+  }
+
+  return tokens
+}
+
+/**
+ * Build shorthand notation from Algorithm format
+ * Shows trigger names for ref steps, with ' suffix for inverses
+ */
+export function buildShorthandFromNewAlgorithm(
+  algorithm: Algorithm,
+  getAlgorithmName?: (id: string) => string | undefined,
+): string {
+  const parts: string[] = []
+
+  for (const step of algorithm.steps) {
+    if (isMovesStep(step)) {
+      parts.push(step.moves)
+    } else if (isRefStep(step)) {
+      // Format as trigger: {triggerName} or {triggerName'} for inverse
+      const baseName = getAlgorithmName?.(step.ref) ?? step.ref
+      const name = step.inverse ? `${baseName}'` : baseName
+      const trigger = `{${name}}`
+      if (step.repeat && step.repeat > 1) {
+        // Show repeated refs as multiple triggers
+        parts.push(Array(step.repeat).fill(trigger).join(' '))
+      } else {
+        parts.push(trigger)
+      }
+    }
+  }
+
+  return parts.join(' ')
+}
+
+/**
+ * Determine step category for new algorithm format
+ */
+type NewStepCategory = 'rotation' | 'trigger' | 'moves'
+
+function getNewStepCategory(step: Algorithm['steps'][0]): NewStepCategory {
+  if (isRefStep(step)) return 'trigger'
+  if (isMovesStep(step)) {
+    // Check if step only contains rotations
+    const onlyBracketedRotations = /^(\[[^\]]+\]\s*)+$/.test(step.moves)
+    const onlyStandaloneRotations = /^[xyz]['2]?$/i.test(step.moves.trim())
+    if (onlyBracketedRotations || onlyStandaloneRotations) return 'rotation'
+  }
+  return 'moves'
+}
+
+/**
+ * Tokenize Algorithm format in shorthand mode (showing trigger names)
+ */
+export function tokenizeNewAlgorithmShorthand(
+  algorithm: Algorithm,
+  getAlgorithmName?: (id: string) => string | undefined,
+): AlgorithmToken[] {
   const tokens: AlgorithmToken[] = []
+  let stepIndex = 0
   const moveCounter = { current: 0 }
 
-  // Pre-compute categories and parities for all steps
-  // Parity alternates only for consecutive steps of the same category
-  const stepCategories = algorithm.decomposition.map(step => getStepCategory(step))
+  // Pre-compute categories and parities - parity resets when category changes
+  const stepCategories = algorithm.steps.map(step => getNewStepCategory(step))
   const stepParities: Array<'even' | 'odd'> = []
 
-  let prevCategory: StepCategory | null = null
+  let prevCategory: NewStepCategory | null = null
   let categoryCount = 0
 
   for (let i = 0; i < stepCategories.length; i++) {
@@ -330,87 +391,48 @@ export function tokenizeAlgorithm(
     stepParities.push(categoryCount % 2 === 0 ? 'even' : 'odd')
   }
 
-  for (let stepIndex = 0; stepIndex < algorithm.decomposition.length; stepIndex++) {
-    const step = algorithm.decomposition[stepIndex]
-    const baseParity = stepParities[stepIndex]
-    const isFromTrigger = !!step.trigger
+  for (const step of algorithm.steps) {
+    const stepParity = stepParities[stepIndex]
 
     // Add space between steps
-    if (stepIndex > 0) {
+    if (tokens.length > 0) {
       tokens.push({ type: 'space', value: ' ' })
     }
 
-    // Check for trigger exponent (²³⁴) - can be before or after prime modifier
-    // Examples: {sexy}², {sexy}'², {trigger}2
-    const exponentMatch = step.trigger?.match(/^\{(.+)\}['2]?([²³⁴])['2]?$/)
-    const exponent = exponentMatch ? { '²': 2, '³': 3, '⁴': 4 }[exponentMatch[2]] || 1 : 1
+    if (isMovesStep(step)) {
+      // Parse and tokenize moves
+      const stepTokens = parseSegment(
+        step.moves,
+        { stepIndex, stepParity, isFromTrigger: false },
+        moveCounter,
+      )
+      tokens.push(...stepTokens)
+    } else if (isRefStep(step)) {
+      // Show as trigger token(s)
+      // Add ' suffix for inverse refs (e.g., "sexy" becomes "sexy'")
+      const baseName = getAlgorithmName?.(step.ref) ?? step.ref
+      const name = step.inverse ? `${baseName}'` : baseName
+      const repeatCount = step.repeat ?? 1
 
-    // If step has a trigger and we're not expanding, show trigger tokens
-    if (step.trigger && !expandTriggers) {
-      // Handle all trigger patterns with modifiers
-      const match = step.trigger.match(/^\{(.+)\}(['2]?)([²³⁴]?)(['2]?)$/)
-      // Extract base trigger name (without exponent) and modifiers
-      const baseTriggerName = match ? match[1] + (match[2] || '') + (match[4] || '') : step.trigger.slice(1, -1)
-
-      // If there's an exponent, generate multiple trigger tokens
-      const baseParityNum = baseParity === 'even' ? 0 : 1
-      for (let i = 0; i < exponent; i++) {
+      // For repeated refs, parity alternates within the same category
+      const baseParityNum = stepParity === 'even' ? 0 : 1
+      for (let i = 0; i < repeatCount; i++) {
         if (i > 0) {
           tokens.push({ type: 'space', value: ' ' })
         }
         const subParity = (baseParityNum + i) % 2 === 0 ? 'even' : 'odd' as const
         tokens.push({
           type: 'trigger',
-          value: baseTriggerName,
-          triggerName: baseTriggerName,
-          rawMoves: step.moves,
-          stepIndex: exponent > 1 ? stepIndex * 100 + i : stepIndex,
+          value: name,
+          triggerName: name,
+          stepIndex: repeatCount > 1 ? stepIndex * 100 + i : stepIndex,
           stepParity: subParity,
         })
       }
-    } else {
-      // Tokenize the moves - for triggers with exponents, split into sub-steps
-      if (isFromTrigger && exponent > 1) {
-        // Split moves by parentheses groups for sub-step parity
-        // Sub-step parity alternates starting from the step's base parity
-        const groups = step.moves.match(/\([^)]+\)/g) || [step.moves]
-        const baseParityNum = baseParity === 'even' ? 0 : 1
-        for (let i = 0; i < groups.length; i++) {
-          if (i > 0) {
-            tokens.push({ type: 'space', value: ' ' })
-          }
-          const subStepParity = (baseParityNum + i) % 2 === 0 ? 'even' : 'odd' as const
-          const stepTokens = parseSegment(
-            groups[i].replace(/^\(|\)$/g, ''), // Remove outer parens
-            { stepIndex: stepIndex * 100 + i, stepParity: subStepParity, isFromTrigger },
-            moveCounter,
-          )
-          tokens.push(...stepTokens)
-        }
-      } else {
-        const stepTokens = parseSegment(
-          step.moves,
-          { stepIndex, stepParity: baseParity, isFromTrigger },
-          moveCounter,
-        )
-        tokens.push(...stepTokens)
-      }
     }
+
+    stepIndex++
   }
 
   return tokens
-}
-
-/**
- * Count the total number of moves in tokens (for playback progress)
- */
-export function countMoves(tokens: AlgorithmToken[]): number {
-  return tokens.filter(t => t.type === 'move' || t.type === 'rotation').length
-}
-
-/**
- * Get the move at a specific index from tokens
- */
-export function getMoveAtIndex(tokens: AlgorithmToken[], moveIndex: number): AlgorithmToken | undefined {
-  return tokens.find(t => t.moveIndex === moveIndex)
 }

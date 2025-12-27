@@ -1,37 +1,44 @@
 import { useEffect } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
-import { ollCategories, OLLCase } from '../data/ollCases'
+import {
+  ollGroups, getCase, getAlgorithmsForCase,
+} from '../data/cases'
+
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
 import { AlgorithmDisplay } from '../components/algorithm'
 import InverseBadge from '../components/InverseBadge'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
-import type { AlgorithmId } from '../types/algorithm'
+import type {
+  AlgorithmId, CaseId, Case,
+} from '../types/algorithm'
 
 function OLLCaseCard({
-  ollCase, isHighlighted, onNavigateToCase,
+  caseData, isHighlighted, onNavigateToCase,
 }: {
-  ollCase: OLLCase
+  caseData: Case
   isHighlighted?: boolean
   onNavigateToCase?: (caseNumber: number) => void
 }) {
-  // Construct algorithm IDs for this case
-  const caseId = `oll-${ollCase.number}`
+  const caseId = caseData.id
+  const algorithms = getAlgorithmsForCase(caseId)
+  const inverseCase = caseData.inverseOf ? getCase(caseData.inverseOf) : null
+  const inverseNumber = inverseCase?.number
 
   return (
     <div className={`case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
       <div className="flex flex-col">
         <h3 className="case-card-title text-left">
-          OLL {ollCase.number} - {ollCase.name}
+          OLL {caseData.number} - {caseData.name}
         </h3>
 
         <div className="mb-6 flex justify-center">
-          <OLLGrid orientations={ollCase.orientations} />
+          <OLLGrid caseId={caseId} />
         </div>
 
         <div className="w-full space-y-3">
-          {ollCase.algorithms.map((algorithm, i) => {
-            const algorithmId: AlgorithmId = `${caseId}-${i + 1}`
+          {algorithms.map((algorithm, i) => {
+            const algorithmId: AlgorithmId = algorithm.id
             const isFirstAlgo = i === 0
 
             return (
@@ -59,9 +66,9 @@ function OLLCaseCard({
                   />
                 </div>
                 {/* Inverse badge - positioned right, shown on hover */}
-                {isFirstAlgo && ollCase.inverseOf && onNavigateToCase ? (
+                {isFirstAlgo && inverseNumber && onNavigateToCase ? (
                   <InverseBadge
-                    inverseCaseNumber={ollCase.inverseOf}
+                    inverseCaseNumber={inverseNumber}
                     onClick={onNavigateToCase}
                     className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/algocard:opacity-100 transition-opacity z-10"
                   />
@@ -73,6 +80,11 @@ function OLLCaseCard({
       </div>
     </div>
   )
+}
+
+// Helper to extract OLL number from case ID
+function getOLLNumber(caseId: CaseId): number {
+  return parseInt(caseId.replace('oll-', ''), 10)
 }
 
 export default function OLLDetailed() {
@@ -125,36 +137,47 @@ export default function OLLDetailed() {
         </div>
       </details>
 
-      {ollCategories.map((category, categoryIndex) => (
-        <section key={categoryIndex} id={category.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
-          <h2 className="section-title">{category.name}</h2>
-          <p className="section-description">{category.description}</p>
+      {ollGroups.map((group, groupIndex) => (
+        <section key={groupIndex} id={group.name.replace(/\s+/g, '-').toLowerCase()} className="case-group scroll-mt-72">
+          <h2 className="section-title">{group.name}</h2>
+          <p className="section-description">{group.description}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {(() => {
               const rendered = []
               let position = 0
 
-              for (const entry of category.cases) {
+              for (const entry of group.cases) {
                 const isRelatedPair = entry.length === 2
+                const firstCaseId = entry[0]
+                const firstCase = getCase(firstCaseId)
+                if (!firstCase) continue
+
+                const firstNumber = getOLLNumber(firstCaseId)
 
                 if (isRelatedPair && position === 1) {
-                  rendered.push(<div key={`spacer-${entry[0].number}`} className="hidden md:block" />)
+                  rendered.push(<div key={`spacer-${firstNumber}`} className="hidden md:block" />)
                   position = (position + 1) % 2
                 }
 
                 if (isRelatedPair) {
+                  const secondCaseId = entry[1]
+                  const secondCase = getCase(secondCaseId)
+                  if (!secondCase) continue
+
+                  const secondNumber = getOLLNumber(secondCaseId)
+
                   rendered.push(
-                    <div key={entry[0].number} id={`oll-${entry[0].number}`} className="md:col-span-2">
-                      <div id={`oll-${entry[1].number}`} className="pair-container">
+                    <div key={firstNumber} id={`oll-${firstNumber}`} className="md:col-span-2">
+                      <div id={`oll-${secondNumber}`} className="pair-container">
                         <OLLCaseCard
-                          ollCase={entry[0]}
-                          isHighlighted={highlightedOll === entry[0].number}
+                          caseData={firstCase}
+                          isHighlighted={highlightedOll === firstNumber}
                           onNavigateToCase={handleNavigateToCase}
                         />
                         <OLLCaseCard
-                          ollCase={entry[1]}
-                          isHighlighted={highlightedOll === entry[1].number}
+                          caseData={secondCase}
+                          isHighlighted={highlightedOll === secondNumber}
                           onNavigateToCase={handleNavigateToCase}
                         />
                       </div>
@@ -163,10 +186,10 @@ export default function OLLDetailed() {
                   position = 0
                 } else {
                   rendered.push(
-                    <div key={entry[0].number} id={`oll-${entry[0].number}`}>
+                    <div key={firstNumber} id={`oll-${firstNumber}`}>
                       <OLLCaseCard
-                        ollCase={entry[0]}
-                        isHighlighted={highlightedOll === entry[0].number}
+                        caseData={firstCase}
+                        isHighlighted={highlightedOll === firstNumber}
                         onNavigateToCase={handleNavigateToCase}
                       />
                     </div>,
