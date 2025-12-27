@@ -803,16 +803,16 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   ['pll-ua', {
     id: 'pll-ua',
     steps: [
-      { moves: 'R2' },
-      { moves: "U' R' U' R U R U R U' R" },
+      { moves: "R2 U' R' U' R" },
+      { moves: "U R U R U' R" },
     ],
     tags: ['pll', 'edges-only'],
   }],
   ['pll-ub', {
     id: 'pll-ub',
     steps: [
-      { moves: 'L2' },
-      { moves: "U L U L' U' L' U' L' U L'" },
+      { moves: "L2 U L U L'" },
+      { moves: "U' L' U' L' U L'" },
     ],
     tags: ['pll', 'edges-only'],
   }],
