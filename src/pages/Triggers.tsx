@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom'
 import { getTriggerPairsByTag, getAlgorithm } from '../data/algorithms'
 import type { Algorithm } from '../types/algorithm'
-import { AlgorithmDisplay } from '../components/algorithm'
+import { AlgoCardRow } from '../components/algorithm'
 import SEOHead from '../components/SEOHead'
 import { getPlaygroundUrlForNotation } from '../utils/algorithmLinks'
 import { expandAlgorithmObject } from '../utils/algorithmExpander'
@@ -85,27 +84,10 @@ function TriggerCard({ algorithm }: { algorithm: Algorithm }) {
       )}
       <div className="space-y-3">
         {/* Main trigger */}
-        <div className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3">
-          <div className="flex items-center gap-2">
-            <Link
-              to={getPlaygroundUrlForNotation(moves)}
-              title="Demo"
-              className="shrink-0 w-6 h-6 flex items-center justify-center rounded
-                text-indigo-600 hover:bg-indigo-100 transition-opacity
-                opacity-0 group-hover/algocard:opacity-100"
-            >
-              <span className="text-sm">▶</span>
-            </Link>
-            <div className="flex-1 min-w-0">
-              <AlgorithmDisplay
-                notation={moves}
-                size="sm"
-                pinnable
-                parentHoverGroup="algocard"
-              />
-            </div>
-          </div>
-        </div>
+        <AlgoCardRow
+          notation={moves}
+          playgroundUrl={getPlaygroundUrlForNotation(moves)}
+        />
 
         {/* Inverse */}
         <div className="pt-1">
@@ -113,27 +95,10 @@ function TriggerCard({ algorithm }: { algorithm: Algorithm }) {
             <span className="label-text">Inverse</span>
             <TriggerBadge name={inverseName} />
           </div>
-          <div className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3">
-            <div className="flex items-center gap-2">
-              <Link
-                to={getPlaygroundUrlForNotation(inverseMoves)}
-                title="Demo"
-                className="shrink-0 w-6 h-6 flex items-center justify-center rounded
-                  text-indigo-600 hover:bg-indigo-100 transition-opacity
-                  opacity-0 group-hover/algocard:opacity-100"
-              >
-                <span className="text-sm">▶</span>
-              </Link>
-              <div className="flex-1 min-w-0">
-                <AlgorithmDisplay
-                  notation={inverseMoves}
-                  size="sm"
-                  pinnable
-                  parentHoverGroup="algocard"
-                />
-              </div>
-            </div>
-          </div>
+          <AlgoCardRow
+            notation={inverseMoves}
+            playgroundUrl={getPlaygroundUrlForNotation(inverseMoves)}
+          />
         </div>
       </div>
     </div>

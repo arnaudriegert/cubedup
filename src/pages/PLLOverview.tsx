@@ -1,18 +1,18 @@
 import {
   memo, useRef, useEffect, useCallback, useMemo,
 } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import {
   pllGroups, getCase, getAlgorithmsForCase,
 } from '../data/cases'
 
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
-import { AlgorithmDisplay } from '../components/algorithm'
+import { AlgoCardRow } from '../components/algorithm'
 import { Color } from '../types/cube'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { useClickOutside, useEscapeKey } from '../hooks'
-import type { AlgorithmId, Case } from '../types/algorithm'
+import type { Case } from '../types/algorithm'
 
 // Build a map from case name to category name
 const categoryByCase = new Map<string, string>()
@@ -95,30 +95,21 @@ const CompactCard = memo(function CompactCard({
       {isExpanded ? (
         (() => {
           const algorithms = getAlgorithmsForCase(caseData.id)
-          const firstAlgorithmId: AlgorithmId = algorithms[0]?.id ?? caseData.id
           return (
-            <div className="group flex flex-col items-center relative">
-              {/* Demo button - visible on hover */}
-              <Link
-                to={getPlaygroundUrlForAlgorithm(firstAlgorithmId)}
-                onClick={(e) => e.stopPropagation()}
-                className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
-                  px-2.5 py-1 text-xs font-medium rounded-lg
-                  bg-indigo-100 text-indigo-700 hover:bg-indigo-200
-                  flex items-center gap-1"
-              >
-                <span>▶</span>
-                <span>Demo</span>
-              </Link>
+            <div className="flex flex-col items-center">
               <h3 className="case-card-title">
                 {caseData.name}
               </h3>
               <div className="mb-6">
                 <PLLGrid caseId={caseData.id} selectedColor={selectedColor} size="medium" />
               </div>
-              <div className="w-full space-y-3">
+              <div className="w-full space-y-3" onClick={(e) => e.stopPropagation()}>
                 {algorithms.map((algorithm, i) => (
-                  <AlgorithmDisplay key={i} algorithm={algorithm} size="sm" pinnable />
+                  <AlgoCardRow
+                    key={i}
+                    algorithm={algorithm}
+                    playgroundUrl={getPlaygroundUrlForAlgorithm(algorithm.id)}
+                  />
                 ))}
               </div>
             </div>

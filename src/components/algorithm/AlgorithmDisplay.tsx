@@ -8,7 +8,9 @@
  * - Decomposition features everywhere (trigger expansion, step boundaries, cancellations)
  */
 
-import { useState, useMemo } from 'react'
+import {
+  useState, useEffect, useMemo,
+} from 'react'
 import type { Algorithm } from '../../types/algorithm'
 import {
   tokenizeNotation,
@@ -22,7 +24,6 @@ import {
   parseMoves, moveToNotation, movesToNotation,
 } from '../../utils/moveParser'
 import type { Move } from '../../types/cubeState'
-import PinBadge from '../PinBadge'
 
 export type DisplayMode = 'static' | 'playback'
 export type DisplaySize = 'sm' | 'md' | 'lg'
@@ -42,7 +43,6 @@ export interface AlgorithmDisplayProps {
 
   // Decomposition features
   showCancellations?: boolean
-  pinnable?: boolean
 
   // Styling
   size?: DisplaySize
@@ -359,13 +359,29 @@ function TokenList({ tokens, state, size }: { tokens: AlgorithmToken[]; state: '
 }
 
 /**
+ * Detect if the device supports hover (desktop vs touch)
+ * On touch devices, we use tap to toggle; on desktop, CSS hover works
+ */
+function useIsTouchDevice() {
+  const [isTouch, setIsTouch] = useState(false)
+
+  useEffect(() => {
+    // hover: none means touch device
+    setIsTouch(!window.matchMedia('(hover: hover)').matches)
+  }, [])
+
+  return isTouch
+}
+
+/**
  * Static mode display with hover-to-expand functionality
+ * - Desktop: hover reveals expanded view (CSS-based)
+ * - Mobile: tap toggles expanded view (JS-based)
  */
 function StaticDisplay({
   tokens,
   shorthandTokens,
   hasShorthand,
-  pinnable,
   size,
   className,
   useParentHover,
@@ -373,17 +389,18 @@ function StaticDisplay({
   tokens: AlgorithmToken[]
   shorthandTokens: AlgorithmToken[]
   hasShorthand: boolean
-  pinnable: boolean
   size: DisplaySize
   className: string
   useParentHover: boolean
 }) {
-  const [isPinned, setIsPinned] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const isTouch = useIsTouchDevice()
 
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (hasShorthand && pinnable) {
-      setIsPinned(prev => !prev)
+    // Only toggle on touch devices
+    if (hasShorthand && isTouch) {
+      e.stopPropagation()
+      setIsExpanded(prev => !prev)
     }
   }
 
@@ -408,17 +425,15 @@ function StaticDisplay({
   return (
     <div
       onClick={handleClick}
-      className={`relative cursor-pointer ${useParentHover ? '' : 'group/algo'} ${className}`}
+      className={`relative ${useParentHover ? '' : 'group/algo'} ${className}`}
     >
-      {isPinned && pinnable && <PinBadge className="absolute -top-2 -right-2 z-10" />}
-
-      {/* Shorthand view: shown by default, hidden on hover or when pinned */}
-      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${isPinned ? 'hidden' : shorthandHoverClass}`}>
+      {/* Shorthand view: shown by default, hidden on hover (desktop) or when expanded (mobile) */}
+      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${isExpanded ? 'hidden' : shorthandHoverClass}`}>
         <TokenList tokens={shorthandTokens} state="default" size={size} />
       </div>
 
-      {/* Full view: hidden by default, shown on hover or when pinned */}
-      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${isPinned ? '' : `hidden ${fullHoverClass}`}`}>
+      {/* Full view: hidden by default, shown on hover (desktop) or when expanded (mobile) */}
+      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${isExpanded ? '' : `hidden ${fullHoverClass}`}`}>
         <TokenList tokens={tokens} state="default" size={size} />
       </div>
     </div>
@@ -487,7 +502,6 @@ export default function AlgorithmDisplay({
   totalMoves,
   playingLabel,
   showCancellations = true,
-  pinnable = false,
   size = 'md',
   showProgress = false,
   className = '',
@@ -559,7 +573,6 @@ export default function AlgorithmDisplay({
       tokens={tokens}
       shorthandTokens={shorthandTokens}
       hasShorthand={hasShorthand}
-      pinnable={pinnable}
       size={size}
       className={className}
       useParentHover={!!parentHoverGroup}

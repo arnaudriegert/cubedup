@@ -1,18 +1,15 @@
 import { useRef } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import {
   ollGroups, getCase, getAlgorithmsForCase,
 } from '../data/cases'
 
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
-import { AlgorithmDisplay } from '../components/algorithm'
-import InverseBadge from '../components/InverseBadge'
+import { AlgoCardRow } from '../components/algorithm'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { useClickOutside } from '../hooks'
-import type {
-  AlgorithmId, CaseId, Case,
-} from '../types/algorithm'
+import type { CaseId, Case } from '../types/algorithm'
 
 function OLLCaseCard({
   caseData, isHighlighted, onNavigateToCase,
@@ -23,8 +20,6 @@ function OLLCaseCard({
 }) {
   const caseId = caseData.id
   const algorithms = getAlgorithmsForCase(caseId)
-  const inverseCase = caseData.inverseOf ? getCase(caseData.inverseOf) : null
-  const inverseNumber = inverseCase?.number
 
   return (
     <div className={`case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
@@ -38,45 +33,14 @@ function OLLCaseCard({
         </div>
 
         <div className="w-full space-y-3">
-          {algorithms.map((algorithm, i) => {
-            const algorithmId: AlgorithmId = algorithm.id
-            const isFirstAlgo = i === 0
-
-            return (
-              <div
-                key={i}
-                className="group/algocard relative rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3"
-              >
-                {/* Play button - positioned left, shown on hover */}
-                <Link
-                  to={getPlaygroundUrlForAlgorithm(algorithmId)}
-                  title="Demo"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded
-                    text-indigo-600 hover:bg-indigo-100 transition-opacity
-                    opacity-0 group-hover/algocard:opacity-100 z-10"
-                >
-                  <span className="text-sm">▶</span>
-                </Link>
-                {/* Algorithm display - centered with padding for buttons */}
-                <div className="px-6">
-                  <AlgorithmDisplay
-                    algorithm={algorithm}
-                    size="sm"
-                    pinnable
-                    parentHoverGroup="algocard"
-                  />
-                </div>
-                {/* Inverse badge - positioned right, shown on hover */}
-                {isFirstAlgo && inverseNumber && onNavigateToCase ? (
-                  <InverseBadge
-                    inverseCaseNumber={inverseNumber}
-                    onClick={onNavigateToCase}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover/algocard:opacity-100 transition-opacity z-10"
-                  />
-                ) : null}
-              </div>
-            )
-          })}
+          {algorithms.map((algorithm, i) => (
+            <AlgoCardRow
+              key={i}
+              algorithm={algorithm}
+              playgroundUrl={getPlaygroundUrlForAlgorithm(algorithm.id)}
+              onInverseClick={onNavigateToCase}
+            />
+          ))}
         </div>
       </div>
     </div>

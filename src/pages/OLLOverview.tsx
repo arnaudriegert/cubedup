@@ -1,18 +1,17 @@
 import {
   memo, useRef, useEffect, useCallback, useMemo,
 } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import {
   ollGroups, getCase, getAlgorithmsForCase,
 } from '../data/cases'
 
 import { OLLContextType } from './OLL'
 import OLLGrid from '../components/OLLGrid'
-import { AlgorithmDisplay } from '../components/algorithm'
-import InverseBadge from '../components/InverseBadge'
+import { AlgoCardRow } from '../components/algorithm'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { useClickOutside, useEscapeKey } from '../hooks'
-import type { AlgorithmId, Case } from '../types/algorithm'
+import type { Case } from '../types/algorithm'
 
 // Build a map from case number to category name
 const categoryByCase = new Map<number, string>()
@@ -56,8 +55,6 @@ const CompactCard = memo(function CompactCard({
 }: CompactCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const caseNumber = caseData.number ?? 0
-  const inverseCase = caseData.inverseOf ? getCase(caseData.inverseOf) : null
-  const inverseNumber = inverseCase?.number
 
   // Scroll expanded card into view (overview only - detailed view uses parent scroll in OLL.tsx)
   useEffect(() => {
@@ -96,50 +93,29 @@ const CompactCard = memo(function CompactCard({
       {isExpanded ? (
         (() => {
           const algorithms = getAlgorithmsForCase(caseData.id)
-          const firstAlgorithmId: AlgorithmId = algorithms[0]?.id ?? caseData.id
           return (
-            <div className="group flex flex-col relative">
-              {/* Demo button - visible on hover */}
-              <Link
-                to={getPlaygroundUrlForAlgorithm(firstAlgorithmId)}
-                onClick={(e) => e.stopPropagation()}
-                className="absolute top-0 left-0 opacity-0 group-hover:opacity-100 transition-opacity
-                  px-2.5 py-1 text-xs font-medium rounded-lg
-                  bg-indigo-100 text-indigo-700 hover:bg-indigo-200
-                  flex items-center gap-1"
-              >
-                <span>▶</span>
-                <span>Demo</span>
-              </Link>
-              {inverseNumber && (
-                <InverseBadge
-                  inverseCaseNumber={inverseNumber}
-                  onClick={onSelect}
-                  className="absolute top-0 right-0"
-                />
-              )}
+            <div className="flex flex-col">
               <h3 className="case-card-title text-left">
                 OLL {caseNumber} - {caseData.name}
               </h3>
               <div className="mb-6 flex justify-center">
                 <OLLGrid caseId={caseData.id} size="medium" />
               </div>
-              <div className="w-full space-y-3">
+              <div className="w-full space-y-3" onClick={(e) => e.stopPropagation()}>
                 {algorithms.map((algorithm, i) => (
-                  <AlgorithmDisplay key={i} algorithm={algorithm} size="sm" pinnable />
+                  <AlgoCardRow
+                    key={i}
+                    algorithm={algorithm}
+                    playgroundUrl={getPlaygroundUrlForAlgorithm(algorithm.id)}
+                    onInverseClick={onSelect}
+                  />
                 ))}
               </div>
             </div>
           )
         })()
       ) : (
-        <div className="flex flex-col items-center relative">
-          {inverseNumber && (
-            <span
-              className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full"
-              title={`Has inverse: OLL ${inverseNumber}`}
-            />
-          )}
+        <div className="flex flex-col items-center">
           <OLLGrid caseId={caseData.id} size="compact" />
           <span className="mt-1 text-xs font-medium text-gray-600">
             {caseNumber}

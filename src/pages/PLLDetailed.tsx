@@ -1,19 +1,17 @@
 import { useRef } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useOutletContext } from 'react-router-dom'
 import {
   pllGroups, getCase, getPLLSwaps, getAlgorithmsForCase,
 } from '../data/cases'
 
 import { PLLContextType } from './PLL'
 import PLLGrid from '../components/PLLGrid'
-import { AlgorithmDisplay } from '../components/algorithm'
+import { AlgoCardRow } from '../components/algorithm'
 import { Color } from '../types/cube'
 import { CORNER_COLOR, EDGE_COLOR } from '../components/PLLArrowOverlay'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { useClickOutside } from '../hooks'
-import type {
-  AlgorithmId, Case, CaseId,
-} from '../types/algorithm'
+import type { Case, CaseId } from '../types/algorithm'
 
 // Highlights "corner(s)" and "edge(s)" words with their respective colors
 function ColorCodedDescription({ text }: { text: string }) {
@@ -69,38 +67,13 @@ function PLLCaseCard({
         )}
 
         <div className="w-full space-y-3">
-          {algorithms.map((algorithm, i) => {
-            const algorithmId: AlgorithmId = algorithm.id
-
-            return (
-              <div
-                key={i}
-                className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3"
-              >
-                <div className="flex items-center gap-2">
-                  {/* Play button - shown on hover */}
-                  <Link
-                    to={getPlaygroundUrlForAlgorithm(algorithmId)}
-                    title="Demo"
-                    className="shrink-0 w-6 h-6 flex items-center justify-center rounded
-                      text-indigo-600 hover:bg-indigo-100 transition-opacity
-                      opacity-0 group-hover/algocard:opacity-100"
-                  >
-                    <span className="text-sm">▶</span>
-                  </Link>
-                  {/* Algorithm display */}
-                  <div className="flex-1 min-w-0">
-                    <AlgorithmDisplay
-                      algorithm={algorithm}
-                      size="sm"
-                      pinnable
-                      parentHoverGroup="algocard"
-                    />
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+          {algorithms.map((algorithm, i) => (
+            <AlgoCardRow
+              key={i}
+              algorithm={algorithm}
+              playgroundUrl={getPlaygroundUrlForAlgorithm(algorithm.id)}
+            />
+          ))}
         </div>
       </div>
     </div>

@@ -1,5 +1,4 @@
-import { Link } from 'react-router-dom'
-import { AlgorithmDisplay } from '../components/algorithm'
+import { AlgoCardRow } from '../components/algorithm'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { Color, FaceColors } from '../types/cube'
@@ -64,22 +63,10 @@ function F2LCaseCard({
           </CubeDisplay>
         ))}
       </div>
-      <div className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3">
-        <div className="flex items-center gap-2">
-          <Link
-            to={getPlaygroundUrlForNotation(notation)}
-            title="Demo"
-            className="shrink-0 w-6 h-6 flex items-center justify-center rounded
-              text-indigo-600 hover:bg-indigo-100 transition-opacity
-              opacity-0 group-hover/algocard:opacity-100"
-          >
-            <span className="text-sm">▶</span>
-          </Link>
-          <div className="flex-1 min-w-0">
-            <AlgorithmDisplay algorithm={algorithm} size="sm" pinnable parentHoverGroup="algocard" />
-          </div>
-        </div>
-      </div>
+      <AlgoCardRow
+        algorithm={algorithm}
+        playgroundUrl={getPlaygroundUrlForNotation(notation)}
+      />
     </div>
   )
 }
