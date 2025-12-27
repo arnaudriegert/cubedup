@@ -47,7 +47,7 @@ The development server makes the app available under http://localhost:5173/cubed
 ```
 src/
 ├── components/algorithm/   # AlgorithmDisplay, Breadcrumb
-├── components/cube/        # Cube, CubeDisplay, Face, Sticker, FaceButton
+├── components/cube/        # Cube, CubeDisplay, Face, Sticker
 ├── data/                   # algorithms (static Map), cases (metadata)
 ├── pages/                  # OLL, PLL, Triggers, Playground, F2L, Cross
 ├── types/                  # algorithm, cube, cubeState

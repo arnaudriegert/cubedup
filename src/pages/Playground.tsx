@@ -1,8 +1,8 @@
 import {
-  useState, useMemo, useEffect, useRef,
+  useState, useEffect, useRef, useCallback,
 } from 'react'
 import {
-  Cube, CubeDisplay, FaceButton,
+  Cube, CubeDisplay,
 } from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { AlgorithmBreadcrumb } from '../components/algorithm'
@@ -14,24 +14,13 @@ import { AlgorithmId } from '../types/algorithm'
 import {
   parseMoves, cleanAlgorithmString, invertAlgorithmString, moveToNotation,
 } from '../utils/moveParser'
-import {
-  ollGroups, pllGroups, getCase, getAlgorithmsForCase,
-} from '../data/cases'
+import { getAlgorithmsForCase } from '../data/cases'
 import { getAlgorithm } from '../data/algorithms'
-import type { Case } from '../types/algorithm'
 import { Color } from '../types/cube'
-import {
-  lookupCase, lookupAlgorithm, AlgorithmLookupResult,
-} from '../utils/caseLookup'
+import { lookupCase, lookupAlgorithm } from '../utils/caseLookup'
 import { parsePlaygroundUrl } from '../utils/algorithmLinks'
 import { getAlgorithmNotation } from '../utils/algorithmExpander'
 import './Playground.css'
-
-// Flatten cases for dropdown
-interface CaseOption {
-  label: string
-  caseData: Case
-}
 
 // Color to Tailwind classes - used for dynamic button colors
 const COLOR_STYLES: Record<Color, { bg: string; text: string }> = {
@@ -58,13 +47,60 @@ const OPPOSITE_FACE: Record<FaceName, FaceName> = {
 }
 
 // Map each face to its rotation axis
-const FACE_ROTATION: Record<FaceName, { cw: string; ccw: string; symbols: [string, string] }> = {
-  U: { cw: 'y', ccw: "y'", symbols: ['↺', '↻'] },
-  D: { cw: "y'", ccw: 'y', symbols: ['↻', '↺'] },
-  F: { cw: 'z', ccw: "z'", symbols: ['↺', '↻'] },
-  B: { cw: "z'", ccw: 'z', symbols: ['↻', '↺'] },
-  R: { cw: 'x', ccw: "x'", symbols: ['↺', '↻'] },
-  L: { cw: "x'", ccw: 'x', symbols: ['↻', '↺'] },
+const FACE_ROTATION: Record<FaceName, { cw: string; ccw: string }> = {
+  U: { cw: 'y', ccw: "y'" },
+  D: { cw: "y'", ccw: 'y' },
+  F: { cw: 'z', ccw: "z'" },
+  B: { cw: "z'", ccw: 'z' },
+  R: { cw: 'x', ccw: "x'" },
+  L: { cw: "x'", ccw: 'x' },
+}
+
+// Map each face to its slice move (M, S, E)
+// M = middle slice (between R/L), turns like L
+// S = standing slice (between F/B), turns like F
+// E = equator slice (between U/D), turns like D
+const FACE_SLICE: Record<FaceName, { cw: string; ccw: string }> = {
+  R: { cw: "M'", ccw: 'M' }, // R turns opposite to M
+  L: { cw: 'M', ccw: "M'" }, // L turns same as M
+  U: { cw: "E'", ccw: 'E' }, // U turns opposite to E
+  D: { cw: 'E', ccw: "E'" }, // D turns same as E
+  F: { cw: 'S', ccw: "S'" }, // F turns same as S
+  B: { cw: "S'", ccw: 'S' }, // B turns opposite to S
+}
+
+// Move modifier modes (mutually exclusive)
+type MoveMode = 'normal' | 'wide' | 'slice' | 'opposing' | 'rotation'
+
+// Mode metadata for UI
+const MODE_INFO: Record<MoveMode, { label: string; shortcut: string; title: string }> = {
+  normal: { label: 'Normal', shortcut: '', title: 'Normal face moves' },
+  wide: { label: 'Wide', shortcut: 'w', title: 'Wide moves (2 layers) [w]' },
+  slice: { label: 'Slice', shortcut: 'i', title: 'Slice moves (middle layer) [i]' },
+  opposing: { label: 'Opposing', shortcut: 'o', title: 'Opposing face [o]' },
+  rotation: { label: 'Rotate', shortcut: 'c', title: 'Full cube rotation [c]' },
+}
+
+// Transform a face move based on the current mode
+function transformMove(face: FaceName, prime: boolean, mode: MoveMode): string {
+  const suffix = prime ? "'" : ''
+
+  switch (mode) {
+    case 'wide':
+      return face.toLowerCase() + suffix
+    case 'slice': {
+      const slice = FACE_SLICE[face]
+      return prime ? slice.ccw : slice.cw
+    }
+    case 'opposing':
+      return OPPOSITE_FACE[face] + suffix
+    case 'rotation': {
+      const rot = FACE_ROTATION[face]
+      return prime ? rot.ccw : rot.cw
+    }
+    default:
+      return face + suffix
+  }
 }
 
 // Get center color of a face from cube state
@@ -72,53 +108,46 @@ function getFaceColor(cubeState: CubeState, face: FaceName): Color {
   return cubeState[FACE_TO_STATE[face]][4] // center sticker is index 4
 }
 
-// Face control panel - cleaner layout with dynamic colors
+// Face control panel - simplified to 2 buttons, mode transforms the moves
 interface FacePanelProps {
   face: FaceName
   cubeState: CubeState
   onMove: (notation: string) => void
+  mode: MoveMode
   vertical?: boolean
 }
 
-function FacePanel({ face, cubeState, onMove, vertical = false }: FacePanelProps) {
-  const opposite = OPPOSITE_FACE[face]
-  const rotation = FACE_ROTATION[face]
-
+function FacePanel({ face, cubeState, onMove, mode, vertical = false }: FacePanelProps) {
   // Get actual colors from cube state
   const faceColor = getFaceColor(cubeState, face)
-  const oppositeColor = getFaceColor(cubeState, opposite)
   const faceStyle = COLOR_STYLES[faceColor]
-  const oppositeStyle = COLOR_STYLES[oppositeColor]
+
+  // Handler that transforms the move based on current mode
+  const handleFaceClick = (prime: boolean) => () => {
+    const move = transformMove(face, prime, mode)
+    onMove(move)
+  }
+
+  // Get labels for the buttons based on mode
+  const label = transformMove(face, false, mode)
+  const labelPrime = transformMove(face, true, mode)
 
   return (
-    <div className={`
-      flex ${vertical ? 'flex-col' : 'flex-row'} items-center gap-2
-      bg-white/95 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-slate-200/80
-    `}>
-      {/* Main face - always in a row */}
-      <div className="flex flex-row gap-1">
-        <FaceButton face={face} size="lg" colorStyle={faceStyle} onClick={() => onMove(face)} />
-        <FaceButton face={face} prime size="lg" colorStyle={faceStyle} onClick={() => onMove(`${face}'`)} />
-      </div>
-
-      {/* Secondary controls: opposite + rotation */}
-      <div className={`flex ${vertical ? 'flex-row' : 'flex-col'} gap-1`}>
-        {/* Opposite face - smaller, muted */}
-        <div className="flex gap-0.5">
-          <FaceButton face={opposite} size="sm" colorStyle={oppositeStyle} opacity={0.5} onClick={() => onMove(opposite)} title={opposite} />
-          <FaceButton face={opposite} prime size="sm" colorStyle={oppositeStyle} opacity={0.5} onClick={() => onMove(`${opposite}'`)} title={`${opposite}'`} />
-        </div>
-
-        {/* Rotation - minimal */}
-        <div className="flex gap-0.5">
-          <button onClick={() => onMove(rotation.ccw)} className="rotation-btn" title={rotation.ccw}>
-            {rotation.symbols[0]}
-          </button>
-          <button onClick={() => onMove(rotation.cw)} className="rotation-btn" title={rotation.cw}>
-            {rotation.symbols[1]}
-          </button>
-        </div>
-      </div>
+    <div className={`flex ${vertical ? 'flex-col' : 'flex-row'} gap-1 bg-white/95 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-slate-200/80`}>
+      <button
+        onClick={handleFaceClick(false)}
+        className={`face-btn ${faceStyle.bg} ${faceStyle.text}`}
+        title={label}
+      >
+        {label}
+      </button>
+      <button
+        onClick={handleFaceClick(true)}
+        className={`face-btn ${faceStyle.bg} ${faceStyle.text}`}
+        title={labelPrime}
+      >
+        {labelPrime}
+      </button>
     </div>
   )
 }
@@ -163,9 +192,6 @@ function getInitialStateFromURL() {
       return {
         inputValue: cleanedAlgo,
         loadedAlgorithmId: parsed.algorithmId,
-        loadedCase: null as AlgorithmLookupResult | null,
-        selectedOLL: result.type === 'oll' ? result.caseId : '',
-        selectedPLL: result.type === 'pll' ? result.caseId : '',
         inverseMoves,
       }
     }
@@ -183,9 +209,6 @@ function getInitialStateFromURL() {
         return {
           inputValue: cleanedAlgo,
           loadedAlgorithmId: algorithms[0].id as AlgorithmId,
-          loadedCase: null as AlgorithmLookupResult | null,
-          selectedOLL: result.type === 'oll' ? result.caseId : '',
-          selectedPLL: result.type === 'pll' ? result.caseId : '',
           inverseMoves,
         }
       }
@@ -200,9 +223,6 @@ function getInitialStateFromURL() {
     return {
       inputValue: cleanedAlgo,
       loadedAlgorithmId: null as AlgorithmId | null,
-      loadedCase: null as AlgorithmLookupResult | null,
-      selectedOLL: '',
-      selectedPLL: '',
       inverseMoves: [] as Move[],
     }
   }
@@ -210,9 +230,6 @@ function getInitialStateFromURL() {
   return {
     inputValue: '',
     loadedAlgorithmId: null as AlgorithmId | null,
-    loadedCase: null as AlgorithmLookupResult | null,
-    selectedOLL: '',
-    selectedPLL: '',
     inverseMoves: [] as Move[],
   }
 }
@@ -236,16 +253,21 @@ export default function Playground() {
   const [initialState] = useState(getInitialStateFromURL)
   const [view, setView] = useState<CubeView>('top-front-right')
   const [inputValue, setInputValue] = useState(initialState.inputValue)
-  const [selectedOLL, setSelectedOLL] = useState(initialState.selectedOLL)
-  const [selectedPLL, setSelectedPLL] = useState(initialState.selectedPLL)
 
   // Track the algorithm being played for progress display
   const [playingMoves, setPlayingMoves] = useState<Move[]>([])
-  const [playingLabel, setPlayingLabel] = useState<string>('')
   const [isInputFocused, setIsInputFocused] = useState(false)
 
   // Track loaded algorithm from URL (for breadcrumb)
   const [loadedAlgorithmId] = useState<AlgorithmId | null>(initialState.loadedAlgorithmId)
+
+  // Modifier mode for move transformations (mutually exclusive)
+  const [moveMode, setMoveMode] = useState<MoveMode>('normal')
+
+  // Toggle a mode - if already active, go back to normal
+  const toggleMode = useCallback((mode: MoveMode) => {
+    setMoveMode(current => current === mode ? 'normal' : mode)
+  }, [])
 
   // Track if we've applied initial moves (prevents double-apply in React Strict Mode)
   const hasAppliedInitialMoves = useRef(false)
@@ -259,44 +281,6 @@ export default function Playground() {
     }
   }, [applyMovesInstantly, initialState.inverseMoves])
 
-  // Flatten OLL cases for dropdown
-  const ollOptions = useMemo(() => {
-    const options: CaseOption[] = []
-    for (const group of ollGroups) {
-      for (const entry of group.cases) {
-        for (const caseId of entry) {
-          const caseData = getCase(caseId)
-          if (caseData) {
-            options.push({
-              label: `OLL ${caseData.number} - ${caseData.name}`,
-              caseData,
-            })
-          }
-        }
-      }
-    }
-    return options.sort((a, b) => (a.caseData.number ?? 0) - (b.caseData.number ?? 0))
-  }, [])
-
-  // Flatten PLL cases for dropdown
-  const pllOptions = useMemo(() => {
-    const options: CaseOption[] = []
-    for (const group of pllGroups) {
-      for (const entry of group.cases) {
-        for (const caseId of entry) {
-          const caseData = getCase(caseId)
-          if (caseData) {
-            options.push({
-              label: `PLL ${caseData.name}`,
-              caseData,
-            })
-          }
-        }
-      }
-    }
-    return options.sort((a, b) => a.caseData.name.localeCompare(b.caseData.name))
-  }, [])
-
   // Calculate current position in the playing algorithm
   const playingPosition = playingMoves.length > 0 && (isAnimating || moveQueueLength > 0)
     ? playingMoves.length - moveQueueLength - (isAnimating ? 1 : 0)
@@ -307,39 +291,97 @@ export default function Playground() {
     if (playingMoves.length > 0 && !isAnimating && moveQueueLength === 0) {
       const timer = setTimeout(() => {
         setPlayingMoves([])
-        setPlayingLabel('')
       }, 800)
       return () => clearTimeout(timer)
     }
   }, [playingMoves.length, isAnimating, moveQueueLength])
 
-  // Populate input when selecting OLL
-  const handleOLLSelect = (label: string) => {
-    setSelectedOLL(label)
-    setSelectedPLL('')
-    const caseData = ollOptions.find(o => o.label === label)?.caseData
-    if (caseData) {
-      const algorithms = getAlgorithmsForCase(caseData.id)
-      if (algorithms.length > 0) {
-        const algoString = getAlgorithmNotation(algorithms[0].id)
-        setInputValue(cleanAlgorithmString(algoString))
-      }
-    }
-  }
+  // Global keyboard shortcuts for moves and mode toggling (when input not focused)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Skip if typing in input
+      if (document.activeElement?.tagName === 'INPUT') return
 
-  // Populate input when selecting PLL
-  const handlePLLSelect = (label: string) => {
-    setSelectedPLL(label)
-    setSelectedOLL('')
-    const caseData = pllOptions.find(o => o.label === label)?.caseData
-    if (caseData) {
-      const algorithms = getAlgorithmsForCase(caseData.id)
-      if (algorithms.length > 0) {
-        const algoString = getAlgorithmNotation(algorithms[0].id)
-        setInputValue(cleanAlgorithmString(algoString))
+      // Skip if Cmd/Ctrl pressed (allow browser shortcuts like Cmd+R refresh)
+      if (e.metaKey || e.ctrlKey) return
+
+      const key = e.key
+
+      // Mode toggle shortcuts (w/i/o/c)
+      const modeShortcuts: Record<string, MoveMode> = {
+        w: 'wide',
+        i: 'slice',
+        o: 'opposing',
+        c: 'rotation',
+      }
+
+      if (modeShortcuts[key]) {
+        toggleMode(modeShortcuts[key])
+        e.preventDefault()
+        return
+      }
+
+      // Skip move shortcuts if animation is playing
+      if (playingMoves.length > 0) return
+
+      // Face moves - case insensitive
+      const faceKeys: Record<string, FaceName> = {
+        R: 'R',
+        r: 'R',
+        L: 'L',
+        l: 'L',
+        U: 'U',
+        u: 'U',
+        D: 'D',
+        d: 'D',
+        F: 'F',
+        f: 'F',
+        B: 'B',
+        b: 'B',
+      }
+
+      // Direct moves (rotations, slices)
+      const directMoves: Record<string, string> = {
+        x: 'x',
+        y: 'y',
+        z: 'z',
+        M: 'M',
+        m: 'M',
+        S: 'S',
+        s: 'S',
+        E: 'E',
+        e: 'E',
+      }
+
+      if (faceKeys[key]) {
+        const face = faceKeys[key]
+        // Wide and slice modes affect keyboard; opposing and rotation only affect buttons
+        const keyboardMode = (moveMode === 'wide' || moveMode === 'slice') ? moveMode : 'normal'
+        const move = transformMove(face, e.shiftKey, keyboardMode)
+        const moves = parseMoves(move)
+        if (moves.length > 0) {
+          setPlayingMoves([])
+          queueMove(moves[0])
+        }
+        e.preventDefault()
+        return
+      }
+
+      if (directMoves[key]) {
+        // Shift adds prime modifier
+        const notation = e.shiftKey ? `${directMoves[key]}'` : directMoves[key]
+        const moves = parseMoves(notation)
+        if (moves.length > 0) {
+          setPlayingMoves([])
+          queueMove(moves[0])
+        }
+        e.preventDefault()
       }
     }
-  }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [playingMoves.length, queueMove, toggleMode, moveMode])
 
   // Valid characters for move notation
   const VALID_MOVE_CHARS = /^[RLUDFBMESxyzrludfb'2()]+$/
@@ -350,17 +392,13 @@ export default function Playground() {
     // Only keep valid characters
     const validChars = noSpaces.split('').filter(char => VALID_MOVE_CHARS.test(char)).join('')
     setInputValue(validChars)
-    setSelectedOLL('')
-    setSelectedPLL('')
   }
 
   const handleExecuteMoves = (inverse: boolean = false) => {
     const notation = inverse ? invertAlgorithmString(inputValue) : inputValue
     const moves = parseMoves(notation)
     if (moves.length > 0) {
-      const label = selectedOLL || selectedPLL || ''
       setPlayingMoves(moves)
-      setPlayingLabel(label ? `${label}${inverse ? ' (inverse)' : ''}` : '')
       queueMoves(moves)
     }
   }
@@ -369,30 +407,23 @@ export default function Playground() {
     // Clean and append to existing input
     const cleanedNotation = notation.replace(/\s/g, '')
     setInputValue(prev => prev + cleanedNotation)
-    setSelectedOLL('')
-    setSelectedPLL('')
   }
 
   const handleReverseInput = () => {
     if (inputValue.trim()) {
       const inverted = invertAlgorithmString(inputValue)
       setInputValue(inverted.replace(/\s/g, ''))
-      setSelectedOLL('')
-      setSelectedPLL('')
     }
   }
 
   const handleClearInput = () => {
     setInputValue('')
-    setSelectedOLL('')
-    setSelectedPLL('')
   }
 
   const handleSingleMove = (notation: string) => {
     const moves = parseMoves(notation)
     if (moves.length > 0) {
       setPlayingMoves([])
-      setPlayingLabel('')
       queueMove(moves[0])
     }
   }
@@ -400,7 +431,6 @@ export default function Playground() {
   const handleReset = () => {
     reset()
     setPlayingMoves([])
-    setPlayingLabel('')
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -504,9 +534,8 @@ export default function Playground() {
                       <span className="w-0.5 h-5 bg-indigo-500 animate-pulse rounded-full" />
                     )}
                     {isPlaying && (
-                      <span className="ml-2 text-slate-500 text-xs font-medium">
-                        {playingLabel && <span className="text-indigo-600">{playingLabel} · </span>}
-                        <span className="font-mono">{playingPosition >= 0 ? playingPosition + 1 : playingMoves.length}/{playingMoves.length}</span>
+                      <span className="ml-2 text-slate-500 text-xs font-medium font-mono">
+                        {playingPosition >= 0 ? playingPosition + 1 : playingMoves.length}/{playingMoves.length}
                       </span>
                     )}
                   </>
@@ -561,34 +590,13 @@ export default function Playground() {
             </div>
           </div>
 
-          {/* Quick Algorithms & OLL/PLL Selectors */}
+          {/* Quick Algorithms */}
           <div className="flex flex-wrap gap-2 items-center mt-3">
             <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Append:</span>
             <button onClick={() => handleAppendMoves("RUR'U'")} className="playground-trigger-btn">Sexy</button>
             <button onClick={() => handleAppendMoves("R'FRF'")} className="playground-trigger-btn">Sledge</button>
             <button onClick={() => handleAppendMoves("RUR'URU2R'")} className="playground-trigger-btn">Sune</button>
             <button onClick={() => handleAppendMoves("R'U'RU'R'U2R")} className="playground-trigger-btn">Anti-Sune</button>
-            <div className="h-4 w-px bg-slate-300 mx-1" />
-            <select
-              value={selectedOLL}
-              onChange={e => handleOLLSelect(e.target.value)}
-              className="playground-select"
-            >
-              <option value="">OLL...</option>
-              {ollOptions.map(option => (
-                <option key={option.label} value={option.label}>{option.label}</option>
-              ))}
-            </select>
-            <select
-              value={selectedPLL}
-              onChange={e => handlePLLSelect(e.target.value)}
-              className="playground-select"
-            >
-              <option value="">PLL...</option>
-              {pllOptions.map(option => (
-                <option key={option.label} value={option.label}>{option.label}</option>
-              ))}
-            </select>
           </div>
         </div>
 
@@ -602,19 +610,53 @@ export default function Playground() {
 
             return (
               <div className="flex flex-col items-center gap-6">
+                {/* Mode toggles with keyboard shortcuts */}
+                <div className="flex gap-2 flex-wrap justify-start items-center self-start mb-6">
+                  {(['wide', 'slice', 'opposing', 'rotation'] as const).map(mode => {
+                    const info = MODE_INFO[mode]
+                    const isActive = moveMode === mode
+                    return (
+                      <button
+                        key={mode}
+                        onClick={() => toggleMode(mode)}
+                        className={`modifier-toggle ${isActive ? 'modifier-toggle--active' : ''}`}
+                        title={info.title}
+                        aria-pressed={isActive}
+                      >
+                        {info.label}
+                        <span className="modifier-shortcut">{info.shortcut}</span>
+                      </button>
+                    )
+                  })}
+                  <span className="text-xs text-slate-400 ml-4 flex items-center gap-1">
+                    <span className="modifier-shortcut">⇧</span> for inverse
+                  </span>
+                </div>
+
                 {/* Visible face controls - spatially positioned */}
                 <div className="relative">
                   {/* Top/Bottom face control - position depends on view */}
                   {view !== 'bottom-front-right' && (
                     <div className="flex justify-center mb-3">
-                      <FacePanel face={topFace.face} cubeState={cubeState} onMove={handleSingleMove} />
+                      <FacePanel
+                        face={topFace.face}
+                        cubeState={cubeState}
+                        onMove={handleSingleMove}
+                        mode={moveMode}
+                      />
                     </div>
                   )}
 
                   {/* Cube with controls positioned spatially */}
                   <div className="flex items-center gap-3">
                     {/* Left face control */}
-                    <FacePanel face={leftFace.face} cubeState={cubeState} onMove={handleSingleMove} vertical />
+                    <FacePanel
+                      face={leftFace.face}
+                      cubeState={cubeState}
+                      onMove={handleSingleMove}
+                      mode={moveMode}
+                      vertical
+                    />
 
                     {/* The Cube */}
                     <CubeDisplay size="large">
@@ -630,19 +672,30 @@ export default function Playground() {
                     </CubeDisplay>
 
                     {/* Right face control */}
-                    <FacePanel face={rightFace.face} cubeState={cubeState} onMove={handleSingleMove} vertical />
+                    <FacePanel
+                      face={rightFace.face}
+                      cubeState={cubeState}
+                      onMove={handleSingleMove}
+                      mode={moveMode}
+                      vertical
+                    />
                   </div>
 
                   {/* Bottom face control - only for BFR view */}
                   {view === 'bottom-front-right' && (
                     <div className="flex justify-center mt-3">
-                      <FacePanel face={topFace.face} cubeState={cubeState} onMove={handleSingleMove} />
+                      <FacePanel
+                        face={topFace.face}
+                        cubeState={cubeState}
+                        onMove={handleSingleMove}
+                        mode={moveMode}
+                      />
                     </div>
                   )}
                 </div>
 
                 {/* Controls Bar */}
-                <div className="flex items-center gap-4 md:gap-6 flex-wrap justify-center bg-slate-50/80 rounded-xl px-4 py-3 border border-slate-200">
+                <div className="flex items-center gap-4 md:gap-6 flex-wrap justify-center bg-slate-50/80 rounded-xl px-4 py-3 border border-slate-200 mt-4">
                   {/* View Selector with micro cube icons */}
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 font-medium">View</span>
