@@ -977,13 +977,6 @@ export function getAlgorithmsForCase(caseId: string): Algorithm[] {
 }
 
 /**
- * Get all OLL cases.
- */
-export function getOLLCases(): Case[] {
-  return Array.from(cases.values()).filter((c) => c.category === 'oll')
-}
-
-/**
  * Get all PLL cases.
  */
 export function getPLLCases(): Case[] {

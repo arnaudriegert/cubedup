@@ -202,20 +202,6 @@ export function tokenizeNotation(
   return tokens
 }
 
-/**
- * Count the total number of moves in tokens (for playback progress)
- */
-export function countMoves(tokens: AlgorithmToken[]): number {
-  return tokens.filter(t => t.type === 'move' || t.type === 'rotation').length
-}
-
-/**
- * Get the move at a specific index from tokens
- */
-export function getMoveAtIndex(tokens: AlgorithmToken[], moveIndex: number): AlgorithmToken | undefined {
-  return tokens.find(t => t.moveIndex === moveIndex)
-}
-
 // =========================================================================
 // New Algorithm Format Support
 // =========================================================================

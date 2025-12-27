@@ -41,23 +41,3 @@ export function getColorRotations(startingFront: SideColor = Color.BLUE): ColorR
   return [0, 1, 2, 3].map(i => BASE_ROTATIONS[(startIndex + i) % 4])
 }
 
-/**
- * Get a single color rotation for a specific front color
- */
-export function getColorRotation(frontColor: SideColor): ColorRotation {
-  return BASE_ROTATIONS[SIDE_COLORS.indexOf(frontColor)]
-}
-
-/**
- * Calculate how many rotation steps between two colors
- */
-export function getRotationSteps(from: SideColor, to: SideColor): number {
-  return (SIDE_COLORS.indexOf(to) - SIDE_COLORS.indexOf(from) + 4) % 4
-}
-
-/**
- * Check if a color is a side color (not white, yellow, or gray)
- */
-export function isSideColor(color: Color): color is SideColor {
-  return SIDE_COLORS.includes(color as SideColor)
-}

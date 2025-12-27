@@ -1086,16 +1086,3 @@ export function getTriggerPairsByTag(tag: string): [Algorithm, Algorithm][] {
   return pairs
 }
 
-/**
- * Get all OLL algorithms.
- */
-export function getOLLAlgorithms(): Algorithm[] {
-  return getAlgorithmsByTag('oll')
-}
-
-/**
- * Get all PLL algorithms.
- */
-export function getPLLAlgorithms(): Algorithm[] {
-  return getAlgorithmsByTag('pll')
-}

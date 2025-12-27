@@ -19,14 +19,6 @@ export function getPlaygroundUrlForAlgorithm(algorithmId: AlgorithmId): string {
 }
 
 /**
- * Generate Playground URL for a case (uses first algorithm)
- * @param caseId - Format: "oll-21" or "pll-ua"
- */
-export function getPlaygroundUrl(caseId: string): string {
-  return `/playground?case=${encodeURIComponent(caseId)}`
-}
-
-/**
  * Generate Playground URL for raw algorithm notation
  * @param notation - Algorithm notation like "R U R' U'"
  */

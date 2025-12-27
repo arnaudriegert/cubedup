@@ -53,17 +53,6 @@ export function isCubeRotation(base: MoveBase): base is CubeRotation {
   return ['x', 'y', 'z'].includes(base)
 }
 
-// Animation state
-export type AnimationStatus = 'idle' | 'animating'
-
-export interface PlaygroundState {
-  cube: CubeState
-  moveQueue: Move[]
-  currentMove: Move | null
-  animationStatus: AnimationStatus
-  animationSpeed: number // ms per quarter turn
-}
-
 // Rotation axis for animation
 export type RotationAxis = 'x' | 'y' | 'z'
 
