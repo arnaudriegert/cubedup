@@ -24,6 +24,7 @@ import {
   parseMoves, moveToNotation, movesToNotation,
 } from '../../utils/moveParser'
 import type { Move } from '../../types/cubeState'
+import './AlgorithmDisplay.css'
 
 export type DisplayMode = 'static' | 'playback'
 export type DisplaySize = 'sm' | 'md' | 'lg'
@@ -61,15 +62,13 @@ const SIZE_STYLES: Record<DisplaySize, { token: string; text: string }> = {
   lg: { token: 'px-3 py-1.5 text-base', text: 'text-base' },
 }
 
-// Token state styling
+// Token state styling - using CSS classes from AlgorithmDisplay.css
 const TOKEN_STATES = {
-  default: 'text-slate-700 bg-white shadow-sm',
-  current: 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold shadow-md scale-110',
-  completed: 'text-slate-400 bg-white/50',
-  cancelled: 'line-through opacity-40 bg-slate-100 decoration-slate-500 decoration-2',
+  default: 'algo-token-default',
+  current: 'algo-token-current',
+  completed: 'algo-token-completed',
+  cancelled: 'algo-token-cancelled',
   highlighted: 'font-bold text-indigo-700',
-  // Trigger tokens get a distinct pill style
-  trigger: 'bg-indigo-100 text-indigo-700 border border-indigo-200',
 }
 
 // Alternating colors for consecutive same-category steps
@@ -123,7 +122,7 @@ function Token({ token, state, size }: TokenProps) {
 
     return (
       <span
-        className={`${sizeStyle.token} rounded-full italic transition-all duration-200 ${baseStyle}`}
+        className={`${sizeStyle.token} algo-token-trigger ${baseStyle}`}
         title={token.rawMoves ? `${token.rawMoves}` : undefined}
       >
         {token.value}
@@ -135,14 +134,14 @@ function Token({ token, state, size }: TokenProps) {
   if (token.type === 'rotation') {
     // Rotation-specific styling (purple) - only override for special states
     let stateStyle = ''
-    if (state === 'current') stateStyle = 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold shadow-md scale-110'
-    if (state === 'completed') stateStyle = 'text-purple-300 bg-purple-50/50'
+    if (state === 'current') stateStyle = 'algo-token-rotation-current'
+    if (state === 'completed') stateStyle = 'algo-token-rotation-completed'
     if (token.isCancelled) stateStyle = TOKEN_STATES.cancelled
     if (token.isHighlighted) stateStyle = 'font-bold text-purple-800'
 
     return (
       <span
-        className={`${sizeStyle.token} rounded-md font-mono transition-all duration-200 ${stateStyle || 'text-purple-600 bg-purple-50 shadow-sm'}`}
+        className={`${sizeStyle.token} algo-token-rotation ${stateStyle || 'algo-token-rotation-default'}`}
       >
         {token.value}
       </span>
@@ -160,7 +159,7 @@ function Token({ token, state, size }: TokenProps) {
 
   return (
     <span
-      className={`${sizeStyle.token} rounded-md shadow-sm transition-all duration-200 ${baseStyle}`}
+      className={`${sizeStyle.token} algo-token shadow-sm ${baseStyle}`}
     >
       {token.value}
     </span>
@@ -205,21 +204,19 @@ function CancellationGroup({
               <span
                 key={idx}
                 onClick={handleClick}
-                className={`${sizeStyle.token} rounded-md transition-all duration-200 ${parityStyle} opacity-50 line-through decoration-slate-500 decoration-2 cursor-pointer`}
+                className={`${sizeStyle.token} algo-token ${parityStyle} algo-cancel-partial cursor-pointer`}
               >
                 {token.value}
               </span>
             ))}
-            <span className="text-slate-400 text-xs mx-0.5">→</span>
+            <span className="algo-cancel-arrow">→</span>
           </>
         )}
         {/* Always show the result */}
         <span
           onClick={handleClick}
-          className={`${sizeStyle.token} rounded-md shadow-sm transition-all duration-200 ${parityStyle} cursor-pointer ${
-            isExpanded
-              ? 'ring-2 ring-indigo-300'
-              : 'border border-dashed border-slate-400'
+          className={`${sizeStyle.token} algo-token ${parityStyle} algo-cancel-result ${
+            isExpanded ? 'algo-cancel-result-expanded' : 'algo-cancel-result-collapsed'
           }`}
           title={isExpanded ? 'Click to collapse' : `Combined from: ${cancelledNotation} (click to reveal)`}
         >
@@ -239,7 +236,7 @@ function CancellationGroup({
             <span
               key={idx}
               onClick={handleClick}
-              className={`${sizeStyle.token} rounded-md transition-all duration-200 bg-slate-200 text-slate-500 line-through decoration-slate-400 decoration-2 cursor-pointer`}
+              className={`${sizeStyle.token} algo-token algo-cancel-expanded cursor-pointer`}
             >
               {token.value}
             </span>
@@ -248,7 +245,7 @@ function CancellationGroup({
       ) : (
         <span
           onClick={handleClick}
-          className={`${sizeStyle.token} rounded-md transition-all duration-200 bg-slate-200 text-slate-400 cursor-pointer hover:bg-slate-300`}
+          className={`${sizeStyle.token} algo-cancel-indicator`}
           title={`Cancelled: ${cancelledNotation} (click to reveal)`}
         >
           ×
@@ -345,7 +342,7 @@ function TokenList({ tokens, state, size }: { tokens: AlgorithmToken[]; state: '
   return (
     <>
       {stepGroups.map((group, groupIdx) => (
-        <span key={groupIdx} className="inline-flex flex-wrap items-center gap-1">
+        <span key={groupIdx} className="algo-step-group">
           {group.items.map((item, itemIdx) => {
             if (item.type === 'cancellation') {
               return <CancellationGroup key={`cancel-${item.group.id}`} group={item.group} size={size} />
@@ -407,7 +404,7 @@ function StaticDisplay({
   // No toggle needed if there's no shorthand
   if (!hasShorthand) {
     return (
-      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${className}`}>
+      <div className={`flex algo-token-container ${className}`}>
         <TokenList tokens={tokens} state="default" size={size} />
       </div>
     )
@@ -428,12 +425,12 @@ function StaticDisplay({
       className={`relative ${useParentHover ? '' : 'group/algo'} ${className}`}
     >
       {/* Shorthand view: shown by default, hidden on hover (desktop) or when expanded (mobile) */}
-      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${isExpanded ? 'hidden' : shorthandHoverClass}`}>
+      <div className={`algo-token-container ${isExpanded ? 'hidden' : `flex ${shorthandHoverClass}`}`}>
         <TokenList tokens={shorthandTokens} state="default" size={size} />
       </div>
 
       {/* Full view: hidden by default, shown on hover (desktop) or when expanded (mobile) */}
-      <div className={`flex flex-wrap gap-1.5 items-center font-mono justify-center ${isExpanded ? '' : `hidden ${fullHoverClass}`}`}>
+      <div className={`algo-token-container ${isExpanded ? 'flex' : `hidden ${fullHoverClass}`}`}>
         <TokenList tokens={tokens} state="default" size={size} />
       </div>
     </div>
@@ -463,7 +460,7 @@ function PlaybackDisplay({
   const isPlaying = currentMoveIndex >= 0
 
   return (
-    <div className={`flex flex-wrap gap-1.5 font-mono items-center ${className}`}>
+    <div className={`flex algo-token-container ${className}`}>
       {moves.map((move, index) => {
         const isCurrentMove = isPlaying && index === currentMoveIndex
         const isCompleted = isPlaying && index < currentMoveIndex
@@ -472,7 +469,7 @@ function PlaybackDisplay({
         return (
           <span
             key={index}
-            className={`${SIZE_STYLES[size].token} rounded-md transition-all duration-200 ${TOKEN_STATES[state]}`}
+            className={`${SIZE_STYLES[size].token} algo-token ${TOKEN_STATES[state]}`}
           >
             {moveToNotation(move)}
           </span>

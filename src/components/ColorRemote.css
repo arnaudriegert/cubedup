@@ -1,0 +1,15 @@
+@reference "tailwindcss";
+
+.color-remote {
+  @apply fixed z-30 flex bg-white/60 backdrop-blur-md rounded-full shadow-lg border border-slate-200/50
+    bottom-4 left-1/2 -translate-x-1/2 flex-row gap-3 px-3 py-2.5
+    md:bottom-auto md:left-auto md:translate-x-0 md:right-4 md:top-1/2 md:-translate-y-1/2 md:flex-col md:gap-4 md:px-3 md:py-4;
+}
+
+.color-remote-btn {
+  @apply size-6 md:size-8 rounded-full transition-all cursor-pointer opacity-70 hover:scale-105 hover:opacity-100;
+}
+
+.color-remote-btn:has(:checked) {
+  @apply ring-2 ring-slate-600 ring-offset-2 ring-offset-white scale-110 opacity-100;
+}

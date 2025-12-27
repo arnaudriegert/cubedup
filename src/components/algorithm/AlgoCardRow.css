@@ -1,0 +1,7 @@
+@reference "tailwindcss";
+
+.ghost-icon-btn {
+  @apply shrink-0 w-6 h-6 flex items-center justify-center rounded
+    text-slate-400 group-hover/algocard:text-indigo-600
+    hover:bg-indigo-100 transition-colors;
+}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import NavLinks from './NavLinks'
 import Logo from './Logo'
+import './Sidebar.css'
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)

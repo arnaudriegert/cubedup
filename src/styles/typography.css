@@ -33,18 +33,6 @@
   @apply text-lg md:text-2xl font-bold text-gray-800 mb-4 md:mb-6 text-center;
 }
 
-.card-title {
-  @apply text-lg md:text-xl font-bold text-gray-800 mb-2;
-}
-
-.card-title-centered {
-  @apply text-lg md:text-xl font-bold text-gray-800 mb-2 text-center;
-}
-
-.case-card-title {
-  @apply text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4;
-}
-
 .body-text {
   @apply text-gray-700;
 }

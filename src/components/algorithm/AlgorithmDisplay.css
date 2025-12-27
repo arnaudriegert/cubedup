@@ -1,0 +1,81 @@
+@reference "tailwindcss";
+
+.algo-token-container {
+  @apply flex-wrap gap-1.5 items-center font-mono justify-center;
+}
+
+/* Base token styles */
+.algo-token {
+  @apply rounded-md transition-all duration-200;
+}
+
+.algo-token-trigger {
+  @apply rounded-full italic transition-all duration-200;
+}
+
+.algo-token-rotation {
+  @apply rounded-md font-mono transition-all duration-200;
+}
+
+.algo-token-rotation-default {
+  @apply text-purple-600 bg-purple-50 shadow-sm;
+}
+
+.algo-token-rotation-current {
+  @apply bg-linear-to-r from-purple-600 to-indigo-600 text-white font-bold shadow-md scale-110;
+}
+
+.algo-token-rotation-completed {
+  @apply text-purple-300 bg-purple-50/50;
+}
+
+/* Token states */
+.algo-token-default {
+  @apply text-slate-700 bg-white shadow-sm;
+}
+
+.algo-token-current {
+  @apply bg-linear-to-r from-indigo-600 to-blue-600 text-white font-bold shadow-md scale-110;
+}
+
+.algo-token-completed {
+  @apply text-slate-400 bg-white/50;
+}
+
+.algo-token-cancelled {
+  @apply line-through opacity-40 bg-slate-100 decoration-slate-500 decoration-2;
+}
+
+/* Step grouping */
+.algo-step-group {
+  @apply inline-flex flex-wrap items-center gap-1;
+}
+
+/* Cancellation UI */
+.algo-cancel-indicator {
+  @apply rounded-md transition-all duration-200 bg-slate-200 text-slate-400 cursor-pointer hover:bg-slate-300;
+}
+
+.algo-cancel-expanded {
+  @apply bg-slate-200 text-slate-500 line-through decoration-slate-400 decoration-2;
+}
+
+.algo-cancel-partial {
+  @apply opacity-50 line-through decoration-slate-500 decoration-2;
+}
+
+.algo-cancel-result {
+  @apply shadow-sm cursor-pointer;
+}
+
+.algo-cancel-result-collapsed {
+  @apply border border-dashed border-slate-400;
+}
+
+.algo-cancel-result-expanded {
+  @apply ring-2 ring-indigo-300;
+}
+
+.algo-cancel-arrow {
+  @apply text-slate-400 text-xs mx-0.5;
+}

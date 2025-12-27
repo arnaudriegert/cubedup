@@ -5,6 +5,7 @@ import SEOHead from '../components/SEOHead'
 import { getPlaygroundUrlForNotation } from '../utils/algorithmLinks'
 import { expandAlgorithmObject } from '../utils/algorithmExpander'
 import { movesToNotation, invertMoves } from '../utils/moveParser'
+import './Triggers.css'
 
 // ============================================================================
 // Presentational data - UI-specific, references algorithm data via tags
@@ -55,11 +56,7 @@ const triggerDescriptions: Record<string, string> = {
 
 // Trigger badge styled like algorithm trigger tokens
 function TriggerBadge({ name }: { name: string }) {
-  return (
-    <span className="px-2 py-1 text-sm font-mono italic rounded-full bg-indigo-200 text-indigo-800 border border-indigo-400">
-      {name}
-    </span>
-  )
+  return <span className="trigger-badge">{name}</span>
 }
 
 function TriggerCard({ algorithm }: { algorithm: Algorithm }) {

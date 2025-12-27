@@ -26,9 +26,9 @@ These principles should guide all feature decisions. Ask: does this help the lea
 - **Follow IDE diagnostics**: address Tailwind, React, TypeScript recommendations
 - **Test in browser**: use MCP chrome-devtools to verify changes visually
 - **Linting runs automatically** via Claude hook after file edits
-- **Design system**: use Tailwind's `@apply` in `styles/` for reusable classes; check there before adding inline Tailwind
+- **CSS organization**: shared classes in `styles/` using `@apply`; component-specific CSS next to component (use `@reference "tailwindcss"` at top). Tailwind v4 `@apply` only works with Tailwind utilities—can't compose custom classes. Keep classes generic; apply layout-specific properties locally.
 - Prefer editing existing files over creating new ones
-- **Keep this file up to date**: when you learn something, discover a pattern, or establish a convention—update this file
+- **Keep this file up to date**: see [Maintaining This File](#maintaining-this-file) at the end
 
 ## Commands
 
@@ -47,7 +47,7 @@ The development server makes the app available under http://localhost:5173/cubed
 ```
 src/
 ├── components/algorithm/   # AlgorithmDisplay, Breadcrumb
-├── components/cube/        # Cube, CubeDisplay, Face, Sticker
+├── components/cube/        # Cube, CubeDisplay, Face, Sticker, FaceButton
 ├── data/                   # algorithms (static Map), cases (metadata)
 ├── pages/                  # OLL, PLL, Triggers, Playground, F2L, Cross
 ├── types/                  # algorithm, cube, cubeState
@@ -140,3 +140,14 @@ isCubeRotation(base) // x, y, z
 ```
 
 **Token styling:** Moves (`text-slate-700`), Rotations (`text-purple-600`), Triggers (`text-indigo-600`), Cancelled (`line-through`)
+
+---
+
+## Maintaining This File
+
+When you discover a reusable pattern or convention, update this file.
+
+- **General to specific**: the file flows from high-level (overview, philosophy) to concrete (architecture, patterns). Place new content where it fits this progression.
+- **Principles over examples**: document the rule, not the instance. Avoid specific file names or one-off fixes.
+- **Concise and consistent**: match the tone and formatting of surrounding content. Edit existing entries rather than adding duplicates.
+- **Keep it current**: remove outdated information. This file should reflect how the codebase works now.

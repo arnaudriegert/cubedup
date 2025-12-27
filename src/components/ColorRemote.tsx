@@ -1,5 +1,6 @@
 import { Color } from '../types/cube'
 import { SIDE_COLORS, colorToTailwind } from '../utils/colors'
+import './ColorRemote.css'
 
 interface ColorRemoteProps {
   selectedColor: Color

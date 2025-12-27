@@ -1,11 +1,38 @@
+/* Base Card Components */
+.card {
+  @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200;
+}
+
+.section-card {
+  @apply bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-slate-200 p-4 md:p-8 mb-8 md:mb-12;
+}
+
+/* Interactive Cards (feature cards, case cards) */
+.feature-card,
+.case-card {
+  @apply bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-xl border-2 border-slate-200 shadow-md hover:shadow-lg hover:border-indigo-300 transition-all;
+}
+
+.feature-card-active {
+  @apply bg-linear-to-br from-orange-50 via-white to-blue-50 p-4 md:p-6 rounded-xl border-2 border-orange-300 shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all;
+}
+
+/* Card Typography */
+.card-title {
+  @apply text-lg md:text-xl font-bold text-gray-800 mb-2;
+}
+
+.card-title-centered {
+  @apply text-lg md:text-xl font-bold text-gray-800 mb-2 text-center;
+}
+
+.case-card-title {
+  @apply text-base md:text-lg font-bold text-gray-800 mb-3 md:mb-4;
+}
+
 /* Case Group (visual grouping without nested cards) */
 .case-group {
   @apply bg-white/60 border border-slate-200 rounded-xl md:rounded-2xl p-4 md:p-6 mb-6 md:mb-8;
-}
-
-/* Case Cards (OLL/PLL) */
-.case-card {
-  @apply bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-xl border-2 border-slate-200 shadow-md hover:shadow-lg hover:border-indigo-300 transition-all;
 }
 
 /* Card Highlight State */

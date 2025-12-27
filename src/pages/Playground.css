@@ -1,0 +1,54 @@
+@reference "tailwindcss";
+
+/* Playground Controls */
+.playground-trigger-btn {
+  @apply px-3 py-1.5 bg-linear-to-r from-amber-50 to-orange-50
+    hover:from-amber-100 hover:to-orange-100 text-amber-800 rounded-lg text-xs font-medium
+    transition-all border border-amber-200/50 shadow-sm hover:shadow;
+}
+
+.playground-select {
+  @apply px-3 py-1.5 border border-slate-200 rounded-lg
+    focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs font-medium
+    text-slate-700 cursor-pointer hover:border-slate-300 transition-colors;
+}
+
+.playground-play-btn {
+  @apply px-4 h-9 rounded-lg bg-linear-to-r from-indigo-600 to-blue-600
+    text-white text-sm font-medium hover:from-indigo-700 hover:to-blue-700 transition-all
+    disabled:opacity-30 disabled:cursor-not-allowed shadow-sm flex items-center justify-center gap-1.5;
+}
+
+.playground-reset-btn {
+  @apply px-4 py-1.5 bg-linear-to-r from-slate-600 to-slate-700
+    text-white rounded-lg text-sm font-semibold hover:from-slate-700 hover:to-slate-800
+    transition-all shadow-md hover:shadow-lg;
+}
+
+/* View Selector */
+.view-selector-btn {
+  @apply p-1.5 rounded-md transition-all flex flex-col items-center gap-0.5 hover:bg-white/50;
+}
+
+.view-selector-btn-active {
+  @apply bg-white shadow-sm;
+}
+
+/* Face Panel Buttons */
+.face-btn {
+  @apply w-11 h-11 rounded-xl font-mono font-bold text-sm
+    shadow-md hover:shadow-lg hover:scale-105 active:scale-95
+    transition-all duration-150 flex items-center justify-center;
+}
+
+.face-btn-sm {
+  @apply w-6 h-6 rounded-lg font-mono font-bold text-[10px]
+    hover:opacity-100 hover:scale-110 active:scale-95
+    transition-all duration-150 flex items-center justify-center;
+}
+
+.rotation-btn {
+  @apply w-6 h-6 rounded-lg bg-slate-600/80 text-slate-200 text-xs
+    hover:bg-slate-500 hover:text-white hover:scale-110 active:scale-95
+    transition-all duration-150 flex items-center justify-center;
+}

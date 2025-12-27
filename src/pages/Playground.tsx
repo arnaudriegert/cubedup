@@ -1,7 +1,9 @@
 import {
   useState, useMemo, useEffect, useRef,
 } from 'react'
-import { Cube, CubeDisplay } from '../components/cube'
+import {
+  Cube, CubeDisplay, FaceButton,
+} from '../components/cube'
 import SEOHead from '../components/SEOHead'
 import { AlgorithmBreadcrumb } from '../components/algorithm'
 import { useAnimatedCube } from '../hooks/useAnimatedCube'
@@ -23,6 +25,7 @@ import {
 } from '../utils/caseLookup'
 import { parsePlaygroundUrl } from '../utils/algorithmLinks'
 import { getAlgorithmNotation } from '../utils/algorithmExpander'
+import './Playground.css'
 
 // Flatten cases for dropdown
 interface CaseOption {
@@ -94,78 +97,24 @@ function FacePanel({ face, cubeState, onMove, vertical = false }: FacePanelProps
     `}>
       {/* Main face - always in a row */}
       <div className="flex flex-row gap-1">
-        <button
-          onClick={() => onMove(face)}
-          className={`
-            w-11 h-11 rounded-xl font-mono font-bold text-sm
-            ${faceStyle.bg} ${faceStyle.text}
-            shadow-md hover:shadow-lg hover:scale-105 active:scale-95
-            transition-all duration-150 flex items-center justify-center
-          `}
-        >
-          {face}
-        </button>
-        <button
-          onClick={() => onMove(`${face}'`)}
-          className={`
-            w-11 h-11 rounded-xl font-mono font-bold text-sm
-            ${faceStyle.bg} ${faceStyle.text}
-            shadow-md hover:shadow-lg hover:scale-105 active:scale-95
-            transition-all duration-150 flex items-center justify-center
-          `}
-        >
-          {face}'
-        </button>
+        <FaceButton face={face} size="lg" colorStyle={faceStyle} onClick={() => onMove(face)} />
+        <FaceButton face={face} prime size="lg" colorStyle={faceStyle} onClick={() => onMove(`${face}'`)} />
       </div>
 
       {/* Secondary controls: opposite + rotation */}
       <div className={`flex ${vertical ? 'flex-row' : 'flex-col'} gap-1`}>
         {/* Opposite face - smaller, muted */}
         <div className="flex gap-0.5">
-          <button
-            onClick={() => onMove(opposite)}
-            className={`
-              w-6 h-6 rounded-lg font-mono font-bold text-[10px]
-              ${oppositeStyle.bg} ${oppositeStyle.text} opacity-50
-              hover:opacity-100 hover:scale-110 active:scale-95
-              transition-all duration-150 flex items-center justify-center
-            `}
-            title={opposite}
-          >
-            {opposite}
-          </button>
-          <button
-            onClick={() => onMove(`${opposite}'`)}
-            className={`
-              w-6 h-6 rounded-lg font-mono font-bold text-[10px]
-              ${oppositeStyle.bg} ${oppositeStyle.text} opacity-50
-              hover:opacity-100 hover:scale-110 active:scale-95
-              transition-all duration-150 flex items-center justify-center
-            `}
-            title={`${opposite}'`}
-          >
-            {opposite}'
-          </button>
+          <FaceButton face={opposite} size="sm" colorStyle={oppositeStyle} opacity={0.5} onClick={() => onMove(opposite)} title={opposite} />
+          <FaceButton face={opposite} prime size="sm" colorStyle={oppositeStyle} opacity={0.5} onClick={() => onMove(`${opposite}'`)} title={`${opposite}'`} />
         </div>
 
         {/* Rotation - minimal */}
         <div className="flex gap-0.5">
-          <button
-            onClick={() => onMove(rotation.ccw)}
-            className="w-6 h-6 rounded-lg bg-slate-600/80 text-slate-200 text-xs
-              hover:bg-slate-500 hover:text-white hover:scale-110 active:scale-95
-              transition-all duration-150 flex items-center justify-center"
-            title={rotation.ccw}
-          >
+          <button onClick={() => onMove(rotation.ccw)} className="rotation-btn" title={rotation.ccw}>
             {rotation.symbols[0]}
           </button>
-          <button
-            onClick={() => onMove(rotation.cw)}
-            className="w-6 h-6 rounded-lg bg-slate-600/80 text-slate-200 text-xs
-              hover:bg-slate-500 hover:text-white hover:scale-110 active:scale-95
-              transition-all duration-150 flex items-center justify-center"
-            title={rotation.cw}
-          >
+          <button onClick={() => onMove(rotation.cw)} className="rotation-btn" title={rotation.cw}>
             {rotation.symbols[1]}
           </button>
         </div>
@@ -604,10 +553,7 @@ export default function Playground() {
                 }}
                 disabled={!inputValue.trim() || playingMoves.length > 0}
                 title="Play (Shift+click for inverse)"
-                className="px-4 h-9 rounded-lg bg-linear-to-r from-indigo-600 to-blue-600 text-white text-sm font-medium
-                  hover:from-indigo-700 hover:to-blue-700 transition-all
-                  disabled:opacity-30 disabled:cursor-not-allowed shadow-sm
-                  flex items-center justify-center gap-1.5"
+                className="playground-play-btn"
               >
                 <span>▶</span>
                 <span className="hidden sm:inline">Play</span>
@@ -618,15 +564,15 @@ export default function Playground() {
           {/* Quick Algorithms & OLL/PLL Selectors */}
           <div className="flex flex-wrap gap-2 items-center mt-3">
             <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Append:</span>
-            <button onClick={() => handleAppendMoves("RUR'U'")} className="px-3 py-1.5 bg-linear-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-800 rounded-lg text-xs font-medium transition-all border border-amber-200/50 shadow-sm hover:shadow">Sexy</button>
-            <button onClick={() => handleAppendMoves("R'FRF'")} className="px-3 py-1.5 bg-linear-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-800 rounded-lg text-xs font-medium transition-all border border-amber-200/50 shadow-sm hover:shadow">Sledge</button>
-            <button onClick={() => handleAppendMoves("RUR'URU2R'")} className="px-3 py-1.5 bg-linear-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-800 rounded-lg text-xs font-medium transition-all border border-amber-200/50 shadow-sm hover:shadow">Sune</button>
-            <button onClick={() => handleAppendMoves("R'U'RU'R'U2R")} className="px-3 py-1.5 bg-linear-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-800 rounded-lg text-xs font-medium transition-all border border-amber-200/50 shadow-sm hover:shadow">Anti-Sune</button>
+            <button onClick={() => handleAppendMoves("RUR'U'")} className="playground-trigger-btn">Sexy</button>
+            <button onClick={() => handleAppendMoves("R'FRF'")} className="playground-trigger-btn">Sledge</button>
+            <button onClick={() => handleAppendMoves("RUR'URU2R'")} className="playground-trigger-btn">Sune</button>
+            <button onClick={() => handleAppendMoves("R'U'RU'R'U2R")} className="playground-trigger-btn">Anti-Sune</button>
             <div className="h-4 w-px bg-slate-300 mx-1" />
             <select
               value={selectedOLL}
               onChange={e => handleOLLSelect(e.target.value)}
-              className="px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs font-medium text-slate-700 cursor-pointer hover:border-slate-300 transition-colors"
+              className="playground-select"
             >
               <option value="">OLL...</option>
               {ollOptions.map(option => (
@@ -636,7 +582,7 @@ export default function Playground() {
             <select
               value={selectedPLL}
               onChange={e => handlePLLSelect(e.target.value)}
-              className="px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-xs font-medium text-slate-700 cursor-pointer hover:border-slate-300 transition-colors"
+              className="playground-select"
             >
               <option value="">PLL...</option>
               {pllOptions.map(option => (
@@ -705,11 +651,7 @@ export default function Playground() {
                       <button
                         onClick={() => setView('top-front-right')}
                         title="Top, Front, Right"
-                        className={`p-1.5 rounded-md transition-all flex flex-col items-center gap-0.5 ${
-                          view === 'top-front-right'
-                            ? 'bg-white shadow-sm'
-                            : 'hover:bg-white/50'
-                        }`}
+                        className={`view-selector-btn ${view === 'top-front-right' ? 'view-selector-btn-active' : ''}`}
                       >
                         <svg width="20" height="18" viewBox="0 0 20 18">
                           <polygon points="9,2 16,5 10,8 3,5" className="fill-slate-300" />
@@ -722,11 +664,7 @@ export default function Playground() {
                       <button
                         onClick={() => setView('top-front-left')}
                         title="Top, Front, Left"
-                        className={`p-1.5 rounded-md transition-all flex flex-col items-center gap-0.5 ${
-                          view === 'top-front-left'
-                            ? 'bg-white shadow-sm'
-                            : 'hover:bg-white/50'
-                        }`}
+                        className={`view-selector-btn ${view === 'top-front-left' ? 'view-selector-btn-active' : ''}`}
                       >
                         <svg width="20" height="18" viewBox="0 0 20 18">
                           <polygon points="10,2 3,5 9,8 16,5" className="fill-slate-300" />
@@ -739,11 +677,7 @@ export default function Playground() {
                       <button
                         onClick={() => setView('bottom-front-right')}
                         title="Bottom, Front, Right"
-                        className={`p-1.5 rounded-md transition-all flex flex-col items-center gap-0.5 ${
-                          view === 'bottom-front-right'
-                            ? 'bg-white shadow-sm'
-                            : 'hover:bg-white/50'
-                        }`}
+                        className={`view-selector-btn ${view === 'bottom-front-right' ? 'view-selector-btn-active' : ''}`}
                       >
                         <svg width="20" height="18" viewBox="0 0 20 18">
                           <polygon points="3,13 10,10 10,2 3,5" className="fill-slate-500" />
@@ -775,10 +709,7 @@ export default function Playground() {
                   <div className="h-6 w-px bg-slate-300" />
 
                   {/* Reset Button */}
-                  <button
-                    onClick={handleReset}
-                    className="px-4 py-1.5 bg-linear-to-r from-slate-600 to-slate-700 text-white rounded-lg text-sm font-semibold hover:from-slate-700 hover:to-slate-800 transition-all shadow-md hover:shadow-lg"
-                  >
+                  <button onClick={handleReset} className="playground-reset-btn">
                     Reset
                   </button>
                 </div>

@@ -1,0 +1,9 @@
+@reference "tailwindcss";
+
+.inverse-badge {
+  @apply inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-medium
+    border rounded-full transition-colors cursor-pointer
+    text-slate-400 border-transparent bg-transparent
+    group-hover/algocard:text-amber-700 group-hover/algocard:bg-amber-100
+    group-hover/algocard:border-amber-200 hover:bg-amber-200 hover:border-amber-300;
+}

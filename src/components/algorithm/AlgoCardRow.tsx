@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom'
 import type { Algorithm } from '../../types/algorithm'
 import AlgorithmDisplay from './AlgorithmDisplay'
 import InverseBadge from '../InverseBadge'
+import './AlgoCardRow.css'
 
 // Extract OLL number from algorithm ID (e.g., 'oll-25' -> 25)
 function getOLLNumberFromId(algoId: string): number | null {
@@ -44,13 +45,7 @@ export default function AlgoCardRow({
     <div className="group/algocard rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors p-3">
       <div className="flex items-center gap-2">
         {/* Demo button - ghost style, prominent on hover */}
-        <Link
-          to={playgroundUrl}
-          title="Demo"
-          className="shrink-0 w-6 h-6 flex items-center justify-center rounded
-            text-slate-400 group-hover/algocard:text-indigo-600
-            hover:bg-indigo-100 transition-colors"
-        >
+        <Link to={playgroundUrl} title="Demo" className="ghost-icon-btn">
           <span className="text-sm">▶</span>
         </Link>
 
@@ -66,11 +61,7 @@ export default function AlgoCardRow({
 
         {/* Inverse badge or spacer to balance demo button */}
         {inverseNumber ? (
-          <InverseBadge
-            inverseCaseNumber={inverseNumber}
-            onClick={onInverseClick}
-            ghost
-          />
+          <InverseBadge inverseCaseNumber={inverseNumber} onClick={onInverseClick} />
         ) : (
           <div className="shrink-0 w-6 h-6" />
         )}
