@@ -137,6 +137,18 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     mirror: 'fat-chair',
     tags: ['trigger'],
   }],
+  ['front-fat-sune', {
+    id: 'front-fat-sune',
+    steps: [{ moves: "r' U' R U' R' U2 r" }],
+    mirror: 'left-front-fat-sune',
+    tags: ['trigger', 'wide'],
+  }],
+  ['left-front-fat-sune', {
+    id: 'left-front-fat-sune',
+    steps: [{ moves: "l U L' U L U2 l'" }],
+    mirror: 'front-fat-sune',
+    tags: ['trigger', 'wide'],
+  }],
 
   // ==========================================================================
   // OLL - SOLVED CROSS (21-27)
@@ -423,7 +435,9 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     steps: [
       { moves: "f'" },
       { ref: 'left-sexy' },
-      { moves: 'f U F' },
+      { moves: 'f' },
+      { moves: 'U' },
+      { moves: 'F' },
       { ref: 'sexy' },
       { moves: "F'" },
     ],
@@ -434,7 +448,9 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     steps: [
       { moves: 'f' },
       { ref: 'sexy' },
-      { moves: "f' U F" },
+      { moves: "f'" },
+      { moves: 'U' },
+      { moves: 'F' },
       { ref: 'sexy' },
       { moves: "F'" },
     ],
@@ -466,7 +482,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     id: 'oll-18',
     steps: [
       { ref: 'fat-sune' },
-      { moves: "r' U' R U' R' U² r" },
+      { ref: 'front-fat-sune' },
     ],
     tags: ['oll', 'dots'],
   }],

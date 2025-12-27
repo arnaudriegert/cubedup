@@ -86,6 +86,16 @@ const PARITY_COLORS = {
   },
 }
 
+/**
+ * Represents a group of tokens that participate in a cancellation.
+ * Either has a result token (partial cancel) or just cancelled tokens (full cancel).
+ */
+interface CancellationGroupData {
+  id: number
+  cancelledTokens: AlgorithmToken[]
+  resultToken?: AlgorithmToken
+}
+
 interface TokenProps {
   token: AlgorithmToken
   state: 'default' | 'current' | 'completed'
@@ -158,33 +168,190 @@ function Token({ token, state, size }: TokenProps) {
 }
 
 /**
+ * Renders a cancellation group with click-to-reveal behavior.
+ * - Partial cancellation (F F → F2): Shows F2 with underline hint, click reveals "~F F~ → F2"
+ * - Full cancellation (R R' → ∅): Shows × indicator, click reveals "~R R'~"
+ */
+function CancellationGroup({
+  group,
+  size,
+}: {
+  group: CancellationGroupData
+  size: DisplaySize
+}) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const sizeStyle = SIZE_STYLES[size]
+
+  // Format cancelled moves for title tooltip
+  const cancelledNotation = group.cancelledTokens.map(t => t.value).join(' ')
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsExpanded(prev => !prev)
+  }
+
+  if (group.resultToken) {
+    // Partial cancellation - show result, click to reveal cancelled moves
+    const parity = group.resultToken.stepParity || 'even'
+    const parityCategory = group.resultToken.isFromTrigger ? 'trigger' : 'moves'
+    const parityStyle = PARITY_COLORS[parityCategory][parity]
+
+    return (
+      <span className="inline-flex items-center gap-0.5">
+        {isExpanded && (
+          <>
+            {/* Show cancelled moves with strikethrough when expanded */}
+            {group.cancelledTokens.map((token, idx) => (
+              <span
+                key={idx}
+                onClick={handleClick}
+                className={`${sizeStyle.token} rounded-md transition-all duration-200 ${parityStyle} opacity-50 line-through decoration-slate-500 decoration-2 cursor-pointer`}
+              >
+                {token.value}
+              </span>
+            ))}
+            <span className="text-slate-400 text-xs mx-0.5">→</span>
+          </>
+        )}
+        {/* Always show the result */}
+        <span
+          onClick={handleClick}
+          className={`${sizeStyle.token} rounded-md shadow-sm transition-all duration-200 ${parityStyle} cursor-pointer ${
+            isExpanded
+              ? 'ring-2 ring-indigo-300'
+              : 'border border-dashed border-slate-400'
+          }`}
+          title={isExpanded ? 'Click to collapse' : `Combined from: ${cancelledNotation} (click to reveal)`}
+        >
+          {group.resultToken.value}
+        </span>
+      </span>
+    )
+  }
+
+  // Full cancellation - show small indicator, click to reveal cancelled moves
+  return (
+    <span className="inline-flex items-center gap-0.5">
+      {isExpanded ? (
+        <>
+          {/* Show cancelled moves with strikethrough when expanded */}
+          {group.cancelledTokens.map((token, idx) => (
+            <span
+              key={idx}
+              onClick={handleClick}
+              className={`${sizeStyle.token} rounded-md transition-all duration-200 bg-slate-200 text-slate-500 line-through decoration-slate-400 decoration-2 cursor-pointer`}
+            >
+              {token.value}
+            </span>
+          ))}
+        </>
+      ) : (
+        <span
+          onClick={handleClick}
+          className={`${sizeStyle.token} rounded-md transition-all duration-200 bg-slate-200 text-slate-400 cursor-pointer hover:bg-slate-300`}
+          title={`Cancelled: ${cancelledNotation} (click to reveal)`}
+        >
+          ×
+        </span>
+      )}
+    </span>
+  )
+}
+
+/**
+ * A renderable item: either a regular token or a cancellation group
+ */
+type RenderItem =
+  | { type: 'token'; token: AlgorithmToken }
+  | { type: 'cancellation'; group: CancellationGroupData }
+
+/**
  * Render tokens - groups tokens by stepIndex to prevent line breaks within a step
+ * Handles cancellation groups with hover-to-reveal behavior
  */
 function TokenList({ tokens, state, size }: { tokens: AlgorithmToken[]; state: 'default' | 'current' | 'completed'; size: DisplaySize }) {
-  // Group tokens by stepIndex to prevent line breaks within a step
-  const groups: Array<{ stepIndex: number | undefined; tokens: AlgorithmToken[] }> = []
-  let currentGroup: { stepIndex: number | undefined; tokens: AlgorithmToken[] } | null = null
+  // Build cancellation groups from tokens
+  const cancellationGroups = new Map<number, CancellationGroupData>()
 
   for (const token of tokens) {
-    // Skip groupStart/groupEnd tokens
+    if (token.cancellationId === undefined) continue
+
+    let group = cancellationGroups.get(token.cancellationId)
+    if (!group) {
+      group = { id: token.cancellationId, cancelledTokens: [] }
+      cancellationGroups.set(token.cancellationId, group)
+    }
+
+    if (token.isCancelled) {
+      group.cancelledTokens.push(token)
+    } else if (token.isResult) {
+      group.resultToken = token
+    }
+  }
+
+  // Build render items: regular tokens + cancellation groups (inserted at correct position)
+  const renderItems: RenderItem[] = []
+  const processedCancellationIds = new Set<number>()
+
+  for (const token of tokens) {
+    // Skip groupStart/groupEnd/space tokens
     if (token.type === 'groupStart' || token.type === 'groupEnd' || token.type === 'space') {
       continue
     }
 
-    if (currentGroup === null || currentGroup.stepIndex !== token.stepIndex) {
-      currentGroup = { stepIndex: token.stepIndex, tokens: [] }
-      groups.push(currentGroup)
+    // Check if this token is part of a cancellation
+    if (token.cancellationId !== undefined) {
+      const group = cancellationGroups.get(token.cancellationId)!
+
+      // For result tokens (partial cancellation), render the cancellation group
+      if (token.isResult && !processedCancellationIds.has(token.cancellationId)) {
+        processedCancellationIds.add(token.cancellationId)
+        renderItems.push({ type: 'cancellation', group })
+        continue
+      }
+
+      // For cancelled tokens
+      if (token.isCancelled) {
+        // For full cancellations (no result), render the group at first cancelled token
+        if (!group.resultToken && !processedCancellationIds.has(token.cancellationId)) {
+          processedCancellationIds.add(token.cancellationId)
+          renderItems.push({ type: 'cancellation', group })
+        }
+        // Skip cancelled tokens - they're rendered as part of the group
+        continue
+      }
     }
-    currentGroup.tokens.push(token)
+
+    // Regular token
+    renderItems.push({ type: 'token', token })
+  }
+
+  // Group render items by stepIndex to prevent line breaks within a step
+  const stepGroups: Array<{ stepIndex: number | undefined; items: RenderItem[] }> = []
+  let currentGroup: { stepIndex: number | undefined; items: RenderItem[] } | null = null
+
+  for (const item of renderItems) {
+    const stepIndex = item.type === 'token'
+      ? item.token.stepIndex
+      : (item.group.resultToken?.stepIndex ?? item.group.cancelledTokens[0]?.stepIndex)
+
+    if (currentGroup === null || currentGroup.stepIndex !== stepIndex) {
+      currentGroup = { stepIndex, items: [] }
+      stepGroups.push(currentGroup)
+    }
+    currentGroup.items.push(item)
   }
 
   return (
     <>
-      {groups.map((group, groupIdx) => (
+      {stepGroups.map((group, groupIdx) => (
         <span key={groupIdx} className="inline-flex flex-wrap items-center gap-1">
-          {group.tokens.map((token, tokenIdx) => (
-            <Token key={tokenIdx} token={token} state={state} size={size} />
-          ))}
+          {group.items.map((item, itemIdx) => {
+            if (item.type === 'cancellation') {
+              return <CancellationGroup key={`cancel-${item.group.id}`} group={item.group} size={size} />
+            }
+            return <Token key={itemIdx} token={item.token} state={state} size={size} />
+          })}
         </span>
       ))}
     </>

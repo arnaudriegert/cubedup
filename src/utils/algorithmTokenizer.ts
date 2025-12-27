@@ -15,6 +15,7 @@ import { isCubeRotation } from '../types/cubeState'
 import { parseMoves, moveToNotation } from './moveParser'
 import type { ExpandedAlgorithm } from './algorithmExpander'
 import type { MoveWithMeta } from './cancellation'
+import type { Move } from '../types/cubeState'
 
 export type TokenType = 'move' | 'trigger' | 'rotation' | 'groupStart' | 'groupEnd' | 'space'
 
@@ -29,6 +30,10 @@ export interface AlgorithmToken {
   moveIndex?: number      // Global move index (for playback tracking)
   stepParity?: 'even' | 'odd'  // For alternating colors within consecutive same-category steps
   isFromTrigger?: boolean      // True if this move came from a trigger expansion
+  // Cancellation display info
+  isResult?: boolean           // This move is the result of a cancellation
+  cancellationId?: number      // Links cancelled moves with their result
+  originalMoves?: [Move, Move] // For result moves: the moves that combined
 }
 
 // Regex patterns for parsing algorithm notation
@@ -281,7 +286,7 @@ export function tokenizeExpandedAlgorithm(
 
   for (let i = 0; i < expanded.movesWithMeta.length; i++) {
     const meta = expanded.movesWithMeta[i]
-    const { move, stepIndex, isCancelled, isResult, isFromRef } = meta
+    const { move, stepIndex, isCancelled, isResult, isFromRef, cancellationId, originalMoves } = meta
 
     // Add space when step changes
     if (stepIndex !== currentStepIndex) {
@@ -310,6 +315,9 @@ export function tokenizeExpandedAlgorithm(
       moveIndex: i,
       stepParity,
       isFromTrigger: isFromRef,
+      isResult,
+      cancellationId,
+      originalMoves,
     })
   }
 
