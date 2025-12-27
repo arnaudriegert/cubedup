@@ -1,28 +1,16 @@
-import {
-  useState, useEffect, useRef, useCallback,
-} from 'react'
+import { useState, useEffect } from 'react'
 import {
   Outlet, Link, useLocation,
 } from 'react-router-dom'
 import { ollGroups } from '../data/cases'
 import CategoryNav from '../components/CategoryNav'
 import SEOHead from '../components/SEOHead'
+import { useCaseSearch, scrollToHighlighted } from '../hooks'
 
-// Debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
+// OLL search validation: must be number 1-57
+function validateOLLSearch(value: string): number | null {
+  const num = parseInt(value, 10)
+  return (num >= 1 && num <= 57) ? num : null
 }
 
 // Context type exported for child routes
@@ -38,74 +26,29 @@ export default function OLL() {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const initialSelect = searchParams.get('select') || ''
-  const [searchValue, setSearchValue] = useState(initialSelect)
-  const [instantValue, setInstantValue] = useState(initialSelect)
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const debouncedFromInput = useDebounce(searchValue, 500)
-
-  // Use instant value if it matches current search, otherwise use debounced
-  const debouncedSearch = instantValue === searchValue ? instantValue : debouncedFromInput
+  const {
+    searchValue,
+    debouncedSearch,
+    highlightedCase: highlightedOll,
+    isInvalidSearch,
+    setSearch,
+    setSearchImmediate,
+    clearSearch,
+    searchInputRef,
+  } = useCaseSearch({
+    validateSearch: validateOLLSearch,
+    initialValue: initialSelect,
+  })
 
   const isOverview = location.pathname.includes('/overview')
 
-  // Derive highlightedOll from debouncedSearch (no separate state needed)
-  const searchNum = parseInt(debouncedSearch, 10)
-  const highlightedOll = (searchNum >= 1 && searchNum <= 57) ? searchNum : null
-
-  // Check if search value is invalid
-  const isInvalidSearch = searchValue !== '' && (
-    !/^\d+$/.test(searchValue) ||
-    parseInt(searchValue, 10) < 1 ||
-    parseInt(searchValue, 10) > 57
-  )
-
-  const clearSearch = useCallback(() => {
-    setSearchValue('')
-    setInstantValue('')
-  }, [])
-
-  const setSearchImmediate = useCallback((value: string) => {
-    setSearchValue(value)
-    setInstantValue(value)
-  }, [])
-
-  // Keyboard shortcut: '/' to focus search, Escape to clear
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        if (e.key === 'Escape') {
-          searchInputRef.current?.blur()
-          clearSearch()
-        }
-        return
-      }
-      if (e.key === '/') {
-        e.preventDefault()
-        searchInputRef.current?.focus()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [clearSearch])
-
-  // Scroll to highlighted OLL in detailed view (only if not already visible)
+  // Scroll to highlighted OLL in detailed view
   useEffect(() => {
     if (highlightedOll !== null && !isOverview) {
-      const element = document.getElementById(`oll-${highlightedOll}`)
-      if (element) {
-        const rect = element.getBoundingClientRect()
-        // Account for sticky header (approximately 288px / 18rem)
-        const headerHeight = 288
-        const isVisible = rect.top >= headerHeight && rect.bottom <= window.innerHeight
-        if (!isVisible) {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          })
-        }
-      }
+      scrollToHighlighted(`oll-${highlightedOll}`)
     }
   }, [highlightedOll, isOverview])
 
@@ -164,7 +107,7 @@ export default function OLL() {
               inputMode="numeric"
               maxLength={2}
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="OLL # (press /)"
               aria-label="Search OLL case by number"
               className={`w-36 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}

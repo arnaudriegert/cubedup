@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useRef } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import {
   ollGroups, getCase, getAlgorithmsForCase,
@@ -9,6 +9,7 @@ import OLLGrid from '../components/OLLGrid'
 import { AlgorithmDisplay } from '../components/algorithm'
 import InverseBadge from '../components/InverseBadge'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
+import { useClickOutside } from '../hooks'
 import type {
   AlgorithmId, CaseId, Case,
 } from '../types/algorithm'
@@ -87,39 +88,31 @@ function getOLLNumber(caseId: CaseId): number {
   return parseInt(caseId.replace('oll-', ''), 10)
 }
 
+// Selectors to ignore when detecting clicks outside
+const DETAILED_IGNORE_SELECTORS = ['nav', 'header', 'input', '.case-card']
+
 export default function OLLDetailed() {
   const {
     highlightedOll,
     clearSearch,
     setSearch,
   } = useOutletContext<OLLContextType>()
+  const mainRef = useRef<HTMLElement>(null)
 
   const handleNavigateToCase = (caseNumber: number) => {
     setSearch(String(caseNumber))
   }
 
-  // Clear highlight when clicking outside cards (but not on nav/header/input)
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (highlightedOll === null) return
-
-      const target = e.target as HTMLElement
-      // Don't clear if clicking on navigation, header, or input
-      if (target.closest('nav') || target.closest('header') || target.closest('input')) {
-        return
-      }
-      // Don't clear if clicking on a card
-      if (target.closest('.case-card')) {
-        return
-      }
-      clearSearch()
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [highlightedOll, clearSearch])
+  // Clear highlight when clicking outside cards
+  useClickOutside({
+    containerRef: mainRef,
+    onClickOutside: clearSearch,
+    enabled: highlightedOll !== null,
+    ignoreSelectors: DETAILED_IGNORE_SELECTORS,
+  })
 
   return (
-    <main className="main-content-detailed">
+    <main ref={mainRef} className="main-content-detailed">
       {/* Collapsible intro */}
       <details className="collapsible">
         <summary className="collapsible-trigger">About OLL cases</summary>

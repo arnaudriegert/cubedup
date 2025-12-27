@@ -1,6 +1,4 @@
-import {
-  useState, useEffect, useRef, useCallback,
-} from 'react'
+import { useState, useEffect } from 'react'
 import {
   Outlet, Link, useLocation,
 } from 'react-router-dom'
@@ -9,26 +7,16 @@ import CategoryNav from '../components/CategoryNav'
 import ColorRemote from '../components/ColorRemote'
 import SEOHead from '../components/SEOHead'
 import { Color } from '../types/cube'
-
-// Debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value)
-    }, delay)
-
-    return () => {
-      clearTimeout(handler)
-    }
-  }, [value, delay])
-
-  return debouncedValue
-}
+import { useCaseSearch, scrollToHighlighted } from '../hooks'
 
 // Get all PLL case names for validation
 const allPLLNames = getPLLCases().map(c => c.name.toLowerCase())
+
+// PLL search validation: must be a valid PLL name
+function validatePLLSearch(value: string): string | null {
+  const lower = value.toLowerCase().trim()
+  return allPLLNames.includes(lower) ? lower : null
+}
 
 // Context type exported for child routes
 export interface PLLContextType {
@@ -44,71 +32,30 @@ export default function PLL() {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
   const initialSelect = searchParams.get('select') || ''
-  const [searchValue, setSearchValue] = useState(initialSelect)
-  const [instantValue, setInstantValue] = useState(initialSelect)
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [selectedColor, setSelectedColor] = useState<Color>(Color.BLUE)
-  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const debouncedFromInput = useDebounce(searchValue, 500)
-
-  // Use instant value if it matches current search, otherwise use debounced
-  const debouncedSearch = instantValue === searchValue ? instantValue : debouncedFromInput
+  const {
+    searchValue,
+    debouncedSearch,
+    highlightedCase: highlightedPll,
+    isInvalidSearch,
+    setSearch,
+    setSearchImmediate,
+    clearSearch,
+    searchInputRef,
+  } = useCaseSearch({
+    validateSearch: validatePLLSearch,
+    initialValue: initialSelect,
+  })
 
   const isOverview = location.pathname.includes('/overview')
 
-  // Derive highlightedPll from debouncedSearch
-  const searchLower = debouncedSearch.toLowerCase().trim()
-  const highlightedPll = allPLLNames.includes(searchLower) ? searchLower : null
-
-  // Check if search value is invalid
-  const isInvalidSearch = searchValue !== '' && !allPLLNames.includes(searchValue.toLowerCase().trim())
-
-  const clearSearch = useCallback(() => {
-    setSearchValue('')
-    setInstantValue('')
-  }, [])
-
-  const setSearchImmediate = useCallback((value: string) => {
-    setSearchValue(value)
-    setInstantValue(value)
-  }, [])
-
-  // Keyboard shortcut: '/' to focus search, Escape to clear
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        if (e.key === 'Escape') {
-          searchInputRef.current?.blur()
-          clearSearch()
-        }
-        return
-      }
-      if (e.key === '/') {
-        e.preventDefault()
-        searchInputRef.current?.focus()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [clearSearch])
-
-  // Scroll to highlighted PLL in detailed view (only if not already visible)
+  // Scroll to highlighted PLL in detailed view
   useEffect(() => {
     if (highlightedPll !== null && !isOverview) {
-      const element = document.getElementById(`pll-${highlightedPll}`)
-      if (element) {
-        const rect = element.getBoundingClientRect()
-        // Account for sticky header (approximately 288px / 18rem)
-        const headerHeight = 288
-        const isVisible = rect.top >= headerHeight && rect.bottom <= window.innerHeight
-        if (!isVisible) {
-          element.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-          })
-        }
-      }
+      scrollToHighlighted(`pll-${highlightedPll}`)
     }
   }, [highlightedPll, isOverview])
 
@@ -167,7 +114,7 @@ export default function PLL() {
               type="search"
               maxLength={3}
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="PLL name (press /)"
               aria-label="Search PLL case by name"
               className={`w-40 search-input ${isInvalidSearch ? 'search-input-error' : 'search-input-valid'}`}

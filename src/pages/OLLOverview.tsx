@@ -11,6 +11,7 @@ import OLLGrid from '../components/OLLGrid'
 import { AlgorithmDisplay } from '../components/algorithm'
 import InverseBadge from '../components/InverseBadge'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
+import { useClickOutside, useEscapeKey } from '../hooks'
 import type { AlgorithmId, Case } from '../types/algorithm'
 
 // Build a map from case number to category name
@@ -170,34 +171,13 @@ export default function OLLOverview() {
   const searchNum = parseInt(debouncedSearch, 10)
   const expandedCase = (searchNum >= 1 && searchNum <= 57) ? searchNum : null
 
-  // Close expanded card when clicking outside the grid
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (expandedCase !== null && gridRef.current) {
-        const target = e.target as HTMLElement
-        // Don't clear if clicking on navigation, header, or input
-        if (target.closest('nav') || target.closest('header') || target.closest('input')) {
-          return
-        }
-        if (!gridRef.current.contains(target)) {
-          clearSearch()
-        }
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [expandedCase, clearSearch])
-
-  // Escape to close expanded card
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape' && !(e.target instanceof HTMLInputElement)) {
-        clearSearch()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [clearSearch])
+  // Close expanded card when clicking outside the grid or pressing Escape
+  useClickOutside({
+    containerRef: gridRef,
+    onClickOutside: clearSearch,
+    enabled: expandedCase !== null,
+  })
+  useEscapeKey(clearSearch, expandedCase !== null)
 
   // Stable callbacks for memoized cards
   const handleSelect = useCallback((ollNumber: number) => {
