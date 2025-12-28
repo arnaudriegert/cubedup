@@ -16,43 +16,74 @@ export default function CategoryNav({
   onCategorySelect,
 }: CategoryNavProps) {
   const getCategoryId = (name: string) => name.replace(/\s+/g, '-').toLowerCase()
+  const isJump = mode === 'jump'
 
-  if (mode === 'jump') {
-    return (
-      <div className="flex gap-2 items-center overflow-x-auto md:overflow-visible md:flex-wrap md:justify-center pb-2 md:pb-0">
-        <span className="text-slate-500 text-sm mr-2 shrink-0">Jump to:</span>
-        {categories.map((category) => (
-          <a
-            key={category.name}
-            href={`#${getCategoryId(category.name)}`}
-            className="section-nav-link shrink-0"
-          >
-            {category.name}
-          </a>
-        ))}
-      </div>
-    )
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value
+    if (isJump) {
+      if (value) {
+        document.getElementById(value)?.scrollIntoView({ behavior: 'smooth' })
+        e.target.value = '' // Reset to show placeholder again
+      }
+    } else {
+      onCategorySelect(value === '' ? null : value)
+    }
   }
 
-  // Filter mode
   return (
-    <div className="flex gap-2 items-center overflow-x-auto md:overflow-visible md:flex-wrap md:justify-center pb-2 md:pb-0">
-      <span className="text-slate-500 text-sm mr-2 shrink-0">Filter:</span>
-      <button
-        onClick={() => onCategorySelect(null)}
-        className={`section-nav-link shrink-0 ${selectedCategory === null ? 'section-nav-link-active' : ''}`}
+    <>
+      {/* Mobile: dropdown */}
+      <select
+        value={isJump ? undefined : (selectedCategory ?? '')}
+        defaultValue={isJump ? '' : undefined}
+        onChange={handleSelectChange}
+        className="md:hidden w-full form-select"
       >
-        All
-      </button>
-      {categories.map((category) => (
-        <button
-          key={category.name}
-          onClick={() => onCategorySelect(category.name)}
-          className={`section-nav-link shrink-0 ${selectedCategory === category.name ? 'section-nav-link-active' : ''}`}
-        >
-          {category.name}
-        </button>
-      ))}
-    </div>
+        <option value="" disabled={isJump}>
+          {isJump ? 'Jump to...' : 'All categories'}
+        </option>
+        {categories.map((category) => (
+          <option
+            key={category.name}
+            value={isJump ? getCategoryId(category.name) : category.name}
+          >
+            {category.name}
+          </option>
+        ))}
+      </select>
+
+      {/* Desktop: horizontal nav */}
+      <div className="hidden md:flex gap-2 items-center flex-wrap justify-center">
+        <span className="text-slate-500 text-sm mr-2 shrink-0">
+          {isJump ? 'Jump to:' : 'Filter:'}
+        </span>
+        {!isJump && (
+          <button
+            onClick={() => onCategorySelect(null)}
+            className={`section-nav-link shrink-0 ${selectedCategory === null ? 'section-nav-link-active' : ''}`}
+          >
+            All
+          </button>
+        )}
+        {categories.map((category) =>
+          isJump ? (
+            <a
+              key={category.name}
+              href={`#${getCategoryId(category.name)}`}
+              className="section-nav-link shrink-0"
+            >
+              {category.name}
+            </a>
+          ) : (
+            <button
+              key={category.name}
+              onClick={() => onCategorySelect(category.name)}
+              className={`section-nav-link shrink-0 ${selectedCategory === category.name ? 'section-nav-link-active' : ''}`}
+            >
+              {category.name}
+            </button>
+          ))}
+      </div>
+    </>
   )
 }
