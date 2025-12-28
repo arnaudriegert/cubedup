@@ -7,17 +7,13 @@
 
 import type { CaseId } from '../types/algorithm'
 import type { CubeState } from '../types/cubeState'
-import { Color } from '../types/cube'
-import {
-  deriveCasePattern,
-  getRotationForColor,
-  type DerivedPattern,
-} from './patternDerivation'
+import { deriveCasePattern, type DerivedPattern } from './patternDerivation'
+import { parseMoves } from './moveParser'
 
 // Pattern cache
 const patternCache = new Map<CaseId, DerivedPattern>()
 
-// Cache for rotated patterns: "caseId:color" -> DerivedPattern
+// Cache for rotated patterns: "caseId:rotation" -> DerivedPattern
 const rotatedPatternCache = new Map<string, DerivedPattern>()
 
 /**
@@ -35,25 +31,25 @@ export function getDerivedPattern(caseId: CaseId): DerivedPattern | null {
 }
 
 /**
- * Get cube state for a case (with optional rotation for selected color)
+ * Get cube state for a case (with optional y-rotation)
  */
-export function getCaseCubeState(caseId: CaseId, selectedColor: Color = Color.BLUE): CubeState | null {
-  // Default color (blue) uses non-rotated pattern
-  if (selectedColor === Color.BLUE) {
+export function getCaseCubeState(caseId: CaseId, rotation: string = ''): CubeState | null {
+  // No rotation uses non-rotated pattern
+  if (!rotation) {
     const pattern = getDerivedPattern(caseId)
     return pattern?.cubeState ?? null
   }
 
   // Check rotated cache
-  const cacheKey = `${caseId}:${selectedColor}`
+  const cacheKey = `${caseId}:${rotation}`
   const cached = rotatedPatternCache.get(cacheKey)
   if (cached) {
     return cached.cubeState
   }
 
   // Derive with rotation
-  const rotation = getRotationForColor(selectedColor)
-  const pattern = deriveCasePattern(caseId, rotation)
+  const moves = parseMoves(rotation)
+  const pattern = deriveCasePattern(caseId, moves)
   if (pattern) {
     rotatedPatternCache.set(cacheKey, pattern)
   }

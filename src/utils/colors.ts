@@ -10,6 +10,3 @@ export const colorToTailwind: Record<Color, string> = {
   [Color.GREEN]: 'bg-green-600',
   [Color.GRAY]: 'bg-gray-500',
 }
-
-// The 4 side face colors (excludes top/bottom)
-export const SIDE_COLORS = [Color.BLUE, Color.RED, Color.GREEN, Color.ORANGE] as const

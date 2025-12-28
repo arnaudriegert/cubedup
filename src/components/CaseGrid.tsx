@@ -4,12 +4,12 @@ import { getCaseCubeState } from '../utils/derivedPatterns'
 import { applyMask } from '../utils/pieceIdentity'
 import { deriveLastLayerColors } from '../utils/patternDerivation'
 import type { PLLSwapInfo } from '../types/algorithm'
-import { Color } from '../types/cube'
+import type { YRotation } from './ColorRemote'
 
 interface CaseGridProps {
   caseId: string
   size?: GridSize
-  selectedColor?: Color
+  selectedRotation?: YRotation
   showArrows?: boolean
   swaps?: PLLSwapInfo
 }
@@ -21,7 +21,7 @@ interface CaseGridProps {
 export default function CaseGrid({
   caseId,
   size = 'normal',
-  selectedColor = Color.BLUE,
+  selectedRotation = '',
   showArrows = false,
   swaps,
 }: CaseGridProps) {
@@ -30,8 +30,8 @@ export default function CaseGrid({
 
   if (!isOLL && !isPLL) return null
 
-  // Get cube state (with rotation for selected color)
-  const cubeState = getCaseCubeState(caseId, selectedColor)
+  // Get cube state (with rotation applied)
+  const cubeState = getCaseCubeState(caseId, selectedRotation)
   if (!cubeState) return null
 
   // Apply appropriate mask and extract last layer colors

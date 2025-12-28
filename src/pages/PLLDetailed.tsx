@@ -6,12 +6,12 @@ import { CaseDetailedLayout, type CaseCardProps } from '../components/CaseDetail
 import type { CaseId } from '../types/algorithm'
 
 function PLLCaseCard({ caseData, isHighlighted }: CaseCardProps) {
-  const { selectedColor } = useOutletContext<PLLContextType>()
+  const { selectedRotation } = useOutletContext<PLLContextType>()
   return (
     <CaseCard
       caseData={caseData}
       isHighlighted={isHighlighted}
-      selectedColor={selectedColor}
+      selectedRotation={selectedRotation}
     />
   )
 }

@@ -4,19 +4,19 @@ import { getAlgorithmsForCase, getPLLSwaps } from '../data/cases'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { CORNER_COLOR, EDGE_COLOR } from './PLLArrowOverlay'
 import type { Case, PLLSwapInfo } from '../types/algorithm'
-import { Color } from '../types/cube'
+import type { YRotation } from './ColorRemote'
 
 export interface CaseCardProps {
   caseData: Case
   isHighlighted: boolean
-  selectedColor?: Color
+  selectedRotation?: YRotation
   onInverseClick?: (num: number) => void
 }
 
 export default function CaseCard({
   caseData,
   isHighlighted,
-  selectedColor = Color.BLUE,
+  selectedRotation = '',
   onInverseClick,
 }: CaseCardProps) {
   const { id, name, number } = caseData
@@ -34,7 +34,7 @@ export default function CaseCard({
         <div className="mb-4">
           <CaseGrid
             caseId={id}
-            selectedColor={selectedColor}
+            selectedRotation={selectedRotation}
             showArrows={!!swaps}
             swaps={swaps}
           />

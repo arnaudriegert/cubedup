@@ -9,10 +9,10 @@ import {
 import { PLLContextType } from './PLL'
 import CaseGrid from '../components/CaseGrid'
 import { AlgoCardRow } from '../components/algorithm'
-import { Color } from '../types/cube'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { useClickOutside, useEscapeKey } from '../hooks'
 import type { Case } from '../types/algorithm'
+import type { YRotation } from '../components/ColorRemote'
 
 // Build a map from case name to category name
 const categoryByCase = new Map<string, string>()
@@ -46,7 +46,7 @@ interface CompactCardProps {
   isExpanded: boolean
   onSelect: (pllName: string) => void
   onDeselect: () => void
-  selectedColor: Color
+  selectedRotation: YRotation
 }
 
 const CompactCard = memo(function CompactCard({
@@ -54,7 +54,7 @@ const CompactCard = memo(function CompactCard({
   isExpanded,
   onSelect,
   onDeselect,
-  selectedColor,
+  selectedRotation,
 }: CompactCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -101,7 +101,7 @@ const CompactCard = memo(function CompactCard({
                 {caseData.name}
               </h3>
               <div className="mb-6">
-                <CaseGrid caseId={caseData.id} selectedColor={selectedColor} size="medium" />
+                <CaseGrid caseId={caseData.id} selectedRotation={selectedRotation} size="medium" />
               </div>
               <div className="w-full space-y-3" onClick={(e) => e.stopPropagation()}>
                 {algorithms.map((algorithm, i) => (
@@ -117,7 +117,7 @@ const CompactCard = memo(function CompactCard({
         })()
       ) : (
         <div className="flex flex-col items-center">
-          <CaseGrid caseId={caseData.id} size="compact" selectedColor={selectedColor} />
+          <CaseGrid caseId={caseData.id} size="compact" selectedRotation={selectedRotation} />
           <span className="mt-1 text-xs font-medium text-gray-600">
             {caseData.name}
           </span>
@@ -133,7 +133,7 @@ export default function PLLOverview() {
     setSearch,
     clearSearch,
     selectedCategory,
-    selectedColor,
+    selectedRotation,
   } = useOutletContext<PLLContextType>()
   const gridRef = useRef<HTMLDivElement>(null)
 
@@ -176,7 +176,7 @@ export default function PLLOverview() {
             isExpanded={expandedCase === caseData.name}
             onSelect={handleSelect}
             onDeselect={clearSearch}
-            selectedColor={selectedColor}
+            selectedRotation={selectedRotation}
           />
         ))}
       </div>

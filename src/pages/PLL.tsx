@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { pllGroups, getPLLCases } from '../data/cases'
 import SEOHead from '../components/SEOHead'
-import ColorRemote from '../components/ColorRemote'
+import ColorRemote, { type YRotation } from '../components/ColorRemote'
 import { CasePageLayout, type CasePageContextParams } from '../components/CasePageLayout'
-import { Color } from '../types/cube'
 
 // Get all PLL case names for validation
 const allPLLNames = getPLLCases().map(c => c.name.toLowerCase())
@@ -21,11 +20,11 @@ export interface PLLContextType {
   setSearch: (value: string) => void
   clearSearch: () => void
   selectedCategory: string | null
-  selectedColor: Color
+  selectedRotation: YRotation
 }
 
 export default function PLL() {
-  const [selectedColor, setSelectedColor] = useState<Color>(Color.BLUE)
+  const [selectedRotation, setSelectedRotation] = useState<YRotation>('')
 
   function buildPLLContext(params: CasePageContextParams): PLLContextType {
     return {
@@ -34,7 +33,7 @@ export default function PLL() {
       setSearch: params.setSearch,
       clearSearch: params.clearSearch,
       selectedCategory: params.selectedCategory,
-      selectedColor,
+      selectedRotation,
     }
   }
 
@@ -55,8 +54,8 @@ export default function PLL() {
         buildContext={buildPLLContext}
       >
         <ColorRemote
-          selectedColor={selectedColor}
-          onColorSelect={setSelectedColor}
+          selectedRotation={selectedRotation}
+          onRotationSelect={setSelectedRotation}
         />
       </CasePageLayout>
     </>

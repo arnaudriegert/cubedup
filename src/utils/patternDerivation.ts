@@ -9,36 +9,11 @@ import type { CubeState, Move } from '../types/cubeState'
 import type {
   FaceColors, SideRowColors, LastLayerColors,
 } from '../types/cube'
-import { Color } from '../types/cube'
 import type { CaseId } from '../types/algorithm'
 import { createSolvedCube, applyMoves } from './cubeState'
-import { invertMoves, parseMoves } from './moveParser'
+import { invertMoves } from './moveParser'
 import { expandAlgorithmObject } from './algorithmExpander'
 import { getAlgorithmsForCase } from '../data/cases'
-
-/**
- * Get the y-rotation moves needed to put the selected color in front.
- *
- * Standard orientation: Blue=front, Red=right, Green=back, Orange=left
- * Returns the moves to rotate cube so selectedColor is in front.
- *
- * y rotation (clockwise from above): front→left, right→front, back→right, left→back
- * y' rotation (counter-clockwise): front→right, left→front, back→left, right→back
- */
-export function getRotationForColor(selectedColor: Color): Move[] {
-  switch (selectedColor) {
-    case Color.BLUE:
-      return [] // Already front
-    case Color.RED:
-      return parseMoves('y') // y brings right to front
-    case Color.GREEN:
-      return parseMoves('y2') // Back to front
-    case Color.ORANGE:
-      return parseMoves("y'") // y' brings left to front
-    default:
-      return []
-  }
-}
 
 /**
  * Derive full last layer colors from a cube state.
