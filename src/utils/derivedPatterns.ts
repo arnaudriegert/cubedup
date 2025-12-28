@@ -6,17 +6,19 @@
  */
 
 import type { CaseId } from '../types/algorithm'
-import type { OLLOrientations } from '../types/cube'
+import type { CubeState } from '../types/cubeState'
 import { Color } from '../types/cube'
 import {
   deriveCasePattern,
   getRotationForColor,
   type DerivedPattern,
-  type SideColors,
 } from './patternDerivation'
 
 // Pattern cache
 const patternCache = new Map<CaseId, DerivedPattern>()
+
+// Cache for rotated patterns: "caseId:color" -> DerivedPattern
+const rotatedPatternCache = new Map<string, DerivedPattern>()
 
 /**
  * Get derived pattern for a case (cached)
@@ -33,44 +35,20 @@ export function getDerivedPattern(caseId: CaseId): DerivedPattern | null {
 }
 
 /**
- * Get OLL orientations for a case
+ * Get cube state for a case (with optional rotation for selected color)
  */
-export function getOLLOrientations(caseId: CaseId): OLLOrientations | null {
-  const pattern = getDerivedPattern(caseId)
-  return pattern?.ollOrientations ?? null
-}
-
-/**
- * Get side colors for a case
- */
-export function getSideColors(caseId: CaseId): SideColors | null {
-  const pattern = getDerivedPattern(caseId)
-  return pattern?.sideColors ?? null
-}
-
-// Cache for rotated patterns: "caseId:color" -> DerivedPattern
-const rotatedPatternCache = new Map<string, DerivedPattern>()
-
-/**
- * Get side colors for a case with a specific front color.
- *
- * The rotation is applied BEFORE the inverse algorithm, simulating
- * what the pattern looks like when viewing from a different angle.
- */
-export function getSideColorsRotated(
-  caseId: CaseId,
-  selectedColor: Color,
-): SideColors | null {
+export function getCaseCubeState(caseId: CaseId, selectedColor: Color = Color.BLUE): CubeState | null {
   // Default color (blue) uses non-rotated pattern
   if (selectedColor === Color.BLUE) {
-    return getSideColors(caseId)
+    const pattern = getDerivedPattern(caseId)
+    return pattern?.cubeState ?? null
   }
 
-  // Check cache
+  // Check rotated cache
   const cacheKey = `${caseId}:${selectedColor}`
   const cached = rotatedPatternCache.get(cacheKey)
   if (cached) {
-    return cached.sideColors ?? null
+    return cached.cubeState
   }
 
   // Derive with rotation
@@ -80,6 +58,5 @@ export function getSideColorsRotated(
     rotatedPatternCache.set(cacheKey, pattern)
   }
 
-  return pattern?.sideColors ?? null
+  return pattern?.cubeState ?? null
 }
-

@@ -1,11 +1,10 @@
 import { LastLayerGrid, GridSize } from './cube'
 import PLLArrowOverlay from './PLLArrowOverlay'
-import { ollToColors } from '../utils/ollToColors'
-import { getOLLOrientations, getSideColorsRotated } from '../utils/derivedPatterns'
+import { getCaseCubeState } from '../utils/derivedPatterns'
+import { applyMask } from '../utils/pieceIdentity'
+import { deriveLastLayerColors } from '../utils/patternDerivation'
 import type { PLLSwapInfo } from '../types/algorithm'
-import {
-  Color, type LastLayerColors, type FaceColors,
-} from '../types/cube'
+import { Color } from '../types/cube'
 
 interface CaseGridProps {
   caseId: string
@@ -17,7 +16,7 @@ interface CaseGridProps {
 
 /**
  * Unified grid for OLL and PLL cases.
- * Automatically detects case type from caseId prefix.
+ * Uses mask-based rendering for both case types.
  */
 export default function CaseGrid({
   caseId,
@@ -29,38 +28,25 @@ export default function CaseGrid({
   const isOLL = caseId.startsWith('oll-')
   const isPLL = caseId.startsWith('pll-')
 
+  if (!isOLL && !isPLL) return null
+
+  // Get cube state (with rotation for selected color)
+  const cubeState = getCaseCubeState(caseId, selectedColor)
+  if (!cubeState) return null
+
+  // Apply appropriate mask and extract last layer colors
+  const maskStep = isOLL ? 'oll' : 'pll'
+  const maskedState = applyMask(cubeState, maskStep)
+  const colors = deriveLastLayerColors(maskedState)
+
   if (isOLL) {
-    const orientations = getOLLOrientations(caseId)
-    if (!orientations) return null
-    const colors = ollToColors(orientations)
     return <LastLayerGrid colors={colors} size={size} />
   }
 
-  if (isPLL) {
-    const sideColors = getSideColorsRotated(caseId, selectedColor)
-    if (!sideColors) return null
-
-    const solvedTop: FaceColors = [
-      Color.YELLOW, Color.YELLOW, Color.YELLOW,
-      Color.YELLOW, Color.YELLOW, Color.YELLOW,
-      Color.YELLOW, Color.YELLOW, Color.YELLOW,
-    ]
-
-    const colors: LastLayerColors = {
-      top: solvedTop,
-      back: sideColors.back,
-      left: sideColors.left,
-      right: sideColors.right,
-      front: sideColors.front,
-    }
-
-    return (
-      <div className="relative">
-        <LastLayerGrid colors={colors} size={size} />
-        {showArrows && swaps && <PLLArrowOverlay swaps={swaps} size={size} />}
-      </div>
-    )
-  }
-
-  return null
+  return (
+    <div className="relative">
+      <LastLayerGrid colors={colors} size={size} />
+      {showArrows && swaps && <PLLArrowOverlay swaps={swaps} size={size} />}
+    </div>
+  )
 }

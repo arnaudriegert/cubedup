@@ -16,8 +16,21 @@ export default function SideRow({
   size = 'normal',
   className = '',
 }: SideRowProps) {
-  const isVertical = side === 'left' || side === 'right'
-  const layout = isVertical ? 'flex-col' : 'flex-row'
+  // Layout direction handles visual orientation from top-down view
+  // Stickers are indexed [0,1,2] from cube state; CSS handles display order
+  const layout = useMemo(() => {
+    switch (side) {
+      case 'back':
+        return 'flex-row-reverse' // Display right-to-left (index 0 on right)
+      case 'front':
+        return 'flex-row' // Display left-to-right (index 0 on left)
+      case 'left':
+        return 'flex-col' // Display top-to-bottom (index 0 at top)
+      case 'right':
+        return 'flex-col-reverse' // Display bottom-to-top (index 0 at bottom)
+    }
+  }, [side])
+
   const borderRadius = useMemo(() => {
     switch (side) {
       case 'back':

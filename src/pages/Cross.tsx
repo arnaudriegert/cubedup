@@ -1,23 +1,7 @@
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
-import { Color, FaceColors } from '../types/cube'
-import { crossFace, buildCubeState } from '../utils/cubeHelpers'
-
-// Helper to create a face with specific stickers highlighted
-function makeFace(
-  center: Color,
-  positions: { [key: number]: Color },
-): FaceColors {
-  const face: FaceColors = [
-    Color.GRAY, Color.GRAY, Color.GRAY,
-    Color.GRAY, center, Color.GRAY,
-    Color.GRAY, Color.GRAY, Color.GRAY,
-  ]
-  for (const [pos, color] of Object.entries(positions)) {
-    face[parseInt(pos)] = color
-  }
-  return face
-}
+import { createSolvedCube } from '../utils/cubeState'
+import { applyMask } from '../utils/pieceIdentity'
 
 export default function Cross() {
   return (
@@ -42,11 +26,7 @@ export default function Cross() {
           <div className="flex flex-wrap justify-center items-center gap-8">
             <CubeDisplay>
               <Cube
-                cubeState={buildCubeState({
-                  bottom: crossFace(Color.WHITE, Color.WHITE),
-                  front: makeFace(Color.BLUE, { 7: Color.BLUE }),
-                  right: makeFace(Color.RED, { 7: Color.RED }),
-                })}
+                cubeState={applyMask(createSolvedCube(), 'cross')}
                 view="bottom-front-right"
                 size="normal"
               />

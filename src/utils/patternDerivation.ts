@@ -7,11 +7,9 @@
 
 import type { CubeState, Move } from '../types/cubeState'
 import type {
-  OLLOrientations, FaceColors, SideRowColors, LastLayerColors,
+  FaceColors, SideRowColors, LastLayerColors,
 } from '../types/cube'
-import {
-  Color, Orientation, TOP_TO_SIDES,
-} from '../types/cube'
+import { Color } from '../types/cube'
 import type { CaseId } from '../types/algorithm'
 import { createSolvedCube, applyMoves } from './cubeState'
 import { invertMoves, parseMoves } from './moveParser'
@@ -43,91 +41,17 @@ export function getRotationForColor(selectedColor: Color): Move[] {
 }
 
 /**
- * Derive OLL orientations from a cube state.
- * Looks at the top face and determines orientation of each position.
- */
-export function deriveOLLOrientations(cube: CubeState): OLLOrientations {
-  const Y = Color.YELLOW
-  const top = cube.top
-
-  const orientations: Orientation[] = []
-
-  for (let i = 0; i < 9; i++) {
-    if (top[i] === Y) {
-      // Yellow is on top - correctly oriented
-      orientations.push(Orientation.TOP)
-    } else {
-      // Find which side face has the yellow sticker
-      const orientation = findYellowOrientation(cube, i)
-      orientations.push(orientation)
-    }
-  }
-
-  return orientations as OLLOrientations
-}
-
-/**
- * Find which side face has the yellow sticker for a given top position.
- */
-function findYellowOrientation(cube: CubeState, topIndex: number): Orientation {
-  const Y = Color.YELLOW
-  const sideMapping = TOP_TO_SIDES[topIndex]
-
-  if (!sideMapping) {
-    // Center position (4) - should always be TOP
-    return Orientation.TOP
-  }
-
-  // Check each adjacent side for the yellow sticker
-  if (sideMapping.back !== undefined && cube.back[sideMapping.back] === Y) {
-    return Orientation.BACK
-  }
-  if (sideMapping.left !== undefined && cube.left[sideMapping.left] === Y) {
-    return Orientation.LEFT
-  }
-  if (sideMapping.right !== undefined && cube.right[sideMapping.right] === Y) {
-    return Orientation.RIGHT
-  }
-  if (sideMapping.front !== undefined && cube.front[sideMapping.front] === Y) {
-    return Orientation.FRONT
-  }
-
-  // Fallback - shouldn't happen in valid cube states
-  return Orientation.TOP
-}
-
-/**
- * Side colors - top row of each side face (for top-down last layer view).
- */
-export interface SideColors {
-  back: SideRowColors
-  left: SideRowColors
-  right: SideRowColors
-  front: SideRowColors
-}
-
-/**
- * Derive side colors from a cube state.
- * Extracts the top row of each side face, adjusted for top-down visual perspective.
- * Back and right are reversed to match how they appear when viewed from above.
- */
-export function deriveSideColors(cube: CubeState): SideColors {
-  return {
-    back: [cube.back[2], cube.back[1], cube.back[0]] as SideRowColors,
-    left: [cube.left[0], cube.left[1], cube.left[2]] as SideRowColors,
-    right: [cube.right[2], cube.right[1], cube.right[0]] as SideRowColors,
-    front: [cube.front[0], cube.front[1], cube.front[2]] as SideRowColors,
-  }
-}
-
-/**
  * Derive full last layer colors from a cube state.
- * Used for visual rendering of OLL/PLL cases.
+ * Extracts top face and top row (indices 0,1,2) of each side face.
+ * Visual orientation is handled by CSS in SideRow component.
  */
 export function deriveLastLayerColors(cube: CubeState): LastLayerColors {
   return {
     top: cube.top as FaceColors,
-    ...deriveSideColors(cube),
+    back: cube.back.slice(0, 3) as SideRowColors,
+    left: cube.left.slice(0, 3) as SideRowColors,
+    right: cube.right.slice(0, 3) as SideRowColors,
+    front: cube.front.slice(0, 3) as SideRowColors,
   }
 }
 
@@ -136,8 +60,6 @@ export function deriveLastLayerColors(cube: CubeState): LastLayerColors {
  */
 export interface DerivedPattern {
   cubeState: CubeState
-  ollOrientations?: OLLOrientations
-  sideColors?: SideColors
   lastLayerColors: LastLayerColors
 }
 
@@ -171,18 +93,9 @@ export function deriveCasePattern(
   const solvedCube = createSolvedCube()
   const problemState = applyMoves(solvedCube, allMoves)
 
-  const pattern: DerivedPattern = {
+  return {
     cubeState: problemState,
     lastLayerColors: deriveLastLayerColors(problemState),
   }
-
-  // Add type-specific pattern data
-  if (caseId.startsWith('oll-')) {
-    pattern.ollOrientations = deriveOLLOrientations(problemState)
-  } else if (caseId.startsWith('pll-')) {
-    pattern.sideColors = deriveSideColors(problemState)
-  }
-
-  return pattern
 }
 

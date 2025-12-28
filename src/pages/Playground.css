@@ -19,13 +19,24 @@
     transition-all shadow-md hover:shadow-lg;
 }
 
-/* View Selector */
-.view-selector-btn {
-  @apply p-1.5 rounded-md transition-all flex flex-col items-center gap-0.5 hover:bg-white/50;
+/* Segmented Button Group (shared pattern) */
+.segmented-group {
+  @apply flex bg-slate-200/80 p-1 rounded-lg;
 }
 
-.view-selector-btn-active {
-  @apply bg-white shadow-sm;
+.segmented-btn {
+  @apply rounded-md transition-all cursor-pointer
+    text-slate-500 hover:bg-white/50 hover:text-slate-700;
+}
+
+.segmented-btn--active {
+  @apply bg-white text-slate-700 shadow-sm
+    hover:bg-white;
+}
+
+/* View Selector (uses segmented pattern) */
+.view-selector-btn {
+  @apply p-1.5;
 }
 
 /* Face Panel Buttons */
@@ -59,4 +70,9 @@
   @apply text-[10px] font-mono px-1.5 py-0.5 rounded
     bg-slate-200 text-slate-500
     transition-colors duration-150;
+}
+
+/* Mask Buttons (uses segmented pattern) */
+.mask-btn {
+  @apply px-2 py-1 text-xs font-medium;
 }

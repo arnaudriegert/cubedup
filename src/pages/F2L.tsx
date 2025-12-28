@@ -1,51 +1,43 @@
 import { AlgoCardRow } from '../components/algorithm'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
-import { Color, FaceColors } from '../types/cube'
 import type { Algorithm } from '../types/algorithm'
-import {
-  solidFace, f2lFace, buildCubeState,
-} from '../utils/cubeHelpers'
-import { getColorRotations } from '../utils/colors'
-import {
-  makeFace,
-  makeLeftFront,
-  makeLeftSide,
-  makeRightFront,
-  makeRightSide,
-} from '../utils/f2lHelpers'
 import { expandAlgorithmObject } from '../utils/algorithmExpander'
-import { movesToNotation } from '../utils/moveParser'
+import {
+  movesToNotation, parseMoves, invertAlgorithmString,
+} from '../utils/moveParser'
 import { getPlaygroundUrlForNotation } from '../utils/algorithmLinks'
+import { createSolvedCube, applyMoves } from '../utils/cubeState'
+import { applyMask } from '../utils/pieceIdentity'
 
-// Color rotations for showing all 4 orientations of a pattern
-// For RIGHT slot view (front+right visible): start with blue-front
-const colorRotationsRight = getColorRotations(Color.BLUE)
-// For LEFT slot view (front+left visible): start with red-front (so blue+red are visible)
-const colorRotationsLeft = getColorRotations(Color.RED)
+// Y rotations for showing all 4 orientations of a pattern
+const Y_ROTATIONS = ['', 'y', 'y2', "y'"]
+
+// Generate cube state for a case: solved -> y rotation -> inverse algorithm -> f2l mask
+function generateCaseState(algorithmNotation: string, yRotation: string) {
+  // Build the full move sequence: y rotation + inverse algorithm
+  const inverseAlgo = invertAlgorithmString(algorithmNotation)
+  const fullNotation = yRotation ? `${yRotation} ${inverseAlgo}` : inverseAlgo
+  const moves = parseMoves(fullNotation)
+
+  // Apply moves to solved cube, then mask
+  const cubeState = applyMoves(createSolvedCube(), moves)
+  return applyMask(cubeState, 'f2l')
+}
 
 // Component for showing a single F2L case with left OR right orientation
-// Uses 2x2 grid for larger cube display
+// Uses 2x2 grid showing all 4 y-rotation variations
 interface F2LCaseCardProps {
   slot: 'left' | 'right'
   algorithm: Algorithm
-  generateFaces: (colors: typeof colorRotationsRight[0]) => {
-    top?: FaceColors
-    front?: FaceColors
-    right?: FaceColors
-    left?: FaceColors
-  }
 }
 
-function F2LCaseCard({
-  slot, algorithm, generateFaces,
-}: F2LCaseCardProps) {
+function F2LCaseCard({ slot, algorithm }: F2LCaseCardProps) {
   const isLeft = slot === 'left'
   const label = isLeft ? 'Left Slot (FL)' : 'Right Slot (FR)'
   const view = isLeft ? 'top-front-left' : 'top-front-right'
-  const colorRotations = isLeft ? colorRotationsLeft : colorRotationsRight
 
-  // Expand algorithm to get notation for playground link
+  // Expand algorithm to get notation
   const expanded = expandAlgorithmObject(algorithm)
   const notation = movesToNotation(expanded.moves)
 
@@ -53,10 +45,10 @@ function F2LCaseCard({
     <div className="case-card">
       <h4 className="case-card-title text-center">{label}</h4>
       <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-4 justify-items-center mb-4 md:mb-6">
-        {colorRotations.map((colors, i) => (
+        {Y_ROTATIONS.map((yRotation, i) => (
           <CubeDisplay key={i}>
             <Cube
-              cubeState={buildCubeState(generateFaces(colors))}
+              cubeState={generateCaseState(notation, yRotation)}
               view={view}
               size="medium"
             />
@@ -94,11 +86,7 @@ export default function F2L() {
           <div className="flex flex-wrap justify-center items-center gap-8">
             <CubeDisplay>
               <Cube
-                cubeState={buildCubeState({
-                  bottom: solidFace(Color.WHITE),
-                  front: f2lFace(Color.BLUE),
-                  right: f2lFace(Color.RED),
-                })}
+                cubeState={applyMask(createSolvedCube(), 'f2l')}
                 view="bottom-front-right"
                 size="normal"
               />
@@ -139,46 +127,13 @@ export default function F2L() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Slot (FL) - pair at front-left area
-                Corner at UFL: WHITE faces FRONT, F-color faces LEFT
-                Edge at UL (top[3], left[1]) - joined with corner
-                For U' L' U L: U' hides pair, L' opens slot, U brings pair over, L closes */}
             <F2LCaseCard
               slot="left"
               algorithm={{ id: 'f2l-1-left', steps: [{ ref: 'left-sexy', inverse: true }] }}
-              generateFaces={(c) => ({
-                // Joined pair: corner at UFL (white front), edge at UL
-                top: makeFace(Color.YELLOW, {
-                  6: c.left,
-                  3: c.left,
-                }),
-                front: makeLeftFront(c, { 0: Color.WHITE }),
-                left: makeLeftSide(c, {
-                  2: c.front,
-                  1: c.front,
-                }),
-              })}
             />
-
-            {/* Right Slot (FR) - pair at front-right area
-                Corner at UFR: WHITE faces FRONT = visible on front[2]
-                Edge at UR (top[5], right[1]) - joined with corner
-                For U R U' R': U hides pair, R opens slot, U' brings pair over, R' closes */}
             <F2LCaseCard
               slot="right"
               algorithm={{ id: 'f2l-1-right', steps: [{ ref: 'sexy', inverse: true }] }}
-              generateFaces={(c) => ({
-                // Joined pair: corner at UFR (white front), edge at UR
-                top: makeFace(Color.YELLOW, {
-                  8: c.right,
-                  5: c.right,
-                }),
-                front: makeRightFront(c, { 2: Color.WHITE }),
-                right: makeRightSide(c, {
-                  0: c.front,
-                  1: c.front,
-                }),
-              })}
             />
           </div>
         </div>
@@ -192,38 +147,13 @@ export default function F2L() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Slot (FL) - L' U' L
-                Corner at UFL: WHITE faces LEFT (visible on left face), L-color on top[6], F-color on front[0]
-                Edge at UB: F-color faces UP (top[1]) */}
             <F2LCaseCard
               slot="left"
               algorithm={{ id: 'f2l-2-left', steps: [{ moves: "L' U' L" }] }}
-              generateFaces={(c) => ({
-                // Split pair: corner at UFL (white left), edge at UB
-                top: makeFace(Color.YELLOW, {
-                  6: c.left,
-                  1: c.front,
-                }),
-                front: makeLeftFront(c, { 0: c.front }),
-                left: makeLeftSide(c, { 2: Color.WHITE }),
-              })}
             />
-
-            {/* Right Slot (FR) - R U R'
-                Corner at UFR: WHITE faces RIGHT (right[0]), R-color on top[8], F-color on front[2]
-                Edge at UB: F-color faces UP (top[1]) */}
             <F2LCaseCard
               slot="right"
               algorithm={{ id: 'f2l-2-right', steps: [{ moves: "R U R'" }] }}
-              generateFaces={(c) => ({
-                // Split pair: corner at UFR (white right), edge at UB
-                top: makeFace(Color.YELLOW, {
-                  8: c.right,
-                  1: c.front,
-                }),
-                front: makeRightFront(c, { 2: c.front }),
-                right: makeRightSide(c, { 0: Color.WHITE }),
-              })}
             />
           </div>
         </div>

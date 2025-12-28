@@ -20,6 +20,7 @@ import { Color } from '../types/cube'
 import { lookupCase, lookupAlgorithm } from '../utils/caseLookup'
 import { parsePlaygroundUrl } from '../utils/algorithmLinks'
 import { getAlgorithmNotation } from '../utils/algorithmExpander'
+import { applyMask, type CFOPStep } from '../utils/pieceIdentity'
 import './Playground.css'
 
 // Color to Tailwind classes - used for dynamic button colors
@@ -263,6 +264,9 @@ export default function Playground() {
 
   // Modifier mode for move transformations (mutually exclusive)
   const [moveMode, setMoveMode] = useState<MoveMode>('normal')
+
+  // CFOP step focus for piece masking
+  const [focusStep, setFocusStep] = useState<CFOPStep>(null)
 
   // Toggle a mode - if already active, go back to normal
   const toggleMode = useCallback((mode: MoveMode) => {
@@ -661,7 +665,7 @@ export default function Playground() {
                     {/* The Cube */}
                     <CubeDisplay size="large">
                       <Cube
-                        cubeState={cubeState}
+                        cubeState={applyMask(cubeState, focusStep)}
                         currentMove={currentMove}
                         isAnimating={isAnimating}
                         animationSpeed={animationSpeed}
@@ -696,48 +700,81 @@ export default function Playground() {
 
                 {/* Controls Bar */}
                 <div className="flex items-center gap-4 md:gap-6 flex-wrap justify-center bg-slate-50/80 rounded-xl px-4 py-3 border border-slate-200 mt-4">
+                  {/* CFOP mask toggles */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500 font-medium">Show</span>
+                    <div className="segmented-group">
+                      <button
+                        onClick={() => setFocusStep(null)}
+                        className={`segmented-btn mask-btn ${focusStep === null ? 'segmented-btn--active' : ''}`}
+                        title="Show all stickers"
+                        aria-pressed={focusStep === null}
+                      >
+                        All
+                      </button>
+                      {([
+                        { step: 'cross', label: 'C', title: 'Cross' },
+                        { step: 'f2l', label: 'F', title: 'F2L' },
+                        { step: 'oll', label: 'O', title: 'OLL' },
+                        { step: 'pll', label: 'P', title: 'PLL' },
+                      ] as const).map(({ step, label, title }) => {
+                        const isActive = focusStep === step
+                        return (
+                          <button
+                            key={step}
+                            onClick={() => setFocusStep(step)}
+                            className={`segmented-btn mask-btn ${isActive ? 'segmented-btn--active' : ''}`}
+                            title={title}
+                            aria-pressed={isActive}
+                          >
+                            {label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="h-6 w-px bg-slate-300" />
+
                   {/* View Selector with micro cube icons */}
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-slate-500 font-medium">View</span>
-                    <div className="flex gap-1 bg-slate-200/80 p-1 rounded-lg">
+                    <div className="segmented-group">
                       {/* TFR - Top Front Right */}
                       <button
                         onClick={() => setView('top-front-right')}
                         title="Top, Front, Right"
-                        className={`view-selector-btn ${view === 'top-front-right' ? 'view-selector-btn-active' : ''}`}
+                        className={`segmented-btn view-selector-btn ${view === 'top-front-right' ? 'segmented-btn--active' : ''}`}
                       >
                         <svg width="20" height="18" viewBox="0 0 20 18">
                           <polygon points="9,2 16,5 10,8 3,5" className="fill-slate-300" />
                           <polygon points="3,5 10,8 10,16 3,13" className="fill-slate-500" />
                           <polygon points="10,8 16,5 16,13 10,16" className="fill-slate-400" />
                         </svg>
-                        <span className="text-[9px] text-slate-500 font-medium">TFR</span>
                       </button>
                       {/* TFL - Top Front Left */}
                       <button
                         onClick={() => setView('top-front-left')}
                         title="Top, Front, Left"
-                        className={`view-selector-btn ${view === 'top-front-left' ? 'view-selector-btn-active' : ''}`}
+                        className={`segmented-btn view-selector-btn ${view === 'top-front-left' ? 'segmented-btn--active' : ''}`}
                       >
                         <svg width="20" height="18" viewBox="0 0 20 18">
                           <polygon points="10,2 3,5 9,8 16,5" className="fill-slate-300" />
                           <polygon points="9,8 3,5 3,13 9,16" className="fill-slate-400" />
                           <polygon points="16,5 9,8 9,16 16,13" className="fill-slate-500" />
                         </svg>
-                        <span className="text-[9px] text-slate-500 font-medium">TFL</span>
                       </button>
                       {/* BFR - Bottom Front Right */}
                       <button
                         onClick={() => setView('bottom-front-right')}
                         title="Bottom, Front, Right"
-                        className={`view-selector-btn ${view === 'bottom-front-right' ? 'view-selector-btn-active' : ''}`}
+                        className={`segmented-btn view-selector-btn ${view === 'bottom-front-right' ? 'segmented-btn--active' : ''}`}
                       >
                         <svg width="20" height="18" viewBox="0 0 20 18">
                           <polygon points="3,13 10,10 10,2 3,5" className="fill-slate-500" />
                           <polygon points="10,10 16,13 16,5 10,2" className="fill-slate-400" />
                           <polygon points="9,16 16,13 10,10 3,13" className="fill-slate-300" />
                         </svg>
-                        <span className="text-[9px] text-slate-500 font-medium">BFR</span>
                       </button>
                     </div>
                   </div>
