@@ -343,7 +343,7 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 37,
     inverseOf: 'oll-33',
-    algorithms: ['oll-37'],
+    algorithms: ['oll-37-1', 'oll-37-2'],
   }],
 
   // ==========================================================================

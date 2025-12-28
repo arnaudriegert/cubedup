@@ -599,8 +599,8 @@ export default function Playground() {
             <span className="text-xs text-slate-500 font-medium uppercase tracking-wide">Append:</span>
             <button onClick={() => handleAppendMoves("RUR'U'")} className="playground-trigger-btn">Sexy</button>
             <button onClick={() => handleAppendMoves("R'FRF'")} className="playground-trigger-btn">Sledge</button>
+            <button onClick={() => handleAppendMoves("R'U'RU'R'U2R")} className="playground-trigger-btn">Chair</button>
             <button onClick={() => handleAppendMoves("RUR'URU2R'")} className="playground-trigger-btn">Sune</button>
-            <button onClick={() => handleAppendMoves("R'U'RU'R'U2R")} className="playground-trigger-btn">Anti-Sune</button>
           </div>
         </div>
 

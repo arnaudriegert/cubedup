@@ -162,6 +162,46 @@ export default function Triggers() {
             </section>
           )
         })}
+
+        {/* 2-Look PLL */}
+        <section className="case-group">
+          <h2 className="section-title">2-Look PLL</h2>
+          <p className="section-description">
+            In 2-look PLL, you first permute corners, then edges. For corners, check for
+            "headlights" (two matching colors on one side). Headlights present? Use T-perm.
+            No headlights? Use Y-perm. Either way, you'll end up with an edges-only case.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="case-card">
+              <div className="mb-3">
+                <TriggerBadge name="half-y" />
+              </div>
+              <p className="help-text mb-4">
+                The core of 2-look PLL corner permutation. Add sexy+sledge before or after
+                to form T-perm or Y-perm.
+              </p>
+              <AlgoCardRow
+                notation="F R U' R' U' R U R' F'"
+                playgroundUrl={getPlaygroundUrlForNotation("F R U' R' U' R U R' F'")}
+              />
+            </div>
+            <div className="case-card">
+              <div className="mb-3 flex gap-1">
+                <TriggerBadge name="sexy" />
+                <TriggerBadge name="sledge" />
+              </div>
+              <p className="help-text mb-4">
+                Combine with half-y to solve T/Y-perm or land on an edges-only case.
+                Also appears in many OLL and PLL cases.
+              </p>
+              <AlgoCardRow
+                notation="R U R' U' R' F R F'"
+                playgroundUrl={getPlaygroundUrlForNotation("R U R' U' R' F R F'")}
+              />
+            </div>
+          </div>
+        </section>
       </main>
     </>
   )

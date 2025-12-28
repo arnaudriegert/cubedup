@@ -151,6 +151,15 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   }],
 
   // ==========================================================================
+  // PLL TRIGGERS
+  // ==========================================================================
+  ['half-y', {
+    id: 'half-y',
+    steps: [{ moves: "F R U' R' U' R U R' F'" }],
+    tags: ['trigger', 'pll'],
+  }],
+
+  // ==========================================================================
   // OLL - SOLVED CROSS (21-27)
   // ==========================================================================
   ['oll-21', {
@@ -249,7 +258,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
       { ref: 'sexy' },
       { ref: 'sledge' },
     ],
-    inverse: 'oll-37',
+    inverse: 'oll-37-1',
     tags: ['oll', 't-shapes'],
   }],
   ['oll-45', {
@@ -266,13 +275,20 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   // ==========================================================================
   // OLL - FISH (37)
   // ==========================================================================
-  ['oll-37', {
-    id: 'oll-37',
+  ['oll-37-1', {
+    id: 'oll-37-1',
     steps: [
       { ref: 'sledge', inverse: true },
       { ref: 'sexy', inverse: true },
     ],
     inverse: 'oll-33',
+    tags: ['oll', 'fish'],
+  }],
+  ['oll-37-2', {
+    id: 'oll-37-2',
+    steps: [
+      { ref: 'half-y' },
+    ],
     tags: ['oll', 'fish'],
   }],
 
@@ -766,7 +782,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   ['oll-52', {
     id: 'oll-52',
     steps: [
-      { moves: "R U R' U" },
+      { ref: 'half-sune' },
       { moves: "R d'" },
       { moves: "R U' R' F'" },
     ],
@@ -875,9 +891,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     steps: [
       { ref: 'sexy' },
       { ref: 'sledge' },
-      { moves: 'F' },
-      { moves: "R U' R' U' R U R'" },
-      { moves: "F'" },
+      { ref: 'half-y' },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
@@ -941,9 +955,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   ['pll-y', {
     id: 'pll-y',
     steps: [
-      { moves: 'F' },
-      { moves: "R U' R' U' R U R'" },
-      { moves: "F'" },
+      { ref: 'half-y' },
       { ref: 'sexy' },
       { ref: 'sledge' },
     ],
