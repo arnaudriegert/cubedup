@@ -1,6 +1,8 @@
 import CaseGrid from './CaseGrid'
-import { AlgoCardRow } from './algorithm'
-import { getAlgorithmsForCase, getPLLSwaps } from '../data/cases'
+import { AlgoCardRow, TwoLookComparison } from './algorithm'
+import {
+  getAlgorithmsForCase, getPLLSwaps, getCase,
+} from '../data/cases'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { CORNER_COLOR, EDGE_COLOR } from './PLLArrowOverlay'
 import type { CFOPStep } from '../utils/pieceIdentity'
@@ -33,6 +35,9 @@ export default function CaseCard({
   const isOLL = id.startsWith('oll-')
   const algorithms = getAlgorithmsForCase(id)
   const swaps = !description ? getPLLSwaps(id) : undefined
+
+  // Check if this case has 2-look data
+  const hasTwoLook = isOLL && !!getCase(id)?.twoLookPath
 
   const title = titleOverride ?? (isOLL ? `OLL ${number} - ${name}` : name)
   const effectiveMask = mask ?? (isOLL ? 'oll' : 'pll')
@@ -69,6 +74,8 @@ export default function CaseCard({
             />
           ))}
         </div>
+
+        {hasTwoLook && <TwoLookComparison caseId={id} />}
       </div>
     </div>
   )

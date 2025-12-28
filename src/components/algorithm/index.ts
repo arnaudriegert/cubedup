@@ -8,3 +8,5 @@ export type { AlgorithmBreadcrumbProps } from './AlgorithmBreadcrumb'
 
 export { default as AlgoCardRow } from './AlgoCardRow'
 export type { AlgoCardRowProps } from './AlgoCardRow'
+
+export { default as TwoLookComparison } from './TwoLookComparison'

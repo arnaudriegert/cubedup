@@ -93,6 +93,12 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 49,
     algorithms: ['oll-49'],
+    twoLookPath: [
+      { moves: "y'" },
+      { ref: 'oll-44' },
+      { moves: "U'" },
+      { ref: 'oll-26' },
+    ],
   }],
   ['oll-50', {
     id: 'oll-50',
@@ -100,6 +106,11 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 50,
     algorithms: ['oll-50'],
+    twoLookPath: [
+      { ref: 'oll-44' },
+      { moves: 'U2' },
+      { ref: 'oll-23' },
+    ],
   }],
   ['oll-53', {
     id: 'oll-53',
@@ -107,6 +118,10 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 53,
     algorithms: ['oll-53'],
+    twoLookPath: [
+      { ref: 'oll-44' },
+      { ref: 'oll-24' },
+    ],
   }],
   ['oll-54', {
     id: 'oll-54',
@@ -114,6 +129,11 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 54,
     algorithms: ['oll-54'],
+    twoLookPath: [
+      { moves: "y'" },
+      { ref: 'oll-44' },
+      { ref: 'oll-22' },
+    ],
   }],
 
   // ==========================================================================
@@ -125,6 +145,12 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 31,
     algorithms: ['oll-31'],
+    twoLookPath: [
+      { moves: "y'" },
+      { ref: 'oll-44' },
+      { moves: 'U' },
+      { ref: 'oll-25' },
+    ],
   }],
   ['oll-32', {
     id: 'oll-32',
@@ -132,6 +158,11 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 32,
     algorithms: ['oll-32'],
+    twoLookPath: [
+      { ref: 'oll-44' },
+      { moves: 'U2' },
+      { ref: 'oll-24' },
+    ],
   }],
   ['oll-43', {
     id: 'oll-43',
@@ -234,6 +265,10 @@ export const cases = new Map<CaseId, Case>([
     number: 51,
     inverseOf: 'oll-48',
     algorithms: ['oll-51'],
+    twoLookPath: [
+      { ref: 'oll-45' },
+      { ref: 'oll-21' },
+    ],
   }],
   ['oll-52', {
     id: 'oll-52',
@@ -241,6 +276,12 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 52,
     algorithms: ['oll-52'],
+    twoLookPath: [
+      { moves: "y'" },
+      { ref: 'oll-45' },
+      { moves: "U'" },
+      { ref: 'oll-26' },
+    ],
   }],
   ['oll-55', {
     id: 'oll-55',
@@ -248,6 +289,10 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 55,
     algorithms: ['oll-55'],
+    twoLookPath: [
+      { ref: 'oll-45' },
+      { ref: 'oll-22' },
+    ],
   }],
   ['oll-56', {
     id: 'oll-56',
@@ -255,6 +300,10 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 56,
     algorithms: ['oll-56'],
+    twoLookPath: [
+      { ref: 'oll-45' },
+      { ref: 'oll-24' },
+    ],
   }],
 
   // ==========================================================================
@@ -267,6 +316,12 @@ export const cases = new Map<CaseId, Case>([
     number: 5,
     inverseOf: 'oll-8',
     algorithms: ['oll-5'],
+    twoLookPath: [
+      { moves: 'y2' },
+      { ref: 'oll-44' },
+      { moves: 'U' },
+      { ref: 'oll-23' },
+    ],
   }],
   ['oll-6', {
     id: 'oll-6',
@@ -275,6 +330,12 @@ export const cases = new Map<CaseId, Case>([
     number: 6,
     inverseOf: 'oll-7',
     algorithms: ['oll-6'],
+    twoLookPath: [
+      { moves: 'y' },
+      { ref: 'oll-44' },
+      { moves: "U'" },
+      { ref: 'oll-25' },
+    ],
   }],
 
   // ==========================================================================
@@ -287,6 +348,12 @@ export const cases = new Map<CaseId, Case>([
     number: 7,
     inverseOf: 'oll-6',
     algorithms: ['oll-7'],
+    twoLookPath: [
+      { moves: 'y2' },
+      { ref: 'oll-44' },
+      { moves: 'U2' },
+      { ref: 'oll-25' },
+    ],
   }],
   ['oll-8', {
     id: 'oll-8',
@@ -295,6 +362,11 @@ export const cases = new Map<CaseId, Case>([
     number: 8,
     inverseOf: 'oll-5',
     algorithms: ['oll-8'],
+    twoLookPath: [
+      { moves: 'y' },
+      { ref: 'oll-44' },
+      { ref: 'oll-26' },
+    ],
   }],
   ['oll-11', {
     id: 'oll-11',
@@ -302,6 +374,11 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 11,
     algorithms: ['oll-11'],
+    twoLookPath: [
+      { ref: 'oll-44' },
+      { moves: "U'" },
+      { ref: 'oll-22' },
+    ],
   }],
   ['oll-12', {
     id: 'oll-12',
@@ -309,6 +386,12 @@ export const cases = new Map<CaseId, Case>([
     category: 'oll',
     number: 12,
     algorithms: ['oll-12'],
+    twoLookPath: [
+      { moves: "y'" },
+      { ref: 'oll-44' },
+      { moves: "U'" },
+      { ref: 'oll-23' },
+    ],
   }],
 
   // ==========================================================================

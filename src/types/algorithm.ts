@@ -39,6 +39,7 @@ export interface Case {
   number?: number // OLL: 1-57
   inverseOf?: CaseId
   algorithms?: AlgorithmId[] // Algorithms that solve this case
+  twoLookPath?: AlgorithmStep[] // 2-look OLL steps (refs to edge/corner cases + AUFs)
 }
 
 // Case entry: single case or pair (for mirror/inverse relationships displayed side-by-side)
