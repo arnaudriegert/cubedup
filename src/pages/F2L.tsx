@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react'
 import { AlgoCardRow } from '../components/algorithm'
 import { Cube, CubeDisplay } from '../components/cube'
 import SEOHead from '../components/SEOHead'
@@ -6,27 +7,27 @@ import { expandAlgorithmObject } from '../utils/algorithmExpander'
 import {
   movesToNotation, parseMoves, invertAlgorithmString,
 } from '../utils/moveParser'
-import { getPlaygroundUrlForNotation } from '../utils/algorithmLinks'
 import { createSolvedCube, applyMoves } from '../utils/cubeState'
 import { applyMask } from '../utils/pieceIdentity'
+import { useAnimatedCubeGrid } from '../hooks/useAnimatedCubeGrid'
+import type { CubeState } from '../types/cubeState'
 
 // Y rotations for showing all 4 orientations of a pattern
-const Y_ROTATIONS = ['', 'y', 'y2', "y'"]
+const Y_ROTATIONS = ['', 'y', 'y2', "y'"] as const
 
-// Generate cube state for a case: solved -> y rotation -> inverse algorithm -> f2l mask
-function generateCaseState(algorithmNotation: string, yRotation: string) {
-  // Build the full move sequence: y rotation + inverse algorithm
-  const inverseAlgo = invertAlgorithmString(algorithmNotation)
+// Generate setup moves for a y-rotation variant (y rotation + inverse algorithm)
+function getSetupMoves(notation: string, yRotation: string) {
+  const inverseAlgo = invertAlgorithmString(notation)
   const fullNotation = yRotation ? `${yRotation} ${inverseAlgo}` : inverseAlgo
-  const moves = parseMoves(fullNotation)
+  return parseMoves(fullNotation)
+}
 
-  // Apply moves to solved cube, then mask
-  const cubeState = applyMoves(createSolvedCube(), moves)
-  return applyMask(cubeState, 'f2l')
+// Generate initial cube state from setup moves
+function generateInitialState(notation: string, yRotation: string): CubeState {
+  return applyMoves(createSolvedCube(), getSetupMoves(notation, yRotation))
 }
 
 // Component for showing a single F2L case with left OR right orientation
-// Uses 2x2 grid showing all 4 y-rotation variations
 interface F2LCaseCardProps {
   slot: 'left' | 'right'
   algorithm: Algorithm
@@ -41,14 +42,44 @@ function F2LCaseCard({ slot, algorithm }: F2LCaseCardProps) {
   const expanded = expandAlgorithmObject(algorithm)
   const notation = movesToNotation(expanded.moves)
 
+  // Memoize initial states and setup moves
+  const initialStates = useMemo(
+    () => Y_ROTATIONS.map(y => generateInitialState(notation, y)) as [CubeState, CubeState, CubeState, CubeState],
+    [notation],
+  )
+  const setupMoves = useMemo(
+    () => Y_ROTATIONS.map(y => getSetupMoves(notation, y)),
+    [notation],
+  )
+
+  // Use grid hook for synchronized animation
+  const { cubes, isAnimating, isFinished, play, reset } = useAnimatedCubeGrid({
+    initialStates,
+    animationSpeed: 300,
+  })
+
+  // Handle demo click
+  const handleDemo = useCallback(() => {
+    if (isAnimating) return
+    if (isFinished) {
+      reset(setupMoves)
+    } else {
+      play(parseMoves(notation), setupMoves)
+    }
+  }, [isAnimating, isFinished, notation, setupMoves, play, reset])
+
   return (
     <div className="case-card">
       <h4 className="case-card-title text-center">{label}</h4>
       <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-4 justify-items-center mb-4 md:mb-6">
-        {Y_ROTATIONS.map((yRotation, i) => (
+        {cubes.map((cube, i) => (
           <CubeDisplay key={i}>
             <Cube
-              cubeState={generateCaseState(notation, yRotation)}
+              cubeState={applyMask(cube.cubeState, 'f2l')}
+              currentMove={cube.currentMove}
+              isAnimating={cube.isAnimating}
+              animationSpeed={cube.animationSpeed}
+              onAnimationEnd={cube.handleAnimationEnd}
               view={view}
               size="medium"
             />
@@ -57,7 +88,9 @@ function F2LCaseCard({ slot, algorithm }: F2LCaseCardProps) {
       </div>
       <AlgoCardRow
         algorithm={algorithm}
-        playgroundUrl={getPlaygroundUrlForNotation(notation)}
+        onDemo={handleDemo}
+        isPlaying={isAnimating}
+        isFinished={isFinished}
       />
     </div>
   )
