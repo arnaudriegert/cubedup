@@ -3,7 +3,8 @@
 .color-remote {
   @apply fixed z-30 flex bg-white/60 backdrop-blur-md rounded-full shadow-lg border border-slate-200/50
     bottom-4 left-1/2 -translate-x-1/2 flex-row gap-3 px-3 py-2.5
-    md:bottom-auto md:left-auto md:translate-x-0 md:right-4 md:top-1/2 md:-translate-y-1/2 md:flex-col md:gap-4 md:px-3 md:py-4;
+    md:left-auto md:translate-x-0 md:right-4
+    xl:bottom-auto xl:top-24 xl:flex-col xl:gap-4 xl:py-4;
 }
 
 .color-remote-btn {

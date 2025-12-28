@@ -21,7 +21,7 @@ export function CaseGroup4Rotations({
     <div className="case-group">
       <h3 className="card-title-centered mb-2">{title}</h3>
       <p className="help-text mb-6 text-center">{description}</p>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CaseCard4Rotations isLeft algorithm={left} mask={mask} />
         <CaseCard4Rotations algorithm={right} mask={mask} />
       </div>

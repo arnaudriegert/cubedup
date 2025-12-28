@@ -10,6 +10,7 @@ import {
 import { createSolvedCube, applyMoves } from '../utils/cubeState'
 import { applyMask } from '../utils/pieceIdentity'
 import { useAnimatedCubeGrid } from '../hooks/useAnimatedCubeGrid'
+import { useMediaQuery } from '../hooks'
 import type { CubeState, CubeView } from '../types/cubeState'
 
 // Y rotations for showing all 4 orientations of a pattern
@@ -40,6 +41,12 @@ export function CaseCard4Rotations({
 }: CaseCard4RotationsProps) {
   const label = isLeft ? 'Left Side' : 'Right Side'
   const view: CubeView = isLeft ? 'top-front-left' : 'top-front-right'
+  const isMdScreen = useMediaQuery('md')
+  const isLgScreen = useMediaQuery('lg')
+  const isXlScreen = useMediaQuery('xl')
+  // compact → medium → compact → medium as viewport grows
+  // md (768): medium single column, lg (1024): compact side-by-side, xl (1280): medium side-by-side
+  const cubeSize = (isMdScreen && !isLgScreen) || isXlScreen ? 'medium' : 'compact'
 
   // Expand algorithm to get notation
   const expanded = expandAlgorithmObject(algorithm)
@@ -74,7 +81,7 @@ export function CaseCard4Rotations({
   return (
     <div className="case-card">
       <h4 className="case-card-title text-center">{label}</h4>
-      <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-4 justify-items-center mb-4 md:mb-6">
+      <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:gap-6 justify-items-center mb-4 md:mb-6">
         {cubes.map((cube, i) => (
           <CubeDisplay key={i}>
             <Cube
@@ -84,7 +91,7 @@ export function CaseCard4Rotations({
               animationSpeed={cube.animationSpeed}
               onAnimationEnd={cube.handleAnimationEnd}
               view={view}
-              size="medium"
+              size={cubeSize}
             />
           </CubeDisplay>
         ))}
