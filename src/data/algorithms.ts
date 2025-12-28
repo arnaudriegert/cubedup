@@ -1040,57 +1040,6 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     tags: ['pll', 'g-perms'],
   }],
 
-  // ==========================================================================
-  // CROSS - EDGE INSERTIONS
-  // ==========================================================================
-  ['cross-top-right', {
-    id: 'cross-top-right',
-    steps: [{ moves: "R' F R" }],
-    mirror: 'cross-top-left',
-    tags: ['cross'],
-  }],
-  ['cross-top-left', {
-    id: 'cross-top-left',
-    steps: [{ moves: "L F' L'" }],
-    mirror: 'cross-top-right',
-    tags: ['cross'],
-  }],
-  ['cross-middle-right', {
-    id: 'cross-middle-right',
-    steps: [{ moves: "R' D' R" }],
-    mirror: 'cross-middle-left',
-    tags: ['cross'],
-  }],
-  ['cross-middle-left', {
-    id: 'cross-middle-left',
-    steps: [{ moves: "L D L'" }],
-    mirror: 'cross-middle-right',
-    tags: ['cross'],
-  }],
-  ['cross-two-edges-right', {
-    id: 'cross-two-edges-right',
-    steps: [{ moves: "R' F" }],
-    mirror: 'cross-two-edges-left',
-    tags: ['cross'],
-  }],
-  ['cross-two-edges-left', {
-    id: 'cross-two-edges-left',
-    steps: [{ moves: "L F'" }],
-    mirror: 'cross-two-edges-right',
-    tags: ['cross'],
-  }],
-  ['cross-flipped-right', {
-    id: 'cross-flipped-right',
-    steps: [{ moves: "F' D R' D'" }],
-    mirror: 'cross-flipped-left',
-    tags: ['cross'],
-  }],
-  ['cross-flipped-left', {
-    id: 'cross-flipped-left',
-    steps: [{ moves: "F D' L D" }],
-    mirror: 'cross-flipped-right',
-    tags: ['cross'],
-  }],
 ])
 
 // ==========================================================================

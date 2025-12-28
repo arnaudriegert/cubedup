@@ -1,100 +1,8 @@
-import { useCallback, useMemo } from 'react'
-import { AlgoCardRow } from '../components/algorithm'
 import { Cube, CubeDisplay } from '../components/cube'
+import { CaseCard4Rotations } from '../components/CaseCard.4Rotations'
 import SEOHead from '../components/SEOHead'
-import type { Algorithm } from '../types/algorithm'
-import { expandAlgorithmObject } from '../utils/algorithmExpander'
-import {
-  movesToNotation, parseMoves, invertAlgorithmString,
-} from '../utils/moveParser'
-import { createSolvedCube, applyMoves } from '../utils/cubeState'
+import { createSolvedCube } from '../utils/cubeState'
 import { applyMask } from '../utils/pieceIdentity'
-import { useAnimatedCubeGrid } from '../hooks/useAnimatedCubeGrid'
-import type { CubeState } from '../types/cubeState'
-
-// Y rotations for showing all 4 orientations of a pattern
-const Y_ROTATIONS = ['', 'y', 'y2', "y'"] as const
-
-// Generate setup moves for a y-rotation variant (y rotation + inverse algorithm)
-function getSetupMoves(notation: string, yRotation: string) {
-  const inverseAlgo = invertAlgorithmString(notation)
-  const fullNotation = yRotation ? `${yRotation} ${inverseAlgo}` : inverseAlgo
-  return parseMoves(fullNotation)
-}
-
-// Generate initial cube state from setup moves
-function generateInitialState(notation: string, yRotation: string): CubeState {
-  return applyMoves(createSolvedCube(), getSetupMoves(notation, yRotation))
-}
-
-// Component for showing a single F2L case with left OR right orientation
-interface F2LCaseCardProps {
-  slot: 'left' | 'right'
-  algorithm: Algorithm
-}
-
-function F2LCaseCard({ slot, algorithm }: F2LCaseCardProps) {
-  const isLeft = slot === 'left'
-  const label = isLeft ? 'Left Slot (FL)' : 'Right Slot (FR)'
-  const view = isLeft ? 'top-front-left' : 'top-front-right'
-
-  // Expand algorithm to get notation
-  const expanded = expandAlgorithmObject(algorithm)
-  const notation = movesToNotation(expanded.moves)
-
-  // Memoize initial states and setup moves
-  const initialStates = useMemo(
-    () => Y_ROTATIONS.map(y => generateInitialState(notation, y)) as [CubeState, CubeState, CubeState, CubeState],
-    [notation],
-  )
-  const setupMoves = useMemo(
-    () => Y_ROTATIONS.map(y => getSetupMoves(notation, y)),
-    [notation],
-  )
-
-  // Use grid hook for synchronized animation
-  const { cubes, isAnimating, isFinished, play, reset } = useAnimatedCubeGrid({
-    initialStates,
-    animationSpeed: 300,
-  })
-
-  // Handle demo click
-  const handleDemo = useCallback(() => {
-    if (isAnimating) return
-    if (isFinished) {
-      reset(setupMoves)
-    } else {
-      play(parseMoves(notation), setupMoves)
-    }
-  }, [isAnimating, isFinished, notation, setupMoves, play, reset])
-
-  return (
-    <div className="case-card">
-      <h4 className="case-card-title text-center">{label}</h4>
-      <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 md:gap-4 justify-items-center mb-4 md:mb-6">
-        {cubes.map((cube, i) => (
-          <CubeDisplay key={i}>
-            <Cube
-              cubeState={applyMask(cube.cubeState, 'f2l')}
-              currentMove={cube.currentMove}
-              isAnimating={cube.isAnimating}
-              animationSpeed={cube.animationSpeed}
-              onAnimationEnd={cube.handleAnimationEnd}
-              view={view}
-              size="medium"
-            />
-          </CubeDisplay>
-        ))}
-      </div>
-      <AlgoCardRow
-        algorithm={algorithm}
-        onDemo={handleDemo}
-        isPlaying={isAnimating}
-        isFinished={isFinished}
-      />
-    </div>
-  )
-}
 
 export default function F2L() {
   return (
@@ -160,13 +68,14 @@ export default function F2L() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <F2LCaseCard
-              slot="left"
+            <CaseCard4Rotations
+              isLeft
               algorithm={{ id: 'f2l-1-left', steps: [{ ref: 'left-sexy', inverse: true }] }}
+              mask="f2l"
             />
-            <F2LCaseCard
-              slot="right"
+            <CaseCard4Rotations
               algorithm={{ id: 'f2l-1-right', steps: [{ ref: 'sexy', inverse: true }] }}
+              mask="f2l"
             />
           </div>
         </div>
@@ -180,13 +89,14 @@ export default function F2L() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <F2LCaseCard
-              slot="left"
+            <CaseCard4Rotations
+              isLeft
               algorithm={{ id: 'f2l-2-left', steps: [{ moves: "L' U' L" }] }}
+              mask="f2l"
             />
-            <F2LCaseCard
-              slot="right"
+            <CaseCard4Rotations
               algorithm={{ id: 'f2l-2-right', steps: [{ moves: "R U R'" }] }}
+              mask="f2l"
             />
           </div>
         </div>
