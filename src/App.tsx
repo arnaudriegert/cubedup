@@ -9,6 +9,7 @@ import Footer from './components/Footer'
 const Home = lazy(() => import('./pages/Home'))
 const Cross = lazy(() => import('./pages/Cross'))
 const F2L = lazy(() => import('./pages/F2L'))
+const TwoLookOLL = lazy(() => import('./pages/TwoLookOLL'))
 const OLL = lazy(() => import('./pages/OLL'))
 const OLLOverview = lazy(() => import('./pages/OLLOverview'))
 const OLLDetailed = lazy(() => import('./pages/OLLDetailed'))
@@ -46,10 +47,14 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/cross" element={<Cross />} />
               <Route path="/f2l" element={<F2L />} />
-              <Route path="/oll" element={<OLL />}>
-                <Route index element={<Navigate to="detailed" replace />} />
-                <Route path="detailed" element={<OLLDetailed />} />
-                <Route path="overview" element={<OLLOverview />} />
+              <Route path="/oll">
+                <Route index element={<Navigate to="full/detailed" replace />} />
+                <Route path="2-look" element={<TwoLookOLL />} />
+                <Route path="full" element={<OLL />}>
+                  <Route index element={<Navigate to="detailed" replace />} />
+                  <Route path="detailed" element={<OLLDetailed />} />
+                  <Route path="overview" element={<OLLOverview />} />
+                </Route>
               </Route>
               <Route path="/pll" element={<PLL />}>
                 <Route index element={<Navigate to="detailed" replace />} />

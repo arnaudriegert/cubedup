@@ -101,7 +101,7 @@ const CompactCard = memo(function CompactCard({
                 {caseData.name}
               </h3>
               <div className="mb-6">
-                <CaseGrid caseId={caseData.id} selectedRotation={selectedRotation} size="medium" />
+                <CaseGrid caseId={caseData.id} mask="pll" selectedRotation={selectedRotation} size="medium" />
               </div>
               <div className="w-full space-y-3" onClick={(e) => e.stopPropagation()}>
                 {algorithms.map((algorithm, i) => (
@@ -117,7 +117,7 @@ const CompactCard = memo(function CompactCard({
         })()
       ) : (
         <div className="flex flex-col items-center">
-          <CaseGrid caseId={caseData.id} size="compact" selectedRotation={selectedRotation} />
+          <CaseGrid caseId={caseData.id} mask="pll" size="compact" selectedRotation={selectedRotation} />
           <span className="mt-1 text-xs font-medium text-gray-600">
             {caseData.name}
           </span>

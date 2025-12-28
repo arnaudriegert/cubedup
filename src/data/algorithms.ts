@@ -318,18 +318,18 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   ['oll-43', {
     id: 'oll-43',
     steps: [
-      { moves: "F'" },
-      { ref: 'left-sexy', inverse: true },
-      { moves: 'F' },
+      { moves: "f'" },
+      { ref: 'left-sexy' },
+      { moves: 'f' },
     ],
     tags: ['oll', 'p-shapes'],
   }],
   ['oll-44', {
     id: 'oll-44',
     steps: [
-      { moves: 'F' },
-      { ref: 'sexy', inverse: true },
-      { moves: "F'" },
+      { moves: 'f' },
+      { ref: 'sexy' },
+      { moves: "f'" },
     ],
     inverse: 'oll-45',
     tags: ['oll', 'p-shapes'],
@@ -487,6 +487,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     'oll-17-2', {
       id: 'oll-17-2',
       steps: [
+        { moves: 'y2' },
         { ref: 'half-sune' },
         { ref: 'sledge' },
         { moves: 'U2' },

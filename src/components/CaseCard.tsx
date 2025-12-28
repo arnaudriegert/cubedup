@@ -3,28 +3,39 @@ import { AlgoCardRow } from './algorithm'
 import { getAlgorithmsForCase, getPLLSwaps } from '../data/cases'
 import { getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { CORNER_COLOR, EDGE_COLOR } from './PLLArrowOverlay'
+import type { CFOPStep } from '../utils/pieceIdentity'
 import type { Case, PLLSwapInfo } from '../types/algorithm'
 import type { YRotation } from './ColorRemote'
 
 export interface CaseCardProps {
   caseData: Case
-  isHighlighted: boolean
+  isHighlighted?: boolean
   selectedRotation?: YRotation
   onInverseClick?: (num: number) => void
+  // Overrides for custom display
+  mask?: CFOPStep
+  title?: string
+  description?: string
+  hideInverse?: boolean
 }
 
 export default function CaseCard({
   caseData,
-  isHighlighted,
+  isHighlighted = false,
   selectedRotation = '',
   onInverseClick,
+  mask,
+  title: titleOverride,
+  description,
+  hideInverse,
 }: CaseCardProps) {
   const { id, name, number } = caseData
   const isOLL = id.startsWith('oll-')
   const algorithms = getAlgorithmsForCase(id)
-  const swaps = getPLLSwaps(id)
+  const swaps = !description ? getPLLSwaps(id) : undefined
 
-  const title = isOLL ? `OLL ${number} - ${name}` : name
+  const title = titleOverride ?? (isOLL ? `OLL ${number} - ${name}` : name)
+  const effectiveMask = mask ?? (isOLL ? 'oll' : 'pll')
 
   return (
     <div className={`case-card transition-all duration-300 relative ${isHighlighted ? 'case-card-highlight' : ''}`}>
@@ -34,12 +45,17 @@ export default function CaseCard({
         <div className="mb-4">
           <CaseGrid
             caseId={id}
+            mask={effectiveMask}
             selectedRotation={selectedRotation}
-            showArrows={!!swaps}
             swaps={swaps}
           />
         </div>
 
+        {description && (
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 text-center">
+            {description}
+          </p>
+        )}
         {swaps && <SwapDescription swaps={swaps} />}
 
         <div className="w-full space-y-3">
@@ -49,6 +65,7 @@ export default function CaseCard({
               algorithm={algorithm}
               playgroundUrl={getPlaygroundUrlForAlgorithm(algorithm.id)}
               onInverseClick={onInverseClick}
+              hideInverse={hideInverse}
             />
           ))}
         </div>

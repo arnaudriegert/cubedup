@@ -31,14 +31,14 @@ export default function OLL() {
   return (
     <>
       <SEOHead
-        title="OLL - Orientation of Last Layer"
+        title="Full OLL - All 57 Algorithms"
         description="Learn all 57 OLL algorithms organized by symmetry. Master last layer orientation with visual patterns and related case groupings for faster memorization."
-        path="/oll"
+        path="/oll/full"
       />
       <CasePageLayout
-        title="OLL - Orientation of Last Layer"
-        subtitle="Orient all pieces on the last layer"
-        basePath="/oll"
+        title="Full OLL"
+        subtitle="All 57 last layer orientation cases"
+        basePath="/oll/full"
         searchPlaceholder="OLL # (press /)"
         searchInputMode="numeric"
         validateSearch={validateOLLSearch}

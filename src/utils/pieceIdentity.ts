@@ -2,7 +2,7 @@ import { Color } from '../types/cube'
 import type { CubeState } from '../types/cubeState'
 
 // CFOP step for masking
-export type CFOPStep = 'cross' | 'cross-no-centers' | 'f2l' | 'oll' | 'pll' | null
+export type CFOPStep = 'cross' | 'cross-no-centers' | 'f2l' | 'oll' | 'oll-edges' | 'pll' | null
 
 // A sticker position on the cube
 interface StickerPosition {
@@ -108,24 +108,32 @@ const F2L_PIECES = new Set([
   pieceIdentityKey([Color.GREEN, Color.ORANGE]),
 ])
 
-// OLL/PLL: yellow center + 4 yellow edges + 4 yellow corners
-const LAST_LAYER_PIECES = new Set([
+// Yellow center + 4 yellow edges (for 2-look OLL edge orientation)
+const LAST_LAYER_EDGE_PIECES = new Set([
   pieceIdentityKey([Color.YELLOW]),
   pieceIdentityKey([Color.YELLOW, Color.BLUE]),
   pieceIdentityKey([Color.YELLOW, Color.GREEN]),
   pieceIdentityKey([Color.YELLOW, Color.RED]),
   pieceIdentityKey([Color.YELLOW, Color.ORANGE]),
+])
+
+// 4 yellow corners
+const LAST_LAYER_CORNER_PIECES = new Set([
   pieceIdentityKey([Color.YELLOW, Color.BLUE, Color.RED]),
   pieceIdentityKey([Color.YELLOW, Color.BLUE, Color.ORANGE]),
   pieceIdentityKey([Color.YELLOW, Color.GREEN, Color.RED]),
   pieceIdentityKey([Color.YELLOW, Color.GREEN, Color.ORANGE]),
 ])
 
+// OLL/PLL: all last layer pieces (edges + corners)
+const LAST_LAYER_PIECES = new Set([...LAST_LAYER_EDGE_PIECES, ...LAST_LAYER_CORNER_PIECES])
+
 const STEP_PIECE_SETS: Record<Exclude<CFOPStep, null>, Set<string>> = {
   cross: CROSS_PIECES,
   'cross-no-centers': CROSS_NO_CENTERS_PIECES,
   f2l: F2L_PIECES,
   oll: LAST_LAYER_PIECES,
+  'oll-edges': LAST_LAYER_EDGE_PIECES,
   pll: LAST_LAYER_PIECES,
 }
 
@@ -138,9 +146,13 @@ function shouldShowSticker(
 ): boolean {
   if (step === null) return true
 
-  // OLL: show only yellow stickers
-  if (step === 'oll') {
-    return state[face][index] === Color.YELLOW
+  // OLL/OLL-edges: show only yellow stickers on relevant pieces
+  if (step === 'oll' || step === 'oll-edges') {
+    if (state[face][index] !== Color.YELLOW) return false
+    // Check piece identity to determine if it's an edge or corner
+    const pieceColors = getPieceIdentity(state, face, index)
+    const key = pieceIdentityKey(pieceColors)
+    return STEP_PIECE_SETS[step].has(key)
   }
 
   // PLL: show all stickers of yellow pieces (yellow + their neighbors)

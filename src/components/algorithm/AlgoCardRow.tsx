@@ -39,6 +39,9 @@ export interface AlgoCardRowProps {
 
   // Callback when inverse badge is clicked (for navigation)
   onInverseClick?: (caseNumber: number) => void
+
+  // Hide the inverse badge even if algorithm has inverse
+  hideInverse?: boolean
 }
 
 export default function AlgoCardRow({
@@ -49,9 +52,10 @@ export default function AlgoCardRow({
   isPlaying,
   isFinished,
   onInverseClick,
+  hideInverse,
 }: AlgoCardRowProps) {
   // Check if this algorithm has an inverse
-  const inverseNumber = algorithm?.inverse ? getOLLNumberFromId(algorithm.inverse) : null
+  const inverseNumber = !hideInverse && algorithm?.inverse ? getOLLNumberFromId(algorithm.inverse) : null
 
   // Determine button icon: playing -> ◼, finished -> ↺, idle -> ▶
   const getButtonIcon = () => {

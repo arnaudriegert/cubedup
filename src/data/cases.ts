@@ -777,6 +777,41 @@ export const ollGroups: CaseGroup[] = [
   },
 ]
 
+// ==========================================================================
+// 2-Look OLL Groups
+// ==========================================================================
+
+// Edge pattern metadata (name/description overrides for 2-look display)
+export const edgePatternMeta: Record<string, { name: string; description: string }> = {
+  'oll-2': { name: 'Dot', description: 'No edges oriented.' },
+  'oll-44': { name: 'L-shape', description: '2 adjacent edges. Hold at front-right.' },
+  'oll-45': { name: 'Line', description: '2 opposite edges. Hold horizontally.' },
+}
+
+export const twoLookOllGroups: CaseGroup[] = [
+  {
+    name: 'First Look: Edges',
+    description: 'Create a yellow cross. Ignore corners completely.',
+    cases: [
+      ['oll-45'],
+      ['oll-44'],
+      ['oll-2'],
+    ],
+  },
+  {
+    name: 'Second Look: Corners',
+    description: 'With cross complete, orient all corners.',
+    cases: [
+      ['oll-21'],
+      ['oll-22'],
+      ['oll-23'],
+      ['oll-24'],
+      ['oll-25'],
+      ['oll-27', 'oll-26'],
+    ],
+  },
+]
+
 export const pllGroups: CaseGroup[] = [
   {
     name: 'Edges Only',

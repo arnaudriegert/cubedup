@@ -5,10 +5,19 @@ const topLinks = [
   { path: '/playground', label: 'Playground' },
 ]
 
-const stepsLinks = [
+type NavLink = { path: string; label: string }
+type NavItem = NavLink | { label: string; children: NavLink[] }
+
+const stepsLinks: NavItem[] = [
   { path: '/cross', label: 'Cross' },
   { path: '/f2l', label: 'F2L' },
-  { path: '/oll', label: 'OLL' },
+  {
+    label: 'OLL',
+    children: [
+      { path: '/oll/2-look', label: '2-Look' },
+      { path: '/oll/full', label: 'Full' },
+    ],
+  },
   { path: '/pll', label: 'PLL' },
 ]
 
@@ -29,19 +38,35 @@ export default function NavLinks({ onLinkClick, showDivider }: Props) {
     return location.pathname.startsWith(path)
   }
 
+  const renderLink = (link: NavLink, isChild = false) => (
+    <Link
+      key={link.path}
+      to={link.path}
+      onClick={onLinkClick}
+      className={`${isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'} ${isChild ? 'sidebar-link-child' : ''}`}
+    >
+      {link.label}
+    </Link>
+  )
+
+  const renderNavItem = (item: NavItem) => {
+    if ('path' in item) {
+      return renderLink(item)
+    }
+
+    // Group with children
+    return (
+      <div key={item.label}>
+        <div className="sidebar-group-label">{item.label}</div>
+        {item.children.map((child) => renderLink(child, true))}
+      </div>
+    )
+  }
+
   return (
     <>
       {/* Top level links */}
-      {topLinks.map((link) => (
-        <Link
-          key={link.path}
-          to={link.path}
-          onClick={onLinkClick}
-          className={isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'}
-        >
-          {link.label}
-        </Link>
-      ))}
+      {topLinks.map((link) => renderLink(link))}
 
       {/* Steps section */}
       {showDivider && (
@@ -49,16 +74,7 @@ export default function NavLinks({ onLinkClick, showDivider }: Props) {
           Steps
         </div>
       )}
-      {stepsLinks.map((link) => (
-        <Link
-          key={link.path}
-          to={link.path}
-          onClick={onLinkClick}
-          className={isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'}
-        >
-          {link.label}
-        </Link>
-      ))}
+      {stepsLinks.map(renderNavItem)}
 
       {/* Reference section */}
       {showDivider && (
@@ -66,16 +82,7 @@ export default function NavLinks({ onLinkClick, showDivider }: Props) {
           Reference
         </div>
       )}
-      {referenceLinks.map((link) => (
-        <Link
-          key={link.path}
-          to={link.path}
-          onClick={onLinkClick}
-          className={isActive(link.path) ? 'sidebar-link-active' : 'sidebar-link'}
-        >
-          {link.label}
-        </Link>
-      ))}
+      {referenceLinks.map((link) => renderLink(link))}
     </>
   )
 }
