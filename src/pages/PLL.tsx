@@ -48,6 +48,7 @@ export default function PLL() {
         title="PLL - Permutation of Last Layer"
         subtitle="Permute all pieces to their correct positions"
         basePath="/pll"
+        scrollIdPrefix="pll"
         searchPlaceholder="PLL name (press /)"
         validateSearch={validatePLLSearch}
         groups={pllGroups}

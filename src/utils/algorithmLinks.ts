@@ -49,7 +49,7 @@ export function getCasePageUrl(idOrCaseId: string): string {
   if (caseId.startsWith('oll-')) {
     const num = caseId.slice(4)
     const algoParam = variantIndex && variantIndex > 1 ? `&algo=${variantIndex}` : ''
-    return `/oll/detailed?select=${num}${algoParam}`
+    return `/oll/full/detailed?select=${num}${algoParam}`
   }
 
   if (caseId.startsWith('pll-')) {

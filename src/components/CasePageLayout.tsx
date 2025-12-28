@@ -20,6 +20,7 @@ export interface CasePageLayoutProps {
   title: string
   subtitle: string
   basePath: string
+  scrollIdPrefix: string
   searchPlaceholder: string
   searchInputMode?: 'numeric' | 'text'
   validateSearch: (value: string) => string | null
@@ -32,6 +33,7 @@ export function CasePageLayout({
   title,
   subtitle,
   basePath,
+  scrollIdPrefix,
   searchPlaceholder,
   searchInputMode,
   validateSearch,
@@ -63,10 +65,9 @@ export function CasePageLayout({
 
   useEffect(() => {
     if (highlightedCase !== null && !isOverview) {
-      const prefix = basePath.replace('/', '')
-      scrollToHighlighted(`${prefix}-${highlightedCase}`)
+      scrollToHighlighted(`${scrollIdPrefix}-${highlightedCase}`)
     }
-  }, [highlightedCase, isOverview, basePath])
+  }, [highlightedCase, isOverview, scrollIdPrefix])
 
   const outletContext = buildContext({
     debouncedSearch,

@@ -39,6 +39,7 @@ export default function OLL() {
         title="Full OLL"
         subtitle="All 57 last layer orientation cases"
         basePath="/oll/full"
+        scrollIdPrefix="oll"
         searchPlaceholder="OLL # (press /)"
         searchInputMode="numeric"
         validateSearch={validateOLLSearch}
