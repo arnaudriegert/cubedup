@@ -2,7 +2,7 @@ import { Color } from '../types/cube'
 import type { CubeState } from '../types/cubeState'
 
 // CFOP step for masking
-export type CFOPStep = 'cross' | 'f2l' | 'oll' | 'pll' | null
+export type CFOPStep = 'cross' | 'cross-no-centers' | 'f2l' | 'oll' | 'pll' | null
 
 // A sticker position on the cube
 interface StickerPosition {
@@ -74,17 +74,23 @@ function getPieceIdentity(state: CubeState, face: keyof CubeState, index: number
 // Define which pieces are relevant for each CFOP step
 // Using piece identity keys (sorted color combinations)
 
-// Cross: white center + 4 side centers + 4 white edges
-const CROSS_PIECES = new Set([
+// Cross without colored centers: white center + 4 white edges only
+// For practicing relative edge placement without slot reference
+const CROSS_NO_CENTERS_PIECES = new Set([
   pieceIdentityKey([Color.WHITE]),
-  pieceIdentityKey([Color.BLUE]),
-  pieceIdentityKey([Color.GREEN]),
-  pieceIdentityKey([Color.RED]),
-  pieceIdentityKey([Color.ORANGE]),
   pieceIdentityKey([Color.WHITE, Color.BLUE]),
   pieceIdentityKey([Color.WHITE, Color.GREEN]),
   pieceIdentityKey([Color.WHITE, Color.RED]),
   pieceIdentityKey([Color.WHITE, Color.ORANGE]),
+])
+
+// Cross: edges + 4 side centers for slot reference
+const CROSS_PIECES = new Set([
+  ...CROSS_NO_CENTERS_PIECES,
+  pieceIdentityKey([Color.BLUE]),
+  pieceIdentityKey([Color.GREEN]),
+  pieceIdentityKey([Color.RED]),
+  pieceIdentityKey([Color.ORANGE]),
 ])
 
 // F2L: Cross + 4 white corners + 4 middle edges
@@ -117,6 +123,7 @@ const LAST_LAYER_PIECES = new Set([
 
 const STEP_PIECE_SETS: Record<Exclude<CFOPStep, null>, Set<string>> = {
   cross: CROSS_PIECES,
+  'cross-no-centers': CROSS_NO_CENTERS_PIECES,
   f2l: F2L_PIECES,
   oll: LAST_LAYER_PIECES,
   pll: LAST_LAYER_PIECES,
