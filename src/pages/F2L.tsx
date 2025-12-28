@@ -1,8 +1,6 @@
-import { Cube, CubeDisplay } from '../components/cube'
-import { CaseCard4Rotations } from '../components/CaseCard.4Rotations'
 import SEOHead from '../components/SEOHead'
-import { createSolvedCube } from '../utils/cubeState'
-import { applyMask } from '../utils/pieceIdentity'
+import { PatternIntro } from '../components/PatternIntro'
+import { CaseGroup4Rotations } from '../components/CaseGroup4Rotations'
 
 export default function F2L() {
   return (
@@ -21,87 +19,40 @@ export default function F2L() {
       </header>
 
       <main className="main-content-wide">
-        {/* Introduction */}
-        <div className="section-card text-center mb-8">
-          <h2 className="section-subtitle">The Goal</h2>
-          <div className="flex flex-wrap justify-center items-center gap-8">
-            <CubeDisplay>
-              <Cube
-                cubeState={applyMask(createSolvedCube(), 'f2l')}
-                view="bottom-front-right"
-                size="normal"
-              />
-            </CubeDisplay>
-            <div className="text-left max-w-md">
-              <p className="body-text mb-2">
-                <strong>Insert corner-edge pairs</strong> into the 4 slots around the bottom layer.
-              </p>
-              <p className="help-text mb-3">
-                Each pattern shows all 4 color variations.
-                Focus on recognizing the <em>relationship</em> between corner and edge, not specific colors.
-              </p>
-              <p className="text-sm text-slate-500">
-                <strong>Learning strategy:</strong> F2L can be learned intuitively by understanding how moves
-                affect pairs, or algorithmically by memorizing solutions.
-                Start intuitive—understand <em>why</em> moves work—then optimize specific cases.
-                Left-slot and right-slot algorithms are mirrors; learn one side, then adapt.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Basic Patterns */}
-        <h2 className="section-subtitle-centered">
-          Basic Patterns
-        </h2>
-        <p className="text-gray-600 text-center mb-6 max-w-2xl mx-auto">
-          The fundamental F2L cases. Corner and edge both on U layer.
-          Left-handed algorithms (L moves) for FL slot, right-handed (R moves) for FR slot.
-        </p>
-
-        {/* Case 1: Joined Pair - Easy Insert */}
-        <div className="case-group">
-          <h3 className="card-title-centered mb-2">1. Joined Pair - Easy Insert</h3>
-          <p className="help-text mb-6 text-center">
-            Corner and edge already paired (touching, colors aligned). Pair is in front, slot is behind.
-            U move hides pair, then insert.
+        <PatternIntro cubeView="bottom-front-right" mask="f2l">
+          <p className="body-text mb-3">
+            <strong>Insert corner-edge pairs</strong> into the 4 slots around the bottom layer.
+            Each pattern shows all 4 color variations—focus on the <em>relationship</em> between
+            corner and edge, not specific colors.
           </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CaseCard4Rotations
-              isLeft
-              algorithm={{ id: 'f2l-1-left', steps: [{ ref: 'left-sexy', inverse: true }] }}
-              mask="f2l"
-            />
-            <CaseCard4Rotations
-              algorithm={{ id: 'f2l-1-right', steps: [{ ref: 'sexy', inverse: true }] }}
-              mask="f2l"
-            />
-          </div>
-        </div>
-
-        {/* Case 2: Split Pair - Three Move Insert */}
-        <div className="case-group">
-          <h3 className="card-title-centered mb-2">2. Split Pair - Three Move Insert</h3>
-          <p className="help-text mb-6 text-center">
-            Corner and edge separated. Corner in front with white facing sideways.
-            Edge in back with front-color facing up.
+          <p className="help-text mb-3">
+            Each case shows <strong>four cubes</strong>: the same pattern rotated to all four front
+            colors. Left and right variants train both hands. The goal is instant recognition—see
+            the pattern, execute without thinking.
           </p>
+          <p className="text-sm text-slate-500">
+            <strong>Learning strategy:</strong> F2L can be learned intuitively by understanding how moves
+            affect pairs, or algorithmically by memorizing solutions.
+            Start intuitive—understand <em>why</em> moves work—then optimize specific cases.
+          </p>
+        </PatternIntro>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <CaseCard4Rotations
-              isLeft
-              algorithm={{ id: 'f2l-2-left', steps: [{ moves: "L' U' L" }] }}
-              mask="f2l"
-            />
-            <CaseCard4Rotations
-              algorithm={{ id: 'f2l-2-right', steps: [{ moves: "R U R'" }] }}
-              mask="f2l"
-            />
-          </div>
-        </div>
+        <CaseGroup4Rotations
+          title="1. Joined Pair - Easy Insert"
+          description="Corner and edge already paired (touching, colors aligned). Pair is in front, slot is behind. U move hides pair, then insert."
+          left={{ id: 'f2l-1-left', steps: [{ ref: 'left-sexy', inverse: true }] }}
+          right={{ id: 'f2l-1-right', steps: [{ ref: 'sexy', inverse: true }] }}
+          mask="f2l"
+        />
 
-        {/* More cases coming soon */}
+        <CaseGroup4Rotations
+          title="2. Split Pair - Three Move Insert"
+          description="Corner and edge separated. Corner in front with white facing sideways. Edge in back with front-color facing up."
+          left={{ id: 'f2l-2-left', steps: [{ moves: "L' U' L" }] }}
+          right={{ id: 'f2l-2-right', steps: [{ moves: "R U R'" }] }}
+          mask="f2l"
+        />
+
         <div className="section-card text-center">
           <p className="text-gray-500 italic">More F2L cases coming soon...</p>
         </div>
