@@ -46,7 +46,7 @@
 }
 
 .section-description {
-  @apply text-gray-700 italic mb-6 md:mb-8;
+  @apply text-gray-700 mb-6 md:mb-8;
 }
 
 .help-text {

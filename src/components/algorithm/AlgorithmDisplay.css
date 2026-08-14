@@ -13,6 +13,19 @@
   @apply rounded-full italic transition-all duration-200;
 }
 
+/* Reference to another whole case algorithm, not a trigger: squarer, dashed
+   and amber, matching the cross-reference language of the OLL inverse badge. */
+.algo-token-case-ref {
+  @apply inline-flex items-center rounded-md border border-dashed
+    border-amber-400 bg-amber-50 text-amber-800 font-medium not-italic
+    transition-colors hover:bg-amber-100 hover:border-amber-500;
+}
+
+/* Trailing alignment turn: present, but visibly not part of the pattern. */
+.algo-token-auf {
+  @apply rounded-md bg-transparent text-slate-400 ml-1 transition-all duration-200;
+}
+
 .algo-token-rotation {
   @apply rounded-md font-mono transition-all duration-200;
 }

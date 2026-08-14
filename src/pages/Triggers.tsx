@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react'
 import { getTriggerPairsByTag, getAlgorithm } from '../data/algorithms'
 import type { Algorithm } from '../types/algorithm'
 import { AlgoCardRow } from '../components/algorithm'
 import SEOHead from '../components/SEOHead'
-import { getPlaygroundUrlForNotation } from '../utils/algorithmLinks'
+import { getPlaygroundUrlForNotation, getPlaygroundUrlForAlgorithm } from '../utils/algorithmLinks'
 import { expandAlgorithmObject } from '../utils/algorithmExpander'
 import { movesToNotation, invertMoves } from '../utils/moveParser'
 import './Triggers.css'
@@ -33,9 +34,11 @@ const triggerCategories: TriggerCategory[] = [
     description: 'Triggers using wide moves (lowercase r/l = two layers together). These affect the M slice, making them useful for edge-related cases.',
     tag: 'wide',
   },
+  // The 'pll' tag is rendered by its own section below, which needs prose
+  // around the pairs rather than a single description line.
 ]
 
-const triggerDescriptions: Record<string, string> = {
+const triggerDescriptions: Record<string, ReactNode> = {
   'sexy': 'The most common trigger. Used in nearly half of all OLL algorithms.',
   'left-sexy': 'Mirror of sexy move, executed with left hand.',
   'sledge': 'Second most common trigger. Often paired with sexy move.',
@@ -50,13 +53,36 @@ const triggerDescriptions: Record<string, string> = {
   'left-sune': 'Mirror of Sune. Inverse is Left Chair.',
   'half-sune': 'First half of Sune. Appears in many OLL/PLL algorithms.',
   'left-half-sune': 'First half of Left Sune. Mirror of Half Sune.',
+  'fexy': (
+    <>
+      Sexy move ending on <MoveBadge moves="F'" /> instead of <MoveBadge moves="U'" />.
+      Opens Jb. Read backwards it is y-hook.
+    </>
+  ),
+  'y-hook': 'The same four moves as fexy, reversed. Opens the Y-perm, and is the setup half of the wrap in T and OLL 37.',
+  'left-fexy': 'Mirror of fexy, executed with left hand. Builds Ja the way fexy builds Jb.',
+  'n-block': 'Do it twice in a row and the Nb-perm is solved—there is nothing else to the algorithm.',
+  'left-n-block': 'Mirror of n-block. Twice through solves Na instead.',
 }
 
 // ============================================================================
 
-// Trigger badge styled like algorithm trigger tokens
-function TriggerBadge({ name }: { name: string }) {
-  return <span className="trigger-badge">{name}</span>
+// Trigger badge styled like algorithm trigger tokens. Use inline when naming a
+// trigger inside a sentence - the brace notation ({sexy}) is internal tokenizer
+// syntax and is never shown to readers.
+function TriggerBadge({ name, inline = false }: { name: string; inline?: boolean }) {
+  return <span className={inline ? 'trigger-badge-inline' : 'trigger-badge'}>{name}</span>
+}
+
+// Moves named in running text, styled like the move tokens in algorithm displays.
+function MoveBadge({ moves }: { moves: string }) {
+  return (
+    <span className="move-badge-group">
+      {moves.trim().split(/\s+/).map((move, i) => (
+        <span key={i} className="move-badge-inline">{move}</span>
+      ))}
+    </span>
+  )
 }
 
 function TriggerCard({ algorithm }: { algorithm: Algorithm }) {
@@ -102,6 +128,12 @@ function TriggerCard({ algorithm }: { algorithm: Algorithm }) {
   )
 }
 
+// The 'pll' triggers are split across two sections, so select by member ID
+// rather than giving them layout-only tags.
+function pairsFor(triggerId: string): [Algorithm, Algorithm][] {
+  return getTriggerPairsByTag('pll').filter((pair) => pair.some((t) => t.id === triggerId))
+}
+
 function TriggerPairDisplay({ pair }: { pair: [Algorithm, Algorithm] }) {
   const [left, right] = pair
   return (
@@ -140,7 +172,8 @@ export default function Triggers() {
           </p>
           <p className="text-sm text-slate-500 text-center max-w-2xl mx-auto">
             <strong>How to use this page:</strong> Learn each trigger until it becomes automatic—you should
-            execute {'{sexy}'} without consciously thinking "R U R' U'". Practice both the trigger and its
+            execute <TriggerBadge name="sexy" inline /> without consciously thinking
+            {' '}<MoveBadge moves="R U R' U'" />. Practice both the trigger and its
             inverse; many algorithms use both. Once triggers are internalized, OLL and PLL algorithms written in
             shorthand become readable at a glance.
           </p>
@@ -163,43 +196,101 @@ export default function Triggers() {
           )
         })}
 
-        {/* 2-Look PLL */}
+        {/* fexy / y-hook and the cycle the PLL cases share */}
         <section className="case-group">
-          <h2 className="section-title">2-Look PLL</h2>
+          <h2 className="section-title">fexy and y-hook</h2>
           <p className="section-description">
-            In 2-look PLL, you first permute corners, then edges. For corners, check for
-            "headlights" (two matching colors on one side). Headlights present? Use T-perm.
-            No headlights? Use Y-perm. Either way, you'll end up with an edges-only case.
+            Take a sexy move and finish it on <MoveBadge moves="F'" /> instead of
+            {' '}<MoveBadge moves="U'" />. That is
+            {' '}<TriggerBadge name="fexy" inline />—four moves, one letter different
+            from the trigger you already know. Read those same four moves backwards and
+            you get <TriggerBadge name="y-hook" inline />, so called because it is
+            exactly how the Y-perm opens. One block, two names, the same way
+            {' '}<TriggerBadge name="chair" inline /> and
+            {' '}<TriggerBadge name="sune" inline /> are one sequence read two ways: an
+            algorithm uses whichever it <em>starts</em> with, so the prime lands on the
+            undo.
+          </p>
+          <p className="section-description">
+            Its job is wrapping. Set up, turn once, undo—
+            {' '}<TriggerBadge name="y-hook" inline /> <MoveBadge moves="U'" />
+            {' '}<TriggerBadge name="y-hook'" inline />—and put
+            {' '}<TriggerBadge name="sexy" inline /> <TriggerBadge name="sledge" inline />
+            {' '}beside it, and you have a five-block cycle that four cases all share.
+            Where you start reading it is the only difference between them:
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {pairsFor('fexy').map((pair, index) => (
+              <TriggerPairDisplay key={index} pair={pair} />
+            ))}
+
             <div className="case-card">
-              <div className="mb-3">
-                <TriggerBadge name="half-y" />
-              </div>
-              <p className="help-text mb-4">
-                The core of 2-look PLL corner permutation. Add sexy+sledge before or after
-                to form T-perm or Y-perm.
-              </p>
+              <h3 className="case-card-title">OLL 37</h3>
+              <p className="help-text mb-4">The wrap on its own.</p>
               <AlgoCardRow
-                notation="F R U' R' U' R U R' F'"
-                playgroundUrl={getPlaygroundUrlForNotation("F R U' R' U' R U R' F'")}
+                algorithm={getAlgorithm('oll-37-2')}
+                playgroundUrl={getPlaygroundUrlForAlgorithm('oll-37-2')}
               />
             </div>
             <div className="case-card">
-              <div className="mb-3 flex gap-1">
-                <TriggerBadge name="sexy" />
-                <TriggerBadge name="sledge" />
-              </div>
+              <h3 className="case-card-title">Y-perm</h3>
               <p className="help-text mb-4">
-                Combine with half-y to solve T/Y-perm or land on an edges-only case.
-                Also appears in many OLL and PLL cases.
+                The same wrap, with <TriggerBadge name="sexy" inline />
+                {' '}<TriggerBadge name="sledge" inline /> added after it.
               </p>
               <AlgoCardRow
-                notation="R U R' U' R' F R F'"
-                playgroundUrl={getPlaygroundUrlForNotation("R U R' U' R' F R F'")}
+                algorithm={getAlgorithm('pll-y')}
+                playgroundUrl={getPlaygroundUrlForAlgorithm('pll-y')}
               />
             </div>
+            <div className="case-card">
+              <h3 className="case-card-title">T-perm</h3>
+              <p className="help-text mb-4">
+                Y-perm's two halves in the opposite order: the same blocks, with
+                {' '}<TriggerBadge name="sexy" inline /> <TriggerBadge name="sledge" inline />
+                {' '}leading instead of trailing.
+              </p>
+              <AlgoCardRow
+                algorithm={getAlgorithm('pll-t')}
+                playgroundUrl={getPlaygroundUrlForAlgorithm('pll-t')}
+              />
+            </div>
+            <div className="case-card">
+              <h3 className="case-card-title">Jb-perm</h3>
+              <p className="help-text mb-4">
+                Starts one block later again, which splits the wrap across the two ends—
+                so it reads with <TriggerBadge name="fexy" inline /> rather than
+                {' '}<TriggerBadge name="y-hook" inline />. Ja is its mirror, using the
+                left-hand blocks throughout.
+              </p>
+              <AlgoCardRow
+                algorithm={getAlgorithm('pll-jb')}
+                playgroundUrl={getPlaygroundUrlForAlgorithm('pll-jb')}
+              />
+            </div>
+          </div>
+
+          <p className="section-description mt-8">
+            That covers 2-look PLL corners: permute corners first, and check for
+            "headlights" (two matching colors on one side). Headlights? T-perm. None?
+            Y-perm. Either way you land on an edges-only case.
+          </p>
+        </section>
+
+        {/* n-block - a PLL trigger, but a different kind of one */}
+        <section className="case-group">
+          <h2 className="section-title">The n-block</h2>
+          <p className="section-description">
+            A special case, and the only trigger here that is a whole algorithm by
+            itself. Repeat <TriggerBadge name="n-block" inline /> twice and the Nb-perm
+            is solved. Its mirror does the same for Na.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {pairsFor('n-block').map((pair, index) => (
+              <TriggerPairDisplay key={index} pair={pair} />
+            ))}
           </div>
         </section>
       </main>

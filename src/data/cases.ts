@@ -9,7 +9,7 @@
  */
 
 import type {
-  Algorithm, Case, CaseId, CaseGroup, PLLSwapInfo,
+  Algorithm, AlgorithmId, Case, CaseId, CaseGroup, PLLSwapInfo,
 } from '../types/algorithm'
 import { algorithms } from './algorithms'
 
@@ -949,35 +949,35 @@ export const pllGroups: CaseGroup[] = [
 export const pllSwaps = new Map<CaseId, PLLSwapInfo>([
   // Edges Only
   ['pll-ua', {
-    edges: [{ positions: ['L', 'R', 'B'], direction: 'cw' }],
-    description: '3-cycle edges: L→R→B',
+    edges: [{ positions: ['B', 'L', 'R'] }],
+    description: '3-cycle edges: B→L→R',
   }],
   ['pll-ub', {
-    edges: [{ positions: ['B', 'R', 'L'], direction: 'ccw' }],
+    edges: [{ positions: ['B', 'R', 'L'] }],
     description: '3-cycle edges: B→R→L',
   }],
   ['pll-h', {
     edges: [
-      { positions: ['F', 'B'] },
+      { positions: ['B', 'F'] },
       { positions: ['L', 'R'] },
     ],
-    description: 'Swap opposite edges: F↔B and L↔R',
+    description: 'Swap opposite edges: B↔F and L↔R',
   }],
   ['pll-z', {
     edges: [
-      { positions: ['F', 'R'] },
       { positions: ['B', 'L'] },
+      { positions: ['R', 'F'] },
     ],
-    description: 'Swap adjacent edges: F↔R and B↔L',
+    description: 'Swap adjacent edges: B↔L and R↔F',
   }],
 
   // Corners Only
   ['pll-aa', {
-    corners: [{ positions: ['BR', 'FL', 'BL'], direction: 'cw' }],
-    description: '3-cycle corners: BR→FL→BL',
+    corners: [{ positions: ['BL', 'BR', 'FL'] }],
+    description: '3-cycle corners: BL→BR→FL',
   }],
   ['pll-ab', {
-    corners: [{ positions: ['BL', 'FR', 'BR'], direction: 'ccw' }],
+    corners: [{ positions: ['BL', 'FR', 'BR'] }],
     description: '3-cycle corners: BL→FR→BR',
   }],
   ['pll-e', {
@@ -995,19 +995,19 @@ export const pllSwaps = new Map<CaseId, PLLSwapInfo>([
     description: 'Swap right corners, swap edges L↔R',
   }],
   ['pll-f', {
-    corners: [{ positions: ['FR', 'BR'] }],
-    edges: [{ positions: ['F', 'B'] }],
-    description: 'Swap right corners, swap edges F↔B',
+    corners: [{ positions: ['BR', 'FR'] }],
+    edges: [{ positions: ['B', 'F'] }],
+    description: 'Swap right corners, swap edges B↔F',
   }],
   ['pll-ja', {
-    corners: [{ positions: ['FL', 'BL'] }],
-    edges: [{ positions: ['F', 'L'] }],
-    description: 'Swap left corners, swap edges F↔L',
+    corners: [{ positions: ['BL', 'FL'] }],
+    edges: [{ positions: ['L', 'F'] }],
+    description: 'Swap left corners, swap edges L↔F',
   }],
   ['pll-jb', {
     corners: [{ positions: ['BR', 'FR'] }],
-    edges: [{ positions: ['F', 'R'] }],
-    description: 'Swap right corners, swap edges F↔R',
+    edges: [{ positions: ['R', 'F'] }],
+    description: 'Swap right corners, swap edges R↔F',
   }],
   ['pll-ra', {
     corners: [{ positions: ['BL', 'BR'] }],
@@ -1023,13 +1023,13 @@ export const pllSwaps = new Map<CaseId, PLLSwapInfo>([
   // Swap Diagonal Corners
   ['pll-y', {
     corners: [{ positions: ['BL', 'FR'] }],
-    edges: [{ positions: ['L', 'B'] }],
-    description: 'Swap diagonal corners BL↔FR, swap edges L↔B',
+    edges: [{ positions: ['B', 'L'] }],
+    description: 'Swap diagonal corners BL↔FR, swap edges B↔L',
   }],
   ['pll-v', {
     corners: [{ positions: ['BL', 'FR'] }],
-    edges: [{ positions: ['R', 'B'] }],
-    description: 'Swap diagonal corners BL↔FR, swap edges R↔B',
+    edges: [{ positions: ['B', 'R'] }],
+    description: 'Swap diagonal corners BL↔FR, swap edges B↔R',
   }],
   ['pll-na', {
     corners: [{ positions: ['FL', 'BR'] }],
@@ -1044,24 +1044,24 @@ export const pllSwaps = new Map<CaseId, PLLSwapInfo>([
 
   // G Permutations
   ['pll-ga', {
-    corners: [{ positions: ['FL', 'BL', 'BR'], direction: 'cw' }],
-    edges: [{ positions: ['L', 'R', 'B'], direction: 'cw' }],
-    description: '3-cycle corners FL→BL→BR, 3-cycle edges L→R→B',
+    corners: [{ positions: ['BL', 'BR', 'FL'] }],
+    edges: [{ positions: ['B', 'L', 'R'] }],
+    description: '3-cycle corners BL→BR→FL, 3-cycle edges B→L→R',
   }],
   ['pll-gb', {
-    corners: [{ positions: ['FL', 'BR', 'BL'], direction: 'ccw' }],
-    edges: [{ positions: ['L', 'B', 'R'], direction: 'ccw' }],
-    description: '3-cycle corners FL→BR→BL, 3-cycle edges L→B→R',
+    corners: [{ positions: ['BL', 'FL', 'BR'] }],
+    edges: [{ positions: ['B', 'R', 'L'] }],
+    description: '3-cycle corners BL→FL→BR, 3-cycle edges B→R→L',
   }],
   ['pll-gc', {
-    corners: [{ positions: ['FR', 'BR', 'BL'], direction: 'cw' }],
-    edges: [{ positions: ['L', 'B', 'R'], direction: 'cw' }],
-    description: '3-cycle corners FR→BR→BL, 3-cycle edges L→B→R',
+    corners: [{ positions: ['BL', 'FR', 'BR'] }],
+    edges: [{ positions: ['B', 'R', 'L'] }],
+    description: '3-cycle corners BL→FR→BR, 3-cycle edges B→R→L',
   }],
   ['pll-gd', {
-    corners: [{ positions: ['FR', 'BL', 'BR'], direction: 'ccw' }],
-    edges: [{ positions: ['L', 'R', 'B'], direction: 'ccw' }],
-    description: '3-cycle corners FR→BL→BR, 3-cycle edges L→R→B',
+    corners: [{ positions: ['BL', 'BR', 'FR'] }],
+    edges: [{ positions: ['B', 'L', 'R'] }],
+    description: '3-cycle corners BL→BR→FR, 3-cycle edges B→L→R',
   }],
 ])
 
@@ -1092,6 +1092,22 @@ export function getAlgorithmsForCase(caseId: string): Algorithm[] {
   return caseData.algorithms
     .map((id) => algorithms.get(id))
     .filter((a): a is Algorithm => a !== undefined)
+}
+
+/**
+ * Human-readable label for an algorithm ID, used when one algorithm references
+ * another as a building block - the F-perm shows {T-perm}, not {pll-t}.
+ * Returns undefined for algorithms with no case (triggers), whose ID already is
+ * the display name.
+ */
+export function getAlgorithmDisplayName(id: AlgorithmId): string | undefined {
+  for (const caseData of cases.values()) {
+    if (!caseData.algorithms?.includes(id)) continue
+    return caseData.category === 'pll'
+      ? `${caseData.name}-perm`
+      : `OLL ${caseData.number}`
+  }
+  return undefined
 }
 
 /**

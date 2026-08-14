@@ -59,11 +59,11 @@ export interface CaseGroup {
 export type CornerPosition = 'FL' | 'FR' | 'BL' | 'BR'
 export type EdgePosition = 'F' | 'R' | 'B' | 'L'
 
-// A cycle describes pieces that rotate through positions
-// 2 positions = swap, 3 positions = 3-cycle
+// A cycle describes pieces that rotate through positions, in order: the piece
+// at positions[0] travels to positions[1], and so on, wrapping around.
+// 2 positions = swap, 3 positions = 3-cycle.
 export interface Cycle {
   positions: (CornerPosition | EdgePosition)[]
-  direction?: 'cw' | 'ccw' // Visual hint for 3-cycles
 }
 
 export interface PLLSwapInfo {

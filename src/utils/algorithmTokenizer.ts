@@ -17,13 +17,15 @@ import type { ExpandedAlgorithm } from './algorithmExpander'
 import type { MoveWithMeta } from './cancellation'
 import type { Move } from '../types/cubeState'
 
-export type TokenType = 'move' | 'trigger' | 'rotation' | 'groupStart' | 'groupEnd' | 'space'
+export type TokenType = 'move' | 'trigger' | 'caseRef' | 'rotation' | 'groupStart' | 'groupEnd' | 'space'
 
 export interface AlgorithmToken {
   type: TokenType
   value: string           // Display text
   rawMoves?: string       // For triggers: the underlying moves
   triggerName?: string    // e.g., "sexy" (without braces)
+  refId?: string          // For caseRef: the referenced algorithm ID, for linking
+  isAuf?: boolean         // Final alignment turn - shown muted, nothing to memorise
   isCancelled?: boolean   // For ~strikethrough~ markup
   isHighlighted?: boolean // For **bold** markup
   stepIndex?: number      // Which algorithm step this belongs to
@@ -39,6 +41,18 @@ export interface AlgorithmToken {
 // Regex patterns for parsing algorithm notation
 const OUTER_REGEX = /(~[^~]+~|\*\*[^*]+\*\*)/g
 const PAREN_REGEX = /(\([^)]+\))/g
+
+// A final step that is nothing but one U turn is an alignment move (AUF): it is
+// needed so the case lands on its canonical picture, but it is not part of the
+// pattern. Triggers like sexy (R U R' U') end on a U turn too, but as one move
+// among several in the step, so they are not matched here.
+const LONE_U_TURN = /^U['2]?$/
+
+function isTrailingAuf(steps: Algorithm['steps'], index: number): boolean {
+  if (index !== steps.length - 1) return false
+  const step = steps[index]
+  return isMovesStep(step) && LONE_U_TURN.test(step.moves.trim())
+}
 
 /**
  * Parse markup and return tokens with cancelled/highlighted flags
@@ -73,11 +87,14 @@ function parseSegment(
     isHighlighted?: boolean
     stepParity?: 'even' | 'odd'
     isFromTrigger?: boolean
+    isAuf?: boolean
   },
   moveCounter: { current: number },
 ): AlgorithmToken[] {
   const tokens: AlgorithmToken[] = []
-  const { stepIndex, isCancelled, isHighlighted, stepParity, isFromTrigger } = options
+  const {
+    stepIndex, isCancelled, isHighlighted, stepParity, isFromTrigger, isAuf,
+  } = options
 
   // Split by parentheses first
   const parenParts = text.split(PAREN_REGEX)
@@ -155,6 +172,7 @@ function parseSegment(
           moveIndex: moveCounter.current++,
           stepParity,
           isFromTrigger,
+          isAuf,
         })
       }
 
@@ -238,6 +256,14 @@ export function tokenizeExpandedAlgorithm(
   const { showCancellations = true } = options
   const tokens: AlgorithmToken[] = []
 
+  // Identify the trailing alignment turn on the expanded steps. Refs are
+  // flattened by then, so the final entry corresponds to the final step.
+  const lastStep = expanded.movesByStep[expanded.movesByStep.length - 1]
+  const aufStepIndex = lastStep && !lastStep.isFromRef && lastStep.moves.length === 1
+    && lastStep.moves[0].base === 'U'
+    ? lastStep.stepIndex
+    : null
+
   // Group moves by stepIndex to determine categories
   const stepGroups = new Map<number, MoveWithMeta[]>()
   for (const meta of expanded.movesWithMeta) {
@@ -301,6 +327,7 @@ export function tokenizeExpandedAlgorithm(
       moveIndex: i,
       stepParity,
       isFromTrigger: isFromRef,
+      isAuf: aufStepIndex !== null && stepIndex === aufStepIndex,
       isResult,
       cancellationId,
       originalMoves,
@@ -397,15 +424,24 @@ export function tokenizeNewAlgorithmShorthand(
       // Parse and tokenize moves
       const stepTokens = parseSegment(
         step.moves,
-        { stepIndex, stepParity, isFromTrigger: false },
+        {
+          stepIndex,
+          stepParity,
+          isFromTrigger: false,
+          isAuf: isTrailingAuf(algorithm.steps, stepIndex),
+        },
         moveCounter,
       )
       tokens.push(...stepTokens)
     } else if (isRefStep(step)) {
       // Show as trigger token(s)
       // Add ' suffix for inverse refs (e.g., "sexy" becomes "sexy'")
-      const baseName = getAlgorithmName?.(step.ref) ?? step.ref
+      // A resolved display name means the ref points at a full case algorithm
+      // rather than a trigger, which renders as a cross-reference instead.
+      const resolvedName = getAlgorithmName?.(step.ref)
+      const baseName = resolvedName ?? step.ref
       const name = step.inverse ? `${baseName}'` : baseName
+      const tokenType: TokenType = resolvedName ? 'caseRef' : 'trigger'
       const repeatCount = step.repeat ?? 1
 
       // For repeated refs, parity alternates within the same category
@@ -416,9 +452,10 @@ export function tokenizeNewAlgorithmShorthand(
         }
         const subParity = (baseParityNum + i) % 2 === 0 ? 'even' : 'odd' as const
         tokens.push({
-          type: 'trigger',
+          type: tokenType,
           value: name,
           triggerName: name,
+          refId: step.ref,
           stepIndex: repeatCount > 1 ? stepIndex * 100 + i : stepIndex,
           stepParity: subParity,
         })

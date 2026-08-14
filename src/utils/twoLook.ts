@@ -8,9 +8,7 @@
 import { getAlgorithm } from '../data/algorithms'
 import { getCase } from '../data/cases'
 import { isRefStep, isMovesStep } from '../types/algorithm'
-import type {
-  Algorithm, AlgorithmId, AlgorithmStep,
-} from '../types/algorithm'
+import type { AlgorithmId, AlgorithmStep } from '../types/algorithm'
 import { expandAlgorithmObject } from './algorithmExpander'
 
 // ==========================================================================

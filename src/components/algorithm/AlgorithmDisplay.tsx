@@ -19,7 +19,10 @@ import {
   buildShorthandFromNewAlgorithm,
   type AlgorithmToken,
 } from '../../utils/algorithmTokenizer'
+import { Link } from 'react-router-dom'
 import { expandAlgorithmObject } from '../../utils/algorithmExpander'
+import { getAlgorithmDisplayName } from '../../data/cases'
+import { getCasePageUrl } from '../../utils/algorithmLinks'
 import {
   parseMoves, moveToNotation, movesToNotation,
 } from '../../utils/moveParser'
@@ -130,6 +133,30 @@ function Token({ token, state, size }: TokenProps) {
     )
   }
 
+  // Handle references to a whole other case algorithm (e.g. the F-perm using
+  // the T-perm). Styled as a cross-reference rather than a trigger pill, and
+  // links through to that case, echoing the OLL inverse badge.
+  if (token.type === 'caseRef') {
+    let baseStyle = 'algo-token-case-ref'
+    if (token.isCancelled) baseStyle = `${baseStyle} ${TOKEN_STATES.cancelled}`
+
+    const label = <>{token.value}</>
+    if (!token.refId) {
+      return <span className={`${sizeStyle.token} ${baseStyle}`}>{label}</span>
+    }
+
+    return (
+      <Link
+        to={getCasePageUrl(token.refId)}
+        onClick={(e) => e.stopPropagation()}
+        className={`${sizeStyle.token} ${baseStyle}`}
+        title={`Go to ${token.value}`}
+      >
+        {label}
+      </Link>
+    )
+  }
+
   // Handle rotation tokens (cube rotations x/y/z) - distinct purple styling
   if (token.type === 'rotation') {
     // Rotation-specific styling (purple) - only override for special states
@@ -156,6 +183,19 @@ function Token({ token, state, size }: TokenProps) {
   let baseStyle = state === 'default' ? parityStyle : TOKEN_STATES[state]
   if (token.isCancelled) baseStyle = `${parityStyle} ${TOKEN_STATES.cancelled}`
   if (token.isHighlighted) baseStyle = `${parityStyle} ${TOKEN_STATES.highlighted}`
+
+  // A trailing alignment turn recedes: no pill, no shadow, just a faint move set
+  // slightly apart from the pattern it follows.
+  if (token.isAuf && state === 'default' && !token.isCancelled) {
+    return (
+      <span
+        className={`${sizeStyle.token} algo-token-auf`}
+        title="Final alignment - not part of the pattern"
+      >
+        {token.value}
+      </span>
+    )
+  }
 
   return (
     <span
@@ -507,12 +547,12 @@ export default function AlgorithmDisplay({
       const fullTokens = tokenizeExpandedAlgorithm(expanded, { showCancellations })
 
       // Build shorthand (shows trigger names)
-      const shorthand = buildShorthandFromNewAlgorithm(algorithm)
+      const shorthand = buildShorthandFromNewAlgorithm(algorithm, getAlgorithmDisplayName)
       const full = movesToNotation(expanded.moves)
       const hasShorthandView = shorthand !== full
 
       const shortTokens = hasShorthandView
-        ? tokenizeNewAlgorithmShorthand(algorithm)
+        ? tokenizeNewAlgorithmShorthand(algorithm, getAlgorithmDisplayName)
         : fullTokens
 
       return {

@@ -153,9 +153,44 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   // ==========================================================================
   // PLL TRIGGERS
   // ==========================================================================
-  ['half-y', {
-    id: 'half-y',
-    steps: [{ moves: "F R U' R' U' R U R' F'" }],
+  // Sexy move ending on F' instead of U'. Named inverse pair, like chair/sune:
+  // the same four moves read in either direction, and algorithms use whichever
+  // one they open with, so the undo side is the one that shows a prime.
+  //   {fexy}   R U R' F'   opens Jb (and Ja mirrored)
+  //   {y-hook} F R U' R'   opens Y, and is the setup in T and OLL 37
+  // Wrapping a single U' in it ({y-hook} U' {y-hook'}) is the core of 2-look
+  // PLL corner permutation, and is itself OLL 37.
+  ['fexy', {
+    id: 'fexy',
+    steps: [{ moves: "R U R' F'" }],
+    inverse: 'y-hook',
+    mirror: 'left-fexy',
+    tags: ['trigger', 'pll'],
+  }],
+  ['y-hook', {
+    id: 'y-hook',
+    steps: [{ moves: "F R U' R'" }],
+    inverse: 'fexy',
+    tags: ['trigger', 'pll'],
+  }],
+  ['left-fexy', {
+    id: 'left-fexy',
+    steps: [{ moves: "L' U' L F" }],
+    mirror: 'fexy',
+    tags: ['trigger', 'pll'],
+  }],
+  // Done twice in a row it solves an N-perm - the whole algorithm is this one
+  // block repeated, and its mirror repeated solves the other N-perm.
+  ['n-block', {
+    id: 'n-block',
+    steps: [{ moves: "R' U L' U2 R U' L" }],
+    mirror: 'left-n-block',
+    tags: ['trigger', 'pll'],
+  }],
+  ['left-n-block', {
+    id: 'left-n-block',
+    steps: [{ moves: "L U' R U2 L' U R'" }],
+    mirror: 'n-block',
     tags: ['trigger', 'pll'],
   }],
 
@@ -287,7 +322,9 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   ['oll-37-2', {
     id: 'oll-37-2',
     steps: [
-      { ref: 'half-y' },
+      { ref: 'y-hook' },
+      { moves: "U'" },
+      { ref: 'y-hook', inverse: true },
     ],
     tags: ['oll', 'fish'],
   }],
@@ -511,7 +548,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
       { moves: "M'" },
       { ref: 'sledge' },
     ],
-    inverse: 'oll-17',
+    inverse: 'oll-17-1',
     tags: ['oll', 'dots'],
   }],
   ['oll-20', {
@@ -850,6 +887,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
       { moves: "M2 U' M2" },
       { moves: "U' M'" },
       { moves: 'U2 M2' },
+      { moves: 'U' },
     ],
     tags: ['pll', 'edges-only'],
   }],
@@ -875,11 +913,15 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
     ],
     tags: ['pll', 'corners-only'],
   }],
+  // Four passes of the same shape, r' U r F, running through all four sign
+  // combinations of its U and F turns: U F', U' F, U' F', U F.
   ['pll-e', {
     id: 'pll-e',
     steps: [
-      { moves: "r' U r F' r' U' r F" },
-      { moves: "r' U' r F' r' U r F" },
+      { moves: "r' U r F'" },
+      { moves: "r' U' r F" },
+      { moves: "r' U' r F'" },
+      { moves: "r' U r F" },
     ],
     tags: ['pll', 'corners-only'],
   }],
@@ -887,45 +929,56 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   // ==========================================================================
   // PLL - ADJACENT CORNERS
   // ==========================================================================
+  // T, Y and Jb are the same five blocks read from different starting points:
+  //   {sexy} {sledge} {y-hook} U' {y-hook'}
+  // T starts on {sexy}, Y on {y-hook}, Jb on {fexy} (= {y-hook'}).
   ['pll-t', {
     id: 'pll-t',
     steps: [
       { ref: 'sexy' },
       { ref: 'sledge' },
-      { ref: 'half-y' },
+      { ref: 'y-hook' },
+      { moves: "U'" },
+      { ref: 'y-hook', inverse: true },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
+  // The T-perm with a three-move setup: set up, T-perm, undo the setup. Costs
+  // four moves over the shortest F-perm, but nothing new to memorise.
   ['pll-f', {
     id: 'pll-f',
     steps: [
-      { moves: "R'" },
-      { ref: 'sledge' },
-      { moves: "R'" },
-      { moves: "U' F' U F" },
-      { moves: 'R' },
-      { ref: 'sexy' },
-      { moves: 'R' },
+      { moves: "R' U' F'" },
+      { ref: 'pll-t' },
+      { moves: 'F U R' },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
+  // Mirror of Jb: the same five-block cycle with every block mirrored
+  // (and U' becoming U), started on {left-fexy}.
   ['pll-ja', {
     id: 'pll-ja',
     steps: [
-      { moves: "L' U' L F" },
+      { ref: 'left-fexy' },
       { ref: 'left-sexy' },
-      { moves: "L F' L'" },
-      { moves: "L' U L" },
+      { ref: 'left-sledge' },
+      { ref: 'left-fexy', inverse: true },
+      { moves: 'U' },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
+  // Same blocks as the T-perm, rotated by one: T ends on {fexy} (shown there
+  // as {y-hook'}), Jb opens with it. Equivalently, Jb is the T-perm
+  // conjugated by {fexy} - but that
+  // form spends four moves undoing itself, so the blocks are listed directly.
   ['pll-jb', {
     id: 'pll-jb',
     steps: [
-      { moves: "R U R' F'" },
+      { ref: 'fexy' },
       { ref: 'sexy' },
-      { moves: "R' F R" },
-      { moves: "R U' R'" },
+      { ref: 'sledge' },
+      { ref: 'fexy', inverse: true },
+      { moves: "U'" },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
@@ -936,6 +989,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
       { moves: "L F'" },
       { ref: 'left-sexy' },
       { moves: 'L F L2' },
+      { moves: 'U' },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
@@ -946,6 +1000,7 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
       { moves: "R' F" },
       { ref: 'sexy' },
       { moves: "R' F' R2" },
+      { moves: "U'" },
     ],
     tags: ['pll', 'adjacent-corners'],
   }],
@@ -953,46 +1008,47 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   // ==========================================================================
   // PLL - DIAGONAL CORNERS
   // ==========================================================================
+  // Same five-block cycle as T and Jb, started on {y-hook}. See pll-t.
   ['pll-y', {
     id: 'pll-y',
     steps: [
-      { ref: 'half-y' },
+      { ref: 'y-hook' },
+      { moves: "U'" },
+      { ref: 'y-hook', inverse: true },
       { ref: 'sexy' },
       { ref: 'sledge' },
     ],
     tags: ['pll', 'diagonal-corners'],
   }],
+  // {chair} wrapped in an f conjugation. The previous algorithm left the whole
+  // cube rotated by y, so the derived picture never matched the case.
   ['pll-v', {
     id: 'pll-v',
     steps: [
-      { moves: "R' U R'" },
-      { moves: "U' y R' F'" },
-      { moves: "R2 U' R' U R'" },
-      { moves: 'F R F' },
+      { moves: "R' U R U' R'" },
+      { moves: "f' U'" },
+      { ref: 'chair' },
+      { moves: 'f R' },
     ],
     tags: ['pll', 'diagonal-corners'],
   }],
+  // One block, done twice, then an AUF. Unusually, an N-perm is order 2 under
+  // every AUF, so the final turn is not optional decoration: it is what lands
+  // the case on its canonical picture (one diagonal corner swap plus the
+  // opposite edge pair) instead of a busier equivalent.
   ['pll-na', {
     id: 'pll-na',
     steps: [
-      { moves: "L U'" },
-      { ref: 'left-sledge' },
-      { moves: "L' U L" },
-      { moves: "F U' F'" },
-      { ref: 'left-sexy' },
-      { moves: "L'" },
+      { ref: 'left-n-block', repeat: 2 },
+      { moves: "U'" },
     ],
     tags: ['pll', 'diagonal-corners'],
   }],
   ['pll-nb', {
     id: 'pll-nb',
     steps: [
-      { moves: "R' U" },
-      { ref: 'sledge' },
-      { moves: "R U' R'" },
-      { moves: "F' U F" },
-      { ref: 'sexy' },
-      { moves: 'R' },
+      { ref: 'n-block', repeat: 2 },
+      { moves: 'U' },
     ],
     tags: ['pll', 'diagonal-corners'],
   }],
@@ -1000,43 +1056,47 @@ export const algorithms = new Map<AlgorithmId, Algorithm>([
   // ==========================================================================
   // PLL - G PERMUTATIONS
   // ==========================================================================
+  // All four are a five-move core wrapped in an (R2 u) conjugation, plus a
+  // three-move F tag. Ga/Gb are one mirror pair, Gc/Gd the other; within a
+  // pair the tag moves from the back to the front. Note the cores of Ga and Gb
+  // are one move apart (R' U R' U' R vs R' U R U' R), not identical.
   ['pll-ga', {
     id: 'pll-ga',
     steps: [
-      { moves: 'L2 F2' },
-      { moves: "L' U2 L' U2 L F'" },
-      { ref: 'left-sexy' },
-      { moves: "L F' L2" },
+      { moves: 'R2 u' },
+      { moves: "R' U R' U' R" },
+      { moves: "u' R2" },
+      { moves: "F' U F" },
     ],
     tags: ['pll', 'g-perms'],
   }],
   ['pll-gb', {
     id: 'pll-gb',
     steps: [
-      { moves: "L2 F L'" },
-      { ref: 'left-sexy', inverse: true },
-      { moves: "F L' U2 L U2 L" },
-      { moves: 'F2 L2' },
+      { moves: "F' U' F" },
+      { moves: 'R2 u' },
+      { moves: "R' U R U' R" },
+      { moves: "u' R2" },
     ],
     tags: ['pll', 'g-perms'],
   }],
   ['pll-gc', {
     id: 'pll-gc',
     steps: [
-      { moves: 'R2 F2' },
-      { moves: "R U2 R U2 R' F" },
-      { ref: 'sexy' },
-      { moves: "R' F R2" },
+      { moves: "L2 u'" },
+      { moves: "L U' L U L'" },
+      { moves: 'u L2' },
+      { moves: "F U' F'" },
     ],
     tags: ['pll', 'g-perms'],
   }],
   ['pll-gd', {
     id: 'pll-gd',
     steps: [
-      { moves: "R2 F' R" },
-      { ref: 'sexy', inverse: true },
-      { moves: "F' R U2 R' U2 R'" },
-      { moves: 'F2 R2' },
+      { moves: "F U F'" },
+      { moves: "L2 u'" },
+      { moves: "L U' L' U L'" },
+      { moves: 'u L2' },
     ],
     tags: ['pll', 'g-perms'],
   }],
